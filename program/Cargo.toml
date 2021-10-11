@@ -1,0 +1,12 @@
+[package]
+name = "solana-token-registry"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+borsh = "0.9.1"
+solana-program "=1.7.9"
+
+[lib]
+name = "solana-token-registry"
+crate-type = ["cdylib", "lib"]

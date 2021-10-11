@@ -1,0 +1,13 @@
+{
+  "name": "solana-token-registry",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "program:build": "cargo build-bpf -manifest-path=./program/Cargo.toml --bpf-out-dir=./dist/program",
+    "program:deploy": "solana progam deploy --final ./dist/program/solana-token-registry.so",
+    "program:test": "echo \"Error: Program tests not implemented.\" && exit 1",
+    "program:lint": "echo \"Error: Program linter not implemented.\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
