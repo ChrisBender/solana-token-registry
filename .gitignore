@@ -1,2 +1,12 @@
+# Vim files.
 *.sw[a-p]
+
+# Build files.
+/program/build/
+/program/target/
+/js/lib/
+
+# Node modules.
+/js/node_modules/
+/client/node_modules/
 

@@ -1,13 +1,19 @@
 {
   "name": "solana-token-registry",
   "version": "1.0.0",
-  "description": "",
   "scripts": {
-    "program:build": "cargo build-bpf -manifest-path=./program/Cargo.toml --bpf-out-dir=./dist/program",
-    "program:deploy": "solana progam deploy --final ./dist/program/solana-token-registry.so",
-    "program:test": "echo \"Error: Program tests not implemented.\" && exit 1",
-    "program:lint": "echo \"Error: Program linter not implemented.\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+    "js:lint": "cd js && npm run lint",
+    "js:build": "cd js && npm run build",
+    "js:test": "cd js && npm run test",
+    "js:deploy": "cd js && npm run deploy",
+    "client:start": "cd client && npm run start",
+    "client:lint": "cd client && npm run lint",
+    "client:build": "cd client && npm run build",
+    "client:test": "cd client && npm run test",
+    "client:deploy": "cd client && npm run deploy",
+    "program:lint": "cd program && npm run lint",
+    "program:build": "cd program && npm run build",
+    "program:deploy": "cd program && npm run deploy",
+    "testall": "npm run program:build && npm run program:deploy && npm run js:build && npm run js:test"
+  }
 }

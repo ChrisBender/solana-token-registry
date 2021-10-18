@@ -4,9 +4,17 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
+arrayref = "0.3.6"
+num-derive = "0.3"
+num-traits = "0.2"
+num_enum = "0.5.4"
+solana-program = "1.8.0"
+thiserror = "1.0"
 borsh = "0.9.1"
-solana-program "=1.7.9"
+
+[dev-dependencies]
+solana-sdk = "1.8.0"
 
 [lib]
-name = "solana-token-registry"
+name = "registry"
 crate-type = ["cdylib", "lib"]
