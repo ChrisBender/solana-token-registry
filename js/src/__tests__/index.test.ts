@@ -19,6 +19,9 @@ const CONFIG_FILE = "/Users/chris/.config/solana/id.json"
 let userPrivateKeyString = readFileSync(CONFIG_FILE).toString();
 let userKeypair = Keypair.fromSecretKey(new Uint8Array(JSON.parse(userPrivateKeyString)));
 
+const USDT_PUBLICKEY = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+const ARBITRARY_USER_ACCOUNT = new PublicKey("DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEAD");
+
 let connection = new Connection("https://api.devnet.solana.com", "confirmed");
 
 // Hack to prevent API calls from displaying error messages.
@@ -51,14 +54,26 @@ test("All Transactions Fail before InitializeRegistry", async () => {
   expect.assertions(1);
   try {
     await sendTx(await createInstructionUpdateFees(
+      connection,
       userKeypair.publicKey,
-      new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-      new PublicKey("DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEAD"),
+      USDT_PUBLICKEY,
+      ARBITRARY_USER_ACCOUNT,
       BigInt(20000000),
     ));
   } catch (error) {
     let txLogs = ((error as SendTransactionError).logs as string[]).join(" ");
     expect(txLogs).toMatch(/RegistryError::NotYetInitialized/);
   }
+});
+
+test("Initialize Registry Succeeds", async () => {
+  let signature = await sendTx(await createInstructionInitializeRegistry(
+    connection,
+    userKeypair.publicKey,
+    USDT_PUBLICKEY,
+    ARBITRARY_USER_ACCOUNT,
+    BigInt(20000000),
+  ));
+  console.log("Sig ", signature);
 });
 

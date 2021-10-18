@@ -10,6 +10,8 @@ pub enum RegistryInstruction<'a> {
      * 1. [] The initial `fee_mint`.
      * 2. [] The initial `fee_destination`.
      * 3. [] The system program.
+     * 4. [] The RegistryMetaAccount.
+     * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 0).
@@ -30,6 +32,8 @@ pub enum RegistryInstruction<'a> {
      * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryHeadAccount::fee_update_authority`.
      * 1. [] The new `fee_mint`.
      * 2. [] The new `fee_destination`.
+     * 3. [] The RegistryMetaAccount.
+     * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 1).
@@ -54,6 +58,8 @@ pub enum RegistryInstruction<'a> {
      * 3. [writable] The destination account. Must be the Associated Token Account of `fee_destination`.
      * 4. [] The system program (to create a new account).
      * 5. [] The token program (to transfer tokens).
+     * 6. [] The RegistryMetaAccount.
+     * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 2).
@@ -86,6 +92,8 @@ pub enum RegistryInstruction<'a> {
      * Accounts:
      * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryNodeAccount::token_update_authority`.
      * 1. [] The address of the mint to be deleted.
+     * 2. [] The RegistryMetaAccount.
+     * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 3).
@@ -104,6 +112,8 @@ pub enum RegistryInstruction<'a> {
      * Accounts:
      * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryNodeAccount::token_update_authority`.
      * 1. [] The address of the mint to be updated.
+     * 2. [] The RegistryMetaAccount.
+     * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 4).
@@ -132,8 +142,10 @@ pub enum RegistryInstruction<'a> {
      * Transfer the `RegistryMetaAccount::fee_update_authority` to a different account.
      *
      * Accounts:
-     * [writable, signer] Fee-payer. Must have pubkey matching `RegistryMetaAccount::fee_update_authority`.
-     * [] The new account to transfer authority to. Must be owned by the system program.
+     * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryMetaAccount::fee_update_authority`.
+     * 1. [] The new account to transfer authority to. Must be owned by the system program.
+     * 2. [] The RegistryMetaAccount.
+     * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 5).
@@ -149,8 +161,10 @@ pub enum RegistryInstruction<'a> {
      * Transfer the `RegistryNodeAccount::token_update_authority` to a different account.
      *
      * Accounts:
-     * [writable, signer] Fee-payer. Must have pubkey matching `RegistryTokenAccount::token_update_authority`.
-     * [] The new account to transfer authority to. Must be owned by the system program.
+     * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryTokenAccount::token_update_authority`.
+     * 1. [] The new account to transfer authority to. Must be owned by the system program.
+     * 2. [] The RegistryMetaAccount.
+     * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 6).
