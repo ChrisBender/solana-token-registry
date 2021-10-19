@@ -77,11 +77,11 @@ impl Processor {
         _fee_amount: u64,
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
-        let _account_user = next_account_info(accounts_iter);
-        let _account_registry_meta = next_account_info(accounts_iter);
-        let _account_fee_mint = next_account_info(accounts_iter);
-        let _account_fee_destination = next_account_info(accounts_iter);
-        let _account_system_program = next_account_info(accounts_iter);
+        let _account_user = next_account_info(accounts_iter)?;
+        let _account_fee_mint = next_account_info(accounts_iter)?;
+        let _account_fee_destination = next_account_info(accounts_iter)?;
+        let _account_system_program = next_account_info(accounts_iter)?;
+        let _account_registry_meta = next_account_info(accounts_iter)?;
         Ok(())
     }
 
@@ -91,54 +91,80 @@ impl Processor {
         _fee_amount: u64,
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
-        let _account_user = next_account_info(accounts_iter);
+        let _account_user = next_account_info(accounts_iter)?;
+        let _account_fee_mint = next_account_info(accounts_iter)?;
+        let _account_fee_destination = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
-        let _account_fee_mint = next_account_info(accounts_iter);
-        let _account_fee_destination = next_account_info(accounts_iter);
-        let _account_system_program = next_account_info(accounts_iter);
         Self::assert_initialized(account_registry_meta)?;
         Ok(())
     }
 
     fn process_create_entry(
         _program_id: &Pubkey,
-        _accounts: &[AccountInfo],
+        accounts: &[AccountInfo],
         _token_symbol: &str,
         _token_name: &str,
         _token_logo_url: &str,
         _token_tags: Vec<&str>,
         _token_extensions: Vec<[&str; 2]>,
     ) -> ProgramResult {
+        let accounts_iter = &mut accounts.iter();
+        let _account_user = next_account_info(accounts_iter)?;
+        let _account_mint = next_account_info(accounts_iter)?;
+        let _account_fee_source_ata = next_account_info(accounts_iter)?;
+        let _account_fee_destination_ata = next_account_info(accounts_iter)?;
+        let _account_system_program = next_account_info(accounts_iter)?;
+        let _account_token_program = next_account_info(accounts_iter)?;
+        let account_registry_meta = next_account_info(accounts_iter)?;
+        Self::assert_initialized(account_registry_meta)?;
         Ok(())
     }
 
-    fn process_delete_entry(_program_id: &Pubkey, _accounts: &[AccountInfo]) -> ProgramResult {
+    fn process_delete_entry(_program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
+        let accounts_iter = &mut accounts.iter();
+        let _account_user = next_account_info(accounts_iter)?;
+        let _account_mint = next_account_info(accounts_iter)?;
+        let account_registry_meta = next_account_info(accounts_iter)?;
+        Self::assert_initialized(account_registry_meta)?;
         Ok(())
     }
 
     fn process_update_entry(
         _program_id: &Pubkey,
-        _accounts: &[AccountInfo],
+        accounts: &[AccountInfo],
         _token_symbol: &str,
         _token_name: &str,
         _token_logo_url: &str,
         _token_tags: Vec<&str>,
         _token_extensions: Vec<[&str; 2]>,
     ) -> ProgramResult {
+        let accounts_iter = &mut accounts.iter();
+        let _account_user = next_account_info(accounts_iter)?;
+        let _account_mint = next_account_info(accounts_iter)?;
+        let account_registry_meta = next_account_info(accounts_iter)?;
+        Self::assert_initialized(account_registry_meta)?;
         Ok(())
     }
 
     fn process_transfer_fee_authority(
         _program_id: &Pubkey,
-        _accounts: &[AccountInfo],
+        accounts: &[AccountInfo],
     ) -> ProgramResult {
+        let accounts_iter = &mut accounts.iter();
+        let _account_fee_authority = next_account_info(accounts_iter)?;
+        let account_registry_meta = next_account_info(accounts_iter)?;
+        Self::assert_initialized(account_registry_meta)?;
         Ok(())
     }
 
     fn process_transfer_token_authority(
         _program_id: &Pubkey,
-        _accounts: &[AccountInfo],
+        accounts: &[AccountInfo],
     ) -> ProgramResult {
+        let accounts_iter = &mut accounts.iter();
+        let _account_token_authority = next_account_info(accounts_iter)?;
+        let account_registry_meta = next_account_info(accounts_iter)?;
+        Self::assert_initialized(account_registry_meta)?;
         Ok(())
     }
 

@@ -1,4 +1,5 @@
 import {
+    AccountInfo,
     Connection,
     PublicKey,
     SystemProgram,
@@ -7,6 +8,9 @@ import {
 } from '@solana/web3.js';
 
 const registryKeypair = require('./registry-keypair.json');
+const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+const ATA_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
+
 
 interface TokenEntry {
     mint: PublicKey,
@@ -106,8 +110,6 @@ export async function createInstructionCreateEntry(
   connection: Connection,
   userPublicKey: PublicKey,
   mintPublicKey: PublicKey,
-  sourceTokenAccount: PublicKey,
-  destinationTokenAccount: PublicKey,
   tokenSymbol: string,
   tokenName: string,
   tokenLogoUrl: string,
@@ -115,9 +117,12 @@ export async function createInstructionCreateEntry(
   tokenExtensions: [string, string][],
 ): Promise<TransactionInstruction> {
 
-  let serializedTokenTags = JSON.stringify(tokenTags);
-  let serializedTokenExtensions = JSON.stringify(tokenExtensions);
-  let buffer = Buffer.alloc(
+  const sourceTokenAccount = await getATA(connection, userPublicKey, mintPublicKey);
+  const destinationTokenAccount = await getATA(connection, userPublicKey, mintPublicKey);
+
+  const serializedTokenTags = JSON.stringify(tokenTags);
+  const serializedTokenExtensions = JSON.stringify(tokenExtensions);
+  const buffer = Buffer.alloc(
     1 + tokenSymbol.length + tokenName.length + tokenLogoUrl.length
     + serializedTokenTags.length + serializedTokenExtensions.length + 5
   );
@@ -136,7 +141,7 @@ export async function createInstructionCreateEntry(
     { isSigner: false, isWritable: true, pubkey: sourceTokenAccount },
     { isSigner: false, isWritable: true, pubkey: destinationTokenAccount },
     { isSigner: false, isWritable: false, pubkey: SystemProgram.programId },
-    { isSigner: false, isWritable: false, pubkey: getTokenProgram() },
+    { isSigner: false, isWritable: false, pubkey: TOKEN_PROGRAM_ID },
     { isSigner: false, isWritable: false, pubkey: await getRegistryMetaPublicKey() },
   ]
   await pushAllRegistryNodes(connection, keys);
@@ -185,8 +190,6 @@ export async function createInstructionUpdateEntry(
   connection: Connection,
   userPublicKey: PublicKey,
   mintPublicKey: PublicKey,
-  sourceTokenAccount: PublicKey,
-  destinationTokenAccount: PublicKey,
   tokenSymbol: string,
   tokenName: string,
   tokenLogoUrl: string,
@@ -280,13 +283,14 @@ export async function createInstructionTransferTokenAuthority(
 
 }
 
+/* Utilities */
 interface transactionKey {
   isSigner: boolean,
   isWritable: boolean,
   pubkey: PublicKey,
 }
 async function pushAllRegistryNodes(connection: Connection, keys: transactionKey[]) {
-  let registryMetaAccountInfo = await connection.getAccountInfo(await getRegistryMetaPublicKey());
+  let registryMetaAccountInfo = await getRegistryMetaAccountInfo(connection);
   if (registryMetaAccountInfo === null) {
     return;
   } else {
@@ -294,19 +298,32 @@ async function pushAllRegistryNodes(connection: Connection, keys: transactionKey
   }
 }
 
+async function getRegistryMetaAccountInfo(connection: Connection): Promise<null | AccountInfo<Buffer>> {
+  return await connection.getAccountInfo(await getRegistryMetaPublicKey());
+}
+
 async function getRegistryMetaPublicKey(): Promise<PublicKey> {
-    let [registryMetaPublicKey, _registryMetaBumpSeed] = await PublicKey.findProgramAddress(
-        [Buffer.from("")],
-        getProgramId(),
-    );
-    return registryMetaPublicKey;
+  let [registryMetaPublicKey, _registryMetaBumpSeed] = await PublicKey.findProgramAddress(
+    [Buffer.from("")],
+    getProgramId(),
+  );
+  return registryMetaPublicKey;
+}
+
+async function getATA(connection: Connection, userAccount: PublicKey, tokenAccount: PublicKey): Promise<PublicKey> {
+  return userAccount
+  let [associatedTokenAccount, _ataBumpSeed] = await PublicKey.findProgramAddress(
+    [
+      userAccount.toBuffer(),
+      TOKEN_PROGRAM_ID.toBuffer(),
+      tokenAccount.toBuffer(),
+    ],
+    ATA_PROGRAM_ID,
+  );
+  return associatedTokenAccount;
 }
 
 function getProgramId(): PublicKey {
     return Keypair.fromSecretKey(Uint8Array.from(registryKeypair)).publicKey;
-}
-
-function getTokenProgram(): PublicKey {
-    return new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
 }
 
