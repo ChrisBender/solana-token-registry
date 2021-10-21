@@ -10,8 +10,14 @@ use thiserror::Error;
 pub enum RegistryError {
     #[error("The registry has not yet been initialized.")]
     NotYetInitialized,
+    #[error("The registry has already been initialized.")]
+    AlreadyInitialized,
+    #[error("Passed an invalid number of accounts.")]
+    InvalidNumberOfAccounts,
     #[error("The provided mint is already in the registry.")]
     PreviouslyRegisteredMint,
+    #[error("A provided program derived account is not correct.")]
+    InvalidProgramDerivedAccount,
     #[error("The provided mint is not owned by the token program.")]
     InvalidMint,
     #[error("The provided fee mint is not owned by the token program.")]
@@ -34,26 +40,25 @@ pub enum RegistryError {
     InvalidInstructionData,
 }
 
-impl From<RegistryError> for ProgramError {
-    fn from(e: RegistryError) -> Self {
-        ProgramError::Custom(e as u32)
-    }
-}
-
-impl<T> DecodeError<T> for RegistryError {
-    fn type_of() -> &'static str {
-        "RegistryError"
-    }
-}
-
 impl PrintProgramError for RegistryError {
     fn print<E>(&self) {
         match self {
             RegistryError::NotYetInitialized => {
-                msg!("RegistryError::NotYetInitialized - The registry has not yet been initialized.")
+                msg!(
+                    "RegistryError::NotYetInitialized - The registry has not yet been initialized."
+                )
+            }
+            RegistryError::AlreadyInitialized => {
+                msg!("RegistryError::AlreadyInitialized - The registry has already been initialized.")
+            }
+            RegistryError::InvalidNumberOfAccounts => {
+                msg!("RegistryError::InvalidNumberOfAccounts - Passed an invalid number of accounts.")
             }
             RegistryError::PreviouslyRegisteredMint => {
                 msg!("RegistryError::PreviouslyRegisteredMint - The provided mint is already in the registry.")
+            }
+            RegistryError::InvalidProgramDerivedAccount => {
+                msg!("RegistryError::InvalidProgramDerivedAccount - A provided program derived account is not correct.")
             }
             RegistryError::InvalidMint => {
                 msg!("RegistryError::InvalidMint - The provided mint is not owned by the token program.")
@@ -86,5 +91,17 @@ impl PrintProgramError for RegistryError {
                 msg!("RegistryError::InvalidInstructionData - The provided instruction data cannot be parsed.")
             }
         }
+    }
+}
+
+impl From<RegistryError> for ProgramError {
+    fn from(e: RegistryError) -> Self {
+        ProgramError::Custom(e as u32)
+    }
+}
+
+impl<T> DecodeError<T> for RegistryError {
+    fn type_of() -> &'static str {
+        "RegistryError"
     }
 }

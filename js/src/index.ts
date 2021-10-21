@@ -7,34 +7,204 @@ import {
     TransactionInstruction
 } from '@solana/web3.js';
 
-const registryKeypair = require('./registry-keypair.json');
+import { serialize, deserialize } from 'borsh';
+
+const fs = require('fs');
+
 const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
 const ATA_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
 
-
-interface TokenEntry {
-    mint: PublicKey,
-    symbol: string,
-    name: string,
-    logo_url: string,
-    token_tags: string[],
-    token_extensions: [string, string][],
+interface RegistryMetaAccount {
+  feeAmount: bigint,
+  feeMint: PublicKey,
+  feeDestination: PublicKey,
+  feeUpdateAuthority: PublicKey,
+}
+interface RegistryNodeAccount {
+  mint: PublicKey,
+  symbol: string,
+  name: string,
+  logoURL: string,
+  tags: string[],
+  extensions: string[][],
+  updateAuthority: PublicKey,
 }
 
 /**
  * Returns a list of all the registered tokens.
  *
  */
-export function getAllTokens(connection: Connection): TokenEntry[] {
+export async function getAllTokens(connection: Connection): Promise<RegistryNodeAccount[]> {
+  let registryState = await getRegistryState(connection);
+  if (registryState === null) {
     return [];
+  } else {
+    let [_registryMetaAccount, registryNodeAccounts] = registryState;
+    return [];
+  }
 }
 
 /**
  * Returns a sanitized list of all the registered tokens. Throw away all duplicate tickers and names, only keeping the ticker or name with highest active DEX volume.
  *
  */
-export function getAllTokensSanitized(connection: Connection): TokenEntry[] {
-    return [];
+export async function getAllTokensSanitized(connection: Connection): Promise<RegistryNodeAccount[]> {
+  return await getAllTokens(connection);
+}
+
+/**
+ * Returns the RegistryMetaAccount and a list of all the RegistryMetaNodes.
+ *
+ */
+export async function getRegistryState(connection: Connection): Promise<null | [RegistryMetaAccount, RegistryNodeAccount[]]> {
+
+  class BorshRegistryMetaAccount {
+    head_registry_node = new Uint8Array(32);
+    fee_amount = 0;
+    fee_mint = new Uint8Array(32);
+    fee_destination = new Uint8Array(32);
+    fee_update_authority = new Uint8Array(32);
+    initialized = false;
+    constructor(fields: {
+      head_registry_node: Uint8Array;
+      fee_amount: number,
+      fee_mint: Uint8Array,
+      fee_destination: Uint8Array,
+      fee_update_authority: Uint8Array,
+      initialized: boolean,
+    } | undefined = undefined) {
+      if (fields) {
+        this.head_registry_node = fields.head_registry_node;
+        this.fee_amount = fields.fee_amount;
+        this.fee_mint = fields.fee_mint;
+        this.fee_destination = fields.fee_destination;
+        this.fee_update_authority = fields.fee_update_authority;
+        this.initialized = fields.initialized;
+      }
+    }
+  }
+  const BorshRegistryMetaAccountSchema = new Map([
+    [BorshRegistryMetaAccount, {
+      kind: 'struct',
+      fields: [
+        ['head_registry_node', [32]],
+        ['fee_amount', 'u64'],
+        ['fee_mint', [32]],
+        ['fee_destination', [32]],
+        ['fee_update_authority', [32]],
+        ['initialized', 'u64'],
+      ],
+    }],
+  ]);
+  
+  class BorshRegistryNodeAccount {
+    next_registry_node = new Uint8Array(32);
+    prev_registry_node = new Uint8Array(32);
+    token_mint = new Uint8Array(32);
+    token_symbol = "";
+    token_name = "";
+    token_logo_url = "";
+    token_tags = [""];
+    token_extensions = [[""]];
+    token_update_authority = new Uint8Array(32);
+    constructor(fields: {
+      next_registry_node: Uint8Array,
+      prev_registry_node: Uint8Array,
+      token_mint: Uint8Array,
+      token_symbol: string,
+      token_name: string,
+      token_logo_url: string,
+      token_tags: string[],
+      token_extensions: string[][],
+      token_update_authority: Uint8Array,
+    } | undefined = undefined) {
+      if (fields) {
+        this.next_registry_node = fields.next_registry_node;
+        this.prev_registry_node = fields.prev_registry_node;
+        this.token_mint = fields.token_mint;
+        this.token_symbol = fields.token_symbol;
+        this.token_name = fields.token_name;
+        this.token_logo_url = fields.token_logo_url;
+        this.token_tags = fields.token_tags;
+        this.token_extensions = fields.token_extensions;
+        this.token_update_authority = fields.token_update_authority;
+      }
+    }
+  }
+  const BorshRegistryNodeAccountSchema = new Map([
+    [BorshRegistryNodeAccount, {
+      kind: 'struct',
+      fields: [
+        ['next_registry_node', [32]],
+        ['prev_registry_node', [32]],
+        ['token_mint', [32]],
+        ['token_symbol', 'String'],
+        ['token_name', 'String'],
+        ['token_logo_url', 'String'],
+        ['token_tags', ['String']],
+        ['token_extensions', [['String']]],
+        ['token_update_authority', [32]],
+      ],
+    }],
+  ]);
+
+  let registryMetaPublicKey = await getProgramDerivedAddress("meta");
+  let registryHeadPublicKey = await getProgramDerivedAddress("head");
+  let registryTailPublicKey = await getProgramDerivedAddress("tail");
+  let registryMetaAccountInfo = await connection.getAccountInfo(registryMetaPublicKey);
+  let registryHeadAccountInfo = await connection.getAccountInfo(registryHeadPublicKey);
+  let registryTailAccountInfo = await connection.getAccountInfo(registryTailPublicKey);
+
+  /* If the registry has not yet been initialized, return null. */
+  if (registryMetaAccountInfo === null || registryHeadAccountInfo === null || registryTailAccountInfo === null) {
+    return null;
+  }
+
+  const borshRegistryMetaAccount = deserialize(
+    BorshRegistryMetaAccountSchema,
+    BorshRegistryMetaAccount,
+    registryMetaAccountInfo.data,
+  );
+
+  const borshRegistryHeadAccount = deserialize(
+    BorshRegistryNodeAccountSchema,
+    BorshRegistryNodeAccount,
+    registryHeadAccountInfo.data,
+  );
+
+  const borshRegistryTailAccount = deserialize(
+    BorshRegistryNodeAccountSchema,
+    BorshRegistryNodeAccount,
+    registryTailAccountInfo.data,
+  );
+
+  let registryMetaAccount = {
+    feeAmount: BigInt(borshRegistryMetaAccount.fee_amount),
+    feeMint: new PublicKey(borshRegistryMetaAccount.fee_mint),
+    feeDestination: new PublicKey(borshRegistryMetaAccount.fee_destination),
+    feeUpdateAuthority: new PublicKey(borshRegistryMetaAccount.fee_update_authority),
+  }
+  let registryHeadAccount = {
+    mint: new PublicKey(borshRegistryHeadAccount.token_mint),
+    symbol: borshRegistryHeadAccount.token_symbol,
+    name: borshRegistryHeadAccount.token_name,
+    logoURL: borshRegistryHeadAccount.token_logo_url,
+    tags: borshRegistryHeadAccount.token_tags,
+    extensions: borshRegistryHeadAccount.token_extensions,
+    updateAuthority: new PublicKey(borshRegistryHeadAccount.token_update_authority),
+  }
+  let registryTailAccount = {
+    mint: new PublicKey(borshRegistryTailAccount.token_mint),
+    symbol: borshRegistryTailAccount.token_symbol,
+    name: borshRegistryTailAccount.token_name,
+    logoURL: borshRegistryTailAccount.token_logo_url,
+    tags: borshRegistryTailAccount.token_tags,
+    extensions: borshRegistryTailAccount.token_extensions,
+    updateAuthority: new PublicKey(borshRegistryTailAccount.token_update_authority),
+  }
+
+  return [registryMetaAccount, [registryHeadAccount, registryTailAccount]];
+
 }
 
 /**
@@ -49,24 +219,24 @@ export async function createInstructionInitializeRegistry(
   feeAmount: bigint,
 ): Promise<TransactionInstruction> {
 
-    let buffer = Buffer.alloc(9)
-    buffer.writeUInt8(0);
-    buffer.writeBigUInt64BE(feeAmount, 1);
+  let buffer = Buffer.alloc(9)
+  buffer.writeUInt8(0);
+  buffer.writeBigUInt64BE(feeAmount, 1);
 
-    let keys = [
-      { isSigner: true, isWritable: true, pubkey: userPublicKey },
-      { isSigner: false, isWritable: false, pubkey: feeMintPublicKey },
-      { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey },
-      { isSigner: false, isWritable: false, pubkey: SystemProgram.programId },
-      { isSigner: false, isWritable: false, pubkey: await getRegistryMetaPublicKey() },
-    ]
-    await pushAllRegistryNodes(connection, keys);
+  let keys = [
+    { isSigner: true, isWritable: true, pubkey: userPublicKey },
+    { isSigner: false, isWritable: false, pubkey: getProgramId() },
+    { isSigner: false, isWritable: false, pubkey: feeMintPublicKey },
+    { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey },
+    { isSigner: false, isWritable: false, pubkey: SystemProgram.programId },
+  ]
+  await pushAllRegistryNodes(connection, keys);
 
-    return new TransactionInstruction({
-        data: buffer,
-        keys: keys,
-        programId: getProgramId(),
-    });
+  return new TransactionInstruction({
+      data: buffer,
+      keys: keys,
+      programId: getProgramId(),
+  });
 
 }
 
@@ -90,7 +260,6 @@ export async function createInstructionUpdateFees(
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeMintPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey },
-    { isSigner: false, isWritable: false, pubkey: await getRegistryMetaPublicKey() },
   ]
   await pushAllRegistryNodes(connection, keys);
 
@@ -142,7 +311,6 @@ export async function createInstructionCreateEntry(
     { isSigner: false, isWritable: true, pubkey: destinationTokenAccount },
     { isSigner: false, isWritable: false, pubkey: SystemProgram.programId },
     { isSigner: false, isWritable: false, pubkey: TOKEN_PROGRAM_ID },
-    { isSigner: false, isWritable: false, pubkey: await getRegistryMetaPublicKey() },
   ]
   await pushAllRegistryNodes(connection, keys);
 
@@ -170,7 +338,6 @@ export async function createInstructionDeleteEntry(
   let keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: mintPublicKey },
-    { isSigner: false, isWritable: false, pubkey: await getRegistryMetaPublicKey() },
   ]
   await pushAllRegistryNodes(connection, keys);
 
@@ -215,7 +382,6 @@ export async function createInstructionUpdateEntry(
   let keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: mintPublicKey },
-    { isSigner: false, isWritable: false, pubkey: await getRegistryMetaPublicKey() },
   ]
   await pushAllRegistryNodes(connection, keys);
 
@@ -243,7 +409,6 @@ export async function createInstructionTransferFeeAuthority(
   let keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeAuthorityPublicKey },
-    { isSigner: false, isWritable: false, pubkey: await getRegistryMetaPublicKey() },
   ]
   await pushAllRegistryNodes(connection, keys);
 
@@ -271,7 +436,6 @@ export async function createInstructionTransferTokenAuthority(
   let keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: tokenAuthorityPublicKey },
-    { isSigner: false, isWritable: false, pubkey: await getRegistryMetaPublicKey() },
   ]
   await pushAllRegistryNodes(connection, keys);
 
@@ -290,24 +454,20 @@ interface transactionKey {
   pubkey: PublicKey,
 }
 async function pushAllRegistryNodes(connection: Connection, keys: transactionKey[]) {
-  let registryMetaAccountInfo = await getRegistryMetaAccountInfo(connection);
-  if (registryMetaAccountInfo === null) {
-    return;
-  } else {
-    throw Error("Not implemented non-null registryMetaAccountInfo.");
-  }
+  let registryMetaPublicKey = await getProgramDerivedAddress("meta");
+  let registryHeadPublicKey = await getProgramDerivedAddress("head");
+  let registryTailPublicKey = await getProgramDerivedAddress("tail");
+  keys.push({ isSigner: false, isWritable: true, pubkey: registryMetaPublicKey });
+  keys.push({ isSigner: false, isWritable: true, pubkey: registryHeadPublicKey });
+  keys.push({ isSigner: false, isWritable: true, pubkey: registryTailPublicKey });
 }
 
-async function getRegistryMetaAccountInfo(connection: Connection): Promise<null | AccountInfo<Buffer>> {
-  return await connection.getAccountInfo(await getRegistryMetaPublicKey());
-}
-
-async function getRegistryMetaPublicKey(): Promise<PublicKey> {
-  let [registryMetaPublicKey, _registryMetaBumpSeed] = await PublicKey.findProgramAddress(
-    [Buffer.from("")],
+async function getProgramDerivedAddress(seed: string): Promise<PublicKey> {
+  let [publicKey, _bumpSeed] = await PublicKey.findProgramAddress(
+    [Buffer.from(seed)],
     getProgramId(),
   );
-  return registryMetaPublicKey;
+  return publicKey;
 }
 
 async function getATA(connection: Connection, userAccount: PublicKey, tokenAccount: PublicKey): Promise<PublicKey> {
@@ -324,6 +484,7 @@ async function getATA(connection: Connection, userAccount: PublicKey, tokenAccou
 }
 
 function getProgramId(): PublicKey {
-    return Keypair.fromSecretKey(Uint8Array.from(registryKeypair)).publicKey;
+  let registryKeypair = JSON.parse(fs.readFileSync('./src/registry-keypair.json').toString());
+  return Keypair.fromSecretKey(Uint8Array.from(registryKeypair)).publicKey;
 }
 

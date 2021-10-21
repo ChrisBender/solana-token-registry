@@ -7,10 +7,11 @@ pub enum RegistryInstruction<'a> {
      *
      * Accounts:
      * 0. [writable, signer] Fee-payer.
-     * 1. [] The initial `fee_mint`.
-     * 2. [] The initial `fee_destination`.
-     * 3. [] The system program.
-     * 4. [] The RegistryMetaAccount.
+     * 1. [] The program account.
+     * 2. [] The initial `fee_mint`.
+     * 3. [] The initial `fee_destination`.
+     * 4. [] The system program.
+     * 5. [] The RegistryMetaAccount.
      * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
@@ -30,9 +31,10 @@ pub enum RegistryInstruction<'a> {
      *
      * Accounts:
      * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryHeadAccount::fee_update_authority`.
-     * 1. [] The new `fee_mint`.
-     * 2. [] The new `fee_destination`.
-     * 3. [] The RegistryMetaAccount.
+     * 1. [] The program account.
+     * 2. [] The new `fee_mint`.
+     * 3. [] The new `fee_destination`.
+     * 4. [] The RegistryMetaAccount.
      * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
@@ -53,12 +55,13 @@ pub enum RegistryInstruction<'a> {
      *
      * Accounts:
      * 0. [writable, signer] Fee-payer. Will be assigned to the `RegistryNodeAccount::token_update_authority`.
-     * 1. [] Mint address to create a `RegistryNode` for. Must have not been registered before. Must be owned by the token program.
-     * 2. [writable] The source account. Must be the Associated Token Account of the fee-payer.
-     * 3. [writable] The destination account. Must be the Associated Token Account of `fee_destination`.
-     * 4. [] The system program (to create a new account).
-     * 5. [] The token program (to transfer tokens).
-     * 6. [] The RegistryMetaAccount.
+     * 1. [] The program account.
+     * 2. [] Mint address to create a `RegistryNode` for. Must have not been registered before. Must be owned by the token program.
+     * 3. [writable] The source account. Must be the Associated Token Account of the fee-payer.
+     * 4. [writable] The destination account. Must be the Associated Token Account of `fee_destination`.
+     * 5. [] The system program (to create a new account).
+     * 6. [] The token program (to transfer tokens).
+     * 7. [] The RegistryMetaAccount.
      * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
@@ -91,8 +94,9 @@ pub enum RegistryInstruction<'a> {
      *
      * Accounts:
      * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryNodeAccount::token_update_authority`.
-     * 1. [] The address of the mint to be deleted.
-     * 2. [] The RegistryMetaAccount.
+     * 1. [] The program account.
+     * 2. [] The address of the mint to be deleted.
+     * 3. [] The RegistryMetaAccount.
      * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
@@ -111,8 +115,9 @@ pub enum RegistryInstruction<'a> {
      *
      * Accounts:
      * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryNodeAccount::token_update_authority`.
-     * 1. [] The address of the mint to be updated.
-     * 2. [] The RegistryMetaAccount.
+     * 1. [] The program account.
+     * 2. [] The address of the mint to be updated.
+     * 3. [] The RegistryMetaAccount.
      * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
@@ -143,8 +148,9 @@ pub enum RegistryInstruction<'a> {
      *
      * Accounts:
      * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryMetaAccount::fee_update_authority`.
-     * 1. [] The new account to transfer authority to. Must be owned by the system program.
-     * 2. [] The RegistryMetaAccount.
+     * 1. [] The program account.
+     * 2. [] The new account to transfer authority to. Must be owned by the system program.
+     * 3. [] The RegistryMetaAccount.
      * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
@@ -162,8 +168,9 @@ pub enum RegistryInstruction<'a> {
      *
      * Accounts:
      * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryTokenAccount::token_update_authority`.
-     * 1. [] The new account to transfer authority to. Must be owned by the system program.
-     * 2. [] The RegistryMetaAccount.
+     * 1. [] The program account.
+     * 2. [] The new account to transfer authority to. Must be owned by the system program.
+     * 3. [] The RegistryMetaAccount.
      * .. [] All the RegistryNodeAccounts, in order.
      *
      * Instruction Data:
