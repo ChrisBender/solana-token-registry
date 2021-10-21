@@ -40,7 +40,7 @@ export async function getAllTokens(connection: Connection): Promise<RegistryNode
     return [];
   } else {
     let [_registryMetaAccount, registryNodeAccounts] = registryState;
-    return [];
+    return registryNodeAccounts.slice(1, -1);
   }
 }
 

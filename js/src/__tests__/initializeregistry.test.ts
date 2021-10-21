@@ -169,7 +169,6 @@ describe("InitializeRegistry", () => {
     let registryState = await getRegistryState(connection);
     expect(registryState).not.toBeNull();
     let [registryMetaAccount, _registryNodeAccounts] = registryState!;
-    console.log(registryMetaAccount);
 
     expect(registryMetaAccount.feeAmount).toEqual(ARBITRARY_BIGINT);
     expect(registryMetaAccount.feeMint).toEqual(USDT_PUBLICKEY);
@@ -200,5 +199,18 @@ describe("InitializeRegistry", () => {
       expect(txLogs).toMatch(/RegistryError::AlreadyInitialized/);
     }
   }, TEST_TIMEOUT);
+
+  it("InitializeRegistry does not create any tokens", async () => {
+    expect(await getAllTokens(connection)).toEqual([]);
+    await sendAndConfirmTx(await createInstructionInitializeRegistry(
+      connection,
+      userKeypair.publicKey,
+      USDT_PUBLICKEY,
+      ARBITRARY_USER_ACCOUNT,
+      ARBITRARY_BIGINT,
+    ));
+    expect(await getAllTokens(connection)).toEqual([]);
+  }, TEST_TIMEOUT);
+
 });
 

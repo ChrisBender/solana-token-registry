@@ -13,7 +13,6 @@
     "client:deploy": "cd client && npm run deploy",
     "program:lint": "cd program && npm run lint",
     "program:build": "cd program && npm run build",
-    "program:deploy": "cd program && npm run deploy",
-    "testall": "npm run program:build && npm run js:build && npm run js:test"
+    "program:deploy": "cd program && npm run deploy"
   }
 }
