@@ -2,6 +2,9 @@
   "name": "solana-token-registry",
   "version": "1.0.0",
   "scripts": {
+    "program:lint": "cd program && npm run lint",
+    "program:build": "cd program && npm run build",
+    "program:deploy": "cd program && npm run deploy",
     "js:lint": "cd js && npm run lint",
     "js:build": "cd js && npm run build",
     "js:test": "cd js && npm run test",
@@ -11,8 +14,6 @@
     "client:build": "cd client && npm run build",
     "client:test": "cd client && npm run test",
     "client:deploy": "cd client && npm run deploy",
-    "program:lint": "cd program && npm run lint",
-    "program:build": "cd program && npm run build",
-    "program:deploy": "cd program && npm run deploy"
+    "lint": "npm run program:lint && npm run js:lint"
   }
 }

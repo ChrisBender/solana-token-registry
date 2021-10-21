@@ -2,7 +2,7 @@
   "name": "program",
   "version": "1.0.0",
   "scripts": {
-    "lint": "echo \"Error: Program linter not implemented.\" && exit 1",
+    "lint": "rustfmt src/*",
     "build": "rm -f build/* && cargo build-bpf --manifest-path=Cargo.toml --bpf-out-dir=build && cp build/registry-keypair.json ../js/src/",
     "deploy": "solana program deploy --final ./build/registry.so"
   }
