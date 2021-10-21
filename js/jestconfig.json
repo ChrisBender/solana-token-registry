@@ -1,5 +1,6 @@
 {
   "transform": {
-    "^.+\\.(t|j)sx?$": "ts-jest"
-  }
+    "^.+\\.ts$": "ts-jest"
+  },
+  "testPathIgnorePatterns": ["src/__tests__/utils.ts"]
 }

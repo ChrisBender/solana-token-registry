@@ -11,54 +11,50 @@ import {
 } from '../index'
 
 import {
-  Connection,
-  PublicKey,
-  Keypair,
-  Transaction,
-  TransactionInstruction,
+  TEST_TIMEOUT,
+  USDT_PUBLICKEY,
+  ARBITRARY_TOKEN_ACCOUNT,
+  ARBITRARY_USER_ACCOUNT,
+  ARBITRARY_BIGINT,
+  connection,
+  userKeypair,
+  deployProgram,
+  sendAndConfirmTx
+} from './utils'
+
+import {
   SendTransactionError
 } from '@solana/web3.js'
-
-import { readFileSync } from 'fs'
-import { execSync } from 'child_process'
-
-const TEST_TIMEOUT = 100000
-const CONFIG_FILE = '/Users/chris/.config/solana/id.json'
-const userPrivateKeyString = readFileSync(CONFIG_FILE).toString()
-const userKeypair = Keypair.fromSecretKey(new Uint8Array(JSON.parse(userPrivateKeyString)))
-
-const USDT_PUBLICKEY = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
-const ARBITRARY_TOKEN_ACCOUNT = new PublicKey('7STJWT74tAZzhbNNPRH8WuGDy9GZg27968EwALWuezrH')
-const ARBITRARY_USER_ACCOUNT = new PublicKey('DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEAD')
-const ARBITRARY_BIGINT = BigInt(123456789)
-
-const connection = new Connection('https://api.devnet.solana.com', 'confirmed')
-
-// Hack to prevent API calls from displaying error messages.
-console.error = () => undefined
-
-async function sendAndConfirmTx (instruction: TransactionInstruction): Promise<string> {
-  const tx = new Transaction({
-    feePayer: userKeypair.publicKey,
-    recentBlockhash: (await connection.getRecentBlockhash()).blockhash
-  })
-  tx.add(instruction)
-  const signature = await connection.sendTransaction(
-    tx,
-    [userKeypair]
-  )
-  await connection.confirmTransaction(signature)
-  return signature
-}
-
-function deployProgram (): void {
-  execSync('cd ../program && npm run build && npm run deploy')
-}
 
 describe('InitializeRegistry', () => {
   beforeEach(deployProgram)
 
-  it('All Transactions Fail before InitializeRegistry', async () => {
+  it('Read-over-write for InitializeRegistry', async () => {
+    expect.assertions(4)
+
+    await sendAndConfirmTx(await createInstructionInitializeRegistry(
+      connection,
+      userKeypair.publicKey,
+      USDT_PUBLICKEY,
+      ARBITRARY_USER_ACCOUNT,
+      ARBITRARY_BIGINT
+    ))
+
+    const registryState = await getRegistryState(connection)
+    let registryMetaAccount
+    if (registryState === null) {
+      return
+    } else {
+      registryMetaAccount = registryState[0]
+    }
+
+    expect(registryMetaAccount.feeAmount).toEqual(ARBITRARY_BIGINT)
+    expect(registryMetaAccount.feeMint).toEqual(USDT_PUBLICKEY)
+    expect(registryMetaAccount.feeDestination).toEqual(ARBITRARY_USER_ACCOUNT)
+    expect(registryMetaAccount.feeUpdateAuthority).toEqual(userKeypair.publicKey)
+  }, TEST_TIMEOUT)
+
+  it('All transactions fail before InitializeRegistry', async () => {
     expect.assertions(6)
 
     // RegistryInstruction::UpdateFees
@@ -150,31 +146,6 @@ describe('InitializeRegistry', () => {
       const txLogs = ((error as SendTransactionError).logs as string[]).join(' ')
       expect(txLogs).toMatch(/RegistryError::NotYetInitialized/)
     }
-  }, TEST_TIMEOUT)
-
-  it('Read-over-Write for InitializeRegistry', async () => {
-    expect.assertions(4)
-
-    await sendAndConfirmTx(await createInstructionInitializeRegistry(
-      connection,
-      userKeypair.publicKey,
-      USDT_PUBLICKEY,
-      ARBITRARY_USER_ACCOUNT,
-      ARBITRARY_BIGINT
-    ))
-
-    const registryState = await getRegistryState(connection)
-    let registryMetaAccount
-    if (registryState === null) {
-      return
-    } else {
-      registryMetaAccount = registryState[0]
-    }
-
-    expect(registryMetaAccount.feeAmount).toEqual(ARBITRARY_BIGINT)
-    expect(registryMetaAccount.feeMint).toEqual(USDT_PUBLICKEY)
-    expect(registryMetaAccount.feeDestination).toEqual(ARBITRARY_USER_ACCOUNT)
-    expect(registryMetaAccount.feeUpdateAuthority).toEqual(userKeypair.publicKey)
   }, TEST_TIMEOUT)
 
   it('Cannot InitializeRegistry twice', async () => {

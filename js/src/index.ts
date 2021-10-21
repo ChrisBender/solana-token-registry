@@ -7,7 +7,7 @@ import {
 } from '@solana/web3.js'
 
 import { deserialize } from 'borsh'
-import fs = require('fs')
+import { readFileSync } from 'fs'
 
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
 const ATA_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
@@ -465,6 +465,6 @@ async function getATA (connection: Connection, userAccount: PublicKey, tokenAcco
 }
 
 function getProgramId (): PublicKey {
-  const registryKeypair = JSON.parse(fs.readFileSync('./src/registry-keypair.json').toString())
+  const registryKeypair = JSON.parse(readFileSync('./src/registry-keypair.json').toString())
   return Keypair.fromSecretKey(Uint8Array.from(registryKeypair)).publicKey
 }
