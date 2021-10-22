@@ -11,14 +11,16 @@ pub enum RegistryInstruction<'a> {
      * 2. [] The initial `fee_mint`.
      * 3. [] The initial `fee_destination`.
      * 4. [] The system program.
-     * 5. [] The RegistryMetaAccount.
-     * .. [] All the RegistryNodeAccounts, in order.
+     * 5. [writable] The RegistryMetaAccount.
+     * 6. [writable] The RegistryHeadAccount.
+     * 7. [writable] The RegistryTailAccount.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 0).
      * Bytes 1-8: The `fee_amount` in big-endian order.
      *
      * Errors:
+     * `AlreadyInitialized` if the registry has already been initialized.
      * `InvalidFeeMint` if the supplied `fee_mint` address is not owned by the token program.
      * `InvalidFeeDestination` if the supplied `fee_destination` is not owned by the system program.
      * `InvalidNamedProgram` If the supplied system program is not the real system program.

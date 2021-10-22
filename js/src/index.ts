@@ -29,11 +29,21 @@ interface RegistryNodeAccount {
 }
 
 /**
+  * Get the programId from disk.
+  *
+  */
+export function getProgramId (): PublicKey {
+  /* TODO: We only really need the publickey, which is in the stdout of npm run deploy. Just get that string and pass programID as an arg. */
+  const registryKeypair = JSON.parse(readFileSync('./src/registry-keypair.json').toString())
+  return Keypair.fromSecretKey(Uint8Array.from(registryKeypair)).publicKey
+}
+
+/**
  * Returns a list of all the registered tokens.
  *
  */
-export async function getAllTokens (connection: Connection): Promise<RegistryNodeAccount[]> {
-  const registryState = await getRegistryState(connection)
+export async function getAllTokens (connection: Connection, programId: PublicKey): Promise<RegistryNodeAccount[]> {
+  const registryState = await getRegistryState(connection, programId)
   if (registryState === null) {
     return []
   } else {
@@ -46,15 +56,18 @@ export async function getAllTokens (connection: Connection): Promise<RegistryNod
  * Returns a sanitized list of all the registered tokens. Throw away all duplicate tickers and names, only keeping the ticker or name with highest active DEX volume.
  *
  */
-export async function getAllTokensSanitized (connection: Connection): Promise<RegistryNodeAccount[]> {
-  return await getAllTokens(connection)
+export async function getAllTokensSanitized (connection: Connection, programId: PublicKey): Promise<RegistryNodeAccount[]> {
+  return await getAllTokens(connection, programId)
 }
 
 /**
  * Returns the RegistryMetaAccount and a list of all the RegistryMetaNodes.
  *
  */
-export async function getRegistryState (connection: Connection): Promise<null | [RegistryMetaAccount, RegistryNodeAccount[]]> {
+export async function getRegistryState (
+  connection: Connection,
+  programId: PublicKey
+): Promise<null | [RegistryMetaAccount, RegistryNodeAccount[]]> {
   class BorshRegistryMetaAccount {
     head_registry_node = new Uint8Array(32)
     fee_amount = 0
@@ -145,9 +158,9 @@ export async function getRegistryState (connection: Connection): Promise<null | 
     }]
   ])
 
-  const registryMetaPublicKey = await getProgramDerivedAddress('meta')
-  const registryHeadPublicKey = await getProgramDerivedAddress('head')
-  const registryTailPublicKey = await getProgramDerivedAddress('tail')
+  const registryMetaPublicKey = await getProgramDerivedAddress('meta', programId)
+  const registryHeadPublicKey = await getProgramDerivedAddress('head', programId)
+  const registryTailPublicKey = await getProgramDerivedAddress('tail', programId)
   const registryMetaAccountInfo = await connection.getAccountInfo(registryMetaPublicKey)
   const registryHeadAccountInfo = await connection.getAccountInfo(registryHeadPublicKey)
   const registryTailAccountInfo = await connection.getAccountInfo(registryTailPublicKey)
@@ -209,6 +222,7 @@ export async function getRegistryState (connection: Connection): Promise<null | 
  */
 export async function createInstructionInitializeRegistry (
   connection: Connection,
+  programId: PublicKey,
   userPublicKey: PublicKey,
   feeMintPublicKey: PublicKey,
   feeDestinationPublicKey: PublicKey,
@@ -220,17 +234,17 @@ export async function createInstructionInitializeRegistry (
 
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
-    { isSigner: false, isWritable: false, pubkey: getProgramId() },
+    { isSigner: false, isWritable: false, pubkey: programId },
     { isSigner: false, isWritable: false, pubkey: feeMintPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey },
     { isSigner: false, isWritable: false, pubkey: SystemProgram.programId }
   ]
-  await pushAllRegistryNodes(connection, keys)
+  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: buffer,
     keys: keys,
-    programId: getProgramId()
+    programId: programId
   })
 }
 
@@ -240,6 +254,7 @@ export async function createInstructionInitializeRegistry (
  */
 export async function createInstructionUpdateFees (
   connection: Connection,
+  programId: PublicKey,
   userPublicKey: PublicKey,
   feeMintPublicKey: PublicKey,
   feeDestinationPublicKey: PublicKey,
@@ -254,12 +269,12 @@ export async function createInstructionUpdateFees (
     { isSigner: false, isWritable: false, pubkey: feeMintPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey }
   ]
-  await pushAllRegistryNodes(connection, keys)
+  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: buffer,
     keys: keys,
-    programId: getProgramId()
+    programId: programId
   })
 }
 
@@ -269,6 +284,7 @@ export async function createInstructionUpdateFees (
  */
 export async function createInstructionCreateEntry (
   connection: Connection,
+  programId: PublicKey,
   userPublicKey: PublicKey,
   mintPublicKey: PublicKey,
   tokenSymbol: string,
@@ -303,12 +319,12 @@ export async function createInstructionCreateEntry (
     { isSigner: false, isWritable: false, pubkey: SystemProgram.programId },
     { isSigner: false, isWritable: false, pubkey: TOKEN_PROGRAM_ID }
   ]
-  await pushAllRegistryNodes(connection, keys)
+  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: buffer,
     keys: keys,
-    programId: getProgramId()
+    programId: programId
   })
 }
 
@@ -318,6 +334,7 @@ export async function createInstructionCreateEntry (
  */
 export async function createInstructionDeleteEntry (
   connection: Connection,
+  programId: PublicKey,
   userPublicKey: PublicKey,
   mintPublicKey: PublicKey
 ): Promise<TransactionInstruction> {
@@ -328,12 +345,12 @@ export async function createInstructionDeleteEntry (
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: mintPublicKey }
   ]
-  await pushAllRegistryNodes(connection, keys)
+  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: Buffer.from(buffer),
     keys: keys,
-    programId: getProgramId()
+    programId: programId
   })
 }
 
@@ -343,6 +360,7 @@ export async function createInstructionDeleteEntry (
  */
 export async function createInstructionUpdateEntry (
   connection: Connection,
+  programId: PublicKey,
   userPublicKey: PublicKey,
   mintPublicKey: PublicKey,
   tokenSymbol: string,
@@ -370,12 +388,12 @@ export async function createInstructionUpdateEntry (
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: mintPublicKey }
   ]
-  await pushAllRegistryNodes(connection, keys)
+  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: buffer,
     keys: keys,
-    programId: getProgramId()
+    programId: programId
   })
 }
 
@@ -385,6 +403,7 @@ export async function createInstructionUpdateEntry (
  */
 export async function createInstructionTransferFeeAuthority (
   connection: Connection,
+  programId: PublicKey,
   userPublicKey: PublicKey,
   feeAuthorityPublicKey: PublicKey
 ): Promise<TransactionInstruction> {
@@ -395,12 +414,12 @@ export async function createInstructionTransferFeeAuthority (
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeAuthorityPublicKey }
   ]
-  await pushAllRegistryNodes(connection, keys)
+  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: Buffer.from(buffer),
     keys: keys,
-    programId: getProgramId()
+    programId: programId
   })
 }
 
@@ -410,6 +429,7 @@ export async function createInstructionTransferFeeAuthority (
  */
 export async function createInstructionTransferTokenAuthority (
   connection: Connection,
+  programId: PublicKey,
   userPublicKey: PublicKey,
   tokenAuthorityPublicKey: PublicKey
 ): Promise<TransactionInstruction> {
@@ -420,12 +440,12 @@ export async function createInstructionTransferTokenAuthority (
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: tokenAuthorityPublicKey }
   ]
-  await pushAllRegistryNodes(connection, keys)
+  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: Buffer.from(buffer),
     keys: keys,
-    programId: getProgramId()
+    programId: programId
   })
 }
 
@@ -435,24 +455,32 @@ interface transactionKey {
   isWritable: boolean
   pubkey: PublicKey
 }
-async function pushAllRegistryNodes (connection: Connection, keys: transactionKey[]): Promise<void> {
-  const registryMetaPublicKey = await getProgramDerivedAddress('meta')
-  const registryHeadPublicKey = await getProgramDerivedAddress('head')
-  const registryTailPublicKey = await getProgramDerivedAddress('tail')
+async function pushAllRegistryNodes (
+  connection: Connection,
+  programId: PublicKey,
+  keys: transactionKey[]
+): Promise<void> {
+  const registryMetaPublicKey = await getProgramDerivedAddress('meta', programId)
+  const registryHeadPublicKey = await getProgramDerivedAddress('head', programId)
+  const registryTailPublicKey = await getProgramDerivedAddress('tail', programId)
   keys.push({ isSigner: false, isWritable: true, pubkey: registryMetaPublicKey })
   keys.push({ isSigner: false, isWritable: true, pubkey: registryHeadPublicKey })
   keys.push({ isSigner: false, isWritable: true, pubkey: registryTailPublicKey })
 }
 
-async function getProgramDerivedAddress (seed: string): Promise<PublicKey> {
+async function getProgramDerivedAddress (seed: string, programId: PublicKey): Promise<PublicKey> {
   const publicKey = (await PublicKey.findProgramAddress(
     [Buffer.from(seed)],
-    getProgramId()
+    programId
   ))[0]
   return publicKey
 }
 
-async function getATA (connection: Connection, userAccount: PublicKey, tokenAccount: PublicKey): Promise<PublicKey> {
+async function getATA (
+  connection: Connection,
+  userAccount: PublicKey,
+  tokenAccount: PublicKey
+): Promise<PublicKey> {
   const associatedTokenAccount = (await PublicKey.findProgramAddress(
     [
       userAccount.toBuffer(),
@@ -462,9 +490,4 @@ async function getATA (connection: Connection, userAccount: PublicKey, tokenAcco
     ATA_PROGRAM_ID
   ))[0]
   return associatedTokenAccount
-}
-
-function getProgramId (): PublicKey {
-  const registryKeypair = JSON.parse(readFileSync('./src/registry-keypair.json').toString())
-  return Keypair.fromSecretKey(Uint8Array.from(registryKeypair)).publicKey
 }

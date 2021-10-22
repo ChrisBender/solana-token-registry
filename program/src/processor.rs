@@ -180,15 +180,23 @@ impl Processor {
     fn process_update_fees(
         _program_id: &Pubkey,
         accounts: &[AccountInfo],
-        _fee_amount: u64,
+        fee_amount: u64,
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
         let _account_user = next_account_info(accounts_iter)?;
         let _account_program = next_account_info(accounts_iter)?;
-        let _account_fee_mint = next_account_info(accounts_iter)?;
-        let _account_fee_destination = next_account_info(accounts_iter)?;
+        let account_fee_mint = next_account_info(accounts_iter)?;
+        let account_fee_destination = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_initialized(account_registry_meta)?;
+
+        /* TODO */
+        let mut registry_meta =
+            RegistryMetaAccount::try_from_slice(&account_registry_meta.data.borrow())?;
+        registry_meta.fee_amount = fee_amount;
+        registry_meta.fee_mint = account_fee_mint.key.to_bytes();
+        registry_meta.fee_destination = account_fee_destination.key.to_bytes();
+
         Ok(())
     }
 

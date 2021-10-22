@@ -4,7 +4,7 @@
   "scripts": {
     "lint": "npx eslint . --ext .ts --fix",
     "build": "tsc",
-    "test": "jest --config jestconfig.json --forceExit --runInBand",
+    "test": "jest --config jestconfig.json",
     "deploy": ""
   },
   "dependencies": {

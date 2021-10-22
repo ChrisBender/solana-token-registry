@@ -16,7 +16,8 @@ import {
   ARBITRARY_TOKEN_ACCOUNT,
   ARBITRARY_USER_ACCOUNT,
   ARBITRARY_BIGINT,
-  connection,
+  getConnection,
+  unreachable,
   userKeypair,
   deployProgram,
   sendAndConfirmTx
@@ -27,20 +28,20 @@ import {
 } from '@solana/web3.js'
 
 describe('InitializeRegistry', () => {
-  beforeEach(deployProgram)
+  test.concurrent('Read-over-write for InitializeRegistry', async () => {
+    const connection = getConnection()
+    const programId = await deployProgram(connection, userKeypair)
 
-  it('Read-over-write for InitializeRegistry', async () => {
-    expect.assertions(4)
-
-    await sendAndConfirmTx(await createInstructionInitializeRegistry(
+    await sendAndConfirmTx(connection, await createInstructionInitializeRegistry(
       connection,
+      programId,
       userKeypair.publicKey,
       USDT_PUBLICKEY,
       ARBITRARY_USER_ACCOUNT,
       ARBITRARY_BIGINT
     ))
 
-    const registryState = await getRegistryState(connection)
+    const registryState = await getRegistryState(connection, programId)
     let registryMetaAccount
     if (registryState === null) {
       return
@@ -54,18 +55,21 @@ describe('InitializeRegistry', () => {
     expect(registryMetaAccount.feeUpdateAuthority).toEqual(userKeypair.publicKey)
   }, TEST_TIMEOUT)
 
-  it('All transactions fail before InitializeRegistry', async () => {
-    expect.assertions(6)
+  test.concurrent('All transactions fail before InitializeRegistry', async () => {
+    const connection = getConnection()
+    const programId = await deployProgram(connection, userKeypair)
 
     // RegistryInstruction::UpdateFees
     try {
-      await sendAndConfirmTx(await createInstructionUpdateFees(
+      await sendAndConfirmTx(connection, await createInstructionUpdateFees(
         connection,
+        programId,
         userKeypair.publicKey,
         USDT_PUBLICKEY,
         ARBITRARY_USER_ACCOUNT,
         ARBITRARY_BIGINT
       ))
+      unreachable()
     } catch (error) {
       const txLogs = ((error as SendTransactionError).logs as string[]).join(' ')
       expect(txLogs).toMatch(/RegistryError::NotYetInitialized/)
@@ -73,8 +77,9 @@ describe('InitializeRegistry', () => {
 
     // RegistryInstruction::CreateEntry
     try {
-      await sendAndConfirmTx(await createInstructionCreateEntry(
+      await sendAndConfirmTx(connection, await createInstructionCreateEntry(
         connection,
+        programId,
         userKeypair.publicKey,
         ARBITRARY_TOKEN_ACCOUNT,
         'wSUSHI',
@@ -86,6 +91,7 @@ describe('InitializeRegistry', () => {
           ['bridgeContract', 'https://etherscan.io/address/0xf92cD566Ea4864356C5491c177A430C222d7e678']
         ]
       ))
+      unreachable()
     } catch (error) {
       const txLogs = ((error as SendTransactionError).logs as string[]).join(' ')
       expect(txLogs).toMatch(/RegistryError::NotYetInitialized/)
@@ -93,11 +99,13 @@ describe('InitializeRegistry', () => {
 
     // RegistryInstruction::DeleteEntry
     try {
-      await sendAndConfirmTx(await createInstructionDeleteEntry(
+      await sendAndConfirmTx(connection, await createInstructionDeleteEntry(
         connection,
+        programId,
         userKeypair.publicKey,
         ARBITRARY_TOKEN_ACCOUNT
       ))
+      unreachable()
     } catch (error) {
       const txLogs = ((error as SendTransactionError).logs as string[]).join(' ')
       expect(txLogs).toMatch(/RegistryError::NotYetInitialized/)
@@ -105,8 +113,9 @@ describe('InitializeRegistry', () => {
 
     // RegistryInstruction::UpdateEntry
     try {
-      await sendAndConfirmTx(await createInstructionUpdateEntry(
+      await sendAndConfirmTx(connection, await createInstructionUpdateEntry(
         connection,
+        programId,
         userKeypair.publicKey,
         ARBITRARY_TOKEN_ACCOUNT,
         'wSUSHI',
@@ -118,6 +127,7 @@ describe('InitializeRegistry', () => {
           ['bridgeContract', 'https://etherscan.io/address/0xf92cD566Ea4864356C5491c177A430C222d7e678']
         ]
       ))
+      unreachable()
     } catch (error) {
       const txLogs = ((error as SendTransactionError).logs as string[]).join(' ')
       expect(txLogs).toMatch(/RegistryError::NotYetInitialized/)
@@ -125,11 +135,13 @@ describe('InitializeRegistry', () => {
 
     // RegistryInstruction::TransferFeeAuthority
     try {
-      await sendAndConfirmTx(await createInstructionTransferFeeAuthority(
+      await sendAndConfirmTx(connection, await createInstructionTransferFeeAuthority(
         connection,
+        programId,
         userKeypair.publicKey,
         ARBITRARY_USER_ACCOUNT
       ))
+      unreachable()
     } catch (error) {
       const txLogs = ((error as SendTransactionError).logs as string[]).join(' ')
       expect(txLogs).toMatch(/RegistryError::NotYetInitialized/)
@@ -137,49 +149,60 @@ describe('InitializeRegistry', () => {
 
     // RegistryInstruction::TransferTokenAuthority
     try {
-      await sendAndConfirmTx(await createInstructionTransferTokenAuthority(
+      await sendAndConfirmTx(connection, await createInstructionTransferTokenAuthority(
         connection,
+        programId,
         userKeypair.publicKey,
         ARBITRARY_USER_ACCOUNT
       ))
+      unreachable()
     } catch (error) {
       const txLogs = ((error as SendTransactionError).logs as string[]).join(' ')
       expect(txLogs).toMatch(/RegistryError::NotYetInitialized/)
     }
   }, TEST_TIMEOUT)
 
-  it('Cannot InitializeRegistry twice', async () => {
-    expect.assertions(1)
-    await sendAndConfirmTx(await createInstructionInitializeRegistry(
+  test.concurrent('Cannot InitializeRegistry twice', async () => {
+    const connection = getConnection()
+    const programId = await deployProgram(connection, userKeypair)
+
+    await sendAndConfirmTx(connection, await createInstructionInitializeRegistry(
       connection,
+      programId,
       userKeypair.publicKey,
       USDT_PUBLICKEY,
       ARBITRARY_USER_ACCOUNT,
       ARBITRARY_BIGINT
     ))
     try {
-      await sendAndConfirmTx(await createInstructionInitializeRegistry(
+      await sendAndConfirmTx(connection, await createInstructionInitializeRegistry(
         connection,
+        programId,
         userKeypair.publicKey,
         USDT_PUBLICKEY,
         ARBITRARY_USER_ACCOUNT,
         ARBITRARY_BIGINT
       ))
+      unreachable()
     } catch (error) {
       const txLogs = ((error as SendTransactionError).logs as string[]).join(' ')
       expect(txLogs).toMatch(/RegistryError::AlreadyInitialized/)
     }
   }, TEST_TIMEOUT)
 
-  it('InitializeRegistry does not create any tokens', async () => {
-    expect(await getAllTokens(connection)).toEqual([])
-    await sendAndConfirmTx(await createInstructionInitializeRegistry(
+  test.concurrent('InitializeRegistry does not create any tokens', async () => {
+    const connection = getConnection()
+    const programId = await deployProgram(connection, userKeypair)
+
+    expect(await getAllTokens(connection, programId)).toEqual([])
+    await sendAndConfirmTx(connection, await createInstructionInitializeRegistry(
       connection,
+      programId,
       userKeypair.publicKey,
       USDT_PUBLICKEY,
       ARBITRARY_USER_ACCOUNT,
       ARBITRARY_BIGINT
     ))
-    expect(await getAllTokens(connection)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual([])
   }, TEST_TIMEOUT)
 })

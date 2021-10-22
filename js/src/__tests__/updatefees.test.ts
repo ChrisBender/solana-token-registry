@@ -10,34 +10,35 @@ import {
   ARBITRARY_TOKEN_ACCOUNT,
   ARBITRARY_USER_ACCOUNT,
   ARBITRARY_BIGINT,
-  connection,
+  getConnection,
   userKeypair,
   deployProgram,
   sendAndConfirmTx
 } from './utils'
 
 describe('UpdateFees', () => {
-  beforeEach(deployProgram)
+  test.concurrent('Read-over-write for UpdateFees', async () => {
+    const connection = getConnection()
+    const programId = await deployProgram(connection, userKeypair)
 
-  it('Read-over-write for UpdateFees', async () => {
-    expect.assertions(1)
-
-    await sendAndConfirmTx(await createInstructionInitializeRegistry(
+    await sendAndConfirmTx(connection, await createInstructionInitializeRegistry(
       connection,
+      programId,
       userKeypair.publicKey,
       USDT_PUBLICKEY,
       ARBITRARY_USER_ACCOUNT,
       ARBITRARY_BIGINT
     ))
-    await sendAndConfirmTx(await createInstructionUpdateFees(
+    await sendAndConfirmTx(connection, await createInstructionUpdateFees(
       connection,
+      programId,
       userKeypair.publicKey,
       ARBITRARY_TOKEN_ACCOUNT,
       ARBITRARY_USER_ACCOUNT,
       ARBITRARY_BIGINT
     ))
 
-    const registryState = await getRegistryState(connection)
+    const registryState = await getRegistryState(connection, programId)
     let registryMetaAccount
     if (registryState === null) {
       return
