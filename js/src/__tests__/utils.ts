@@ -8,15 +8,18 @@ import {
 
 import { readFileSync } from 'fs'
 import { execSync } from 'child_process'
+import { getRegistryState } from '../index'
 
 // Hack to prevent API calls from displaying error messages.
 console.error = () => undefined
 
 export const TEST_TIMEOUT = 200000
-export const USDT_PUBLICKEY = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
-export const ARBITRARY_TOKEN_ACCOUNT = new PublicKey('7STJWT74tAZzhbNNPRH8WuGDy9GZg27968EwALWuezrH')
-export const ARBITRARY_USER_ACCOUNT = new PublicKey('DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEAD')
-export const ARBITRARY_BIGINT = BigInt(123456789)
+export const ARBITRARY_MINT_1 = new PublicKey('7Cab8z1Lz1bTC9bQNeY7VQoZw5a2YbZoxmvFSvPgcTEL')
+export const ARBITRARY_MINT_2 = new PublicKey('7STJWT74tAZzhbNNPRH8WuGDy9GZg27968EwALWuezrH')
+export const ARBITRARY_USER_1 = new PublicKey('DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEAD')
+export const ARBITRARY_USER_2 = new PublicKey('DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFBEEF')
+export const ARBITRARY_BIGINT_1 = BigInt(123456789)
+export const ARBITRARY_BIGINT_2 = BigInt(987654321)
 
 const configFile = '/Users/chris/.config/solana/id.json'
 const userPrivateKeyString = readFileSync(configFile).toString()
@@ -35,8 +38,26 @@ export async function deployProgram (
   return programId.publicKey
 }
 
-export function unreachable (): void {
-  expect(true).toBe(false)
+export async function assertMetaAccountEquals (
+  connection: Connection,
+  programId: PublicKey,
+  feeAmount: bigint,
+  feeMint: PublicKey,
+  feeDestination: PublicKey,
+  feeUpdateAuthority: PublicKey
+): Promise<void> {
+  const registryState = await getRegistryState(connection, programId)
+  let registryMetaAccount
+  if (registryState === null) {
+    unreachable()
+    return
+  } else {
+    registryMetaAccount = registryState[0]
+  }
+  expect(registryMetaAccount.feeAmount).toEqual(feeAmount)
+  expect(registryMetaAccount.feeMint).toEqual(feeMint)
+  expect(registryMetaAccount.feeDestination).toEqual(feeDestination)
+  expect(registryMetaAccount.feeUpdateAuthority).toEqual(feeUpdateAuthority)
 }
 
 export async function sendAndConfirmTx (
@@ -54,4 +75,8 @@ export async function sendAndConfirmTx (
   )
   await connection.confirmTransaction(signature)
   return signature
+}
+
+export function unreachable (): void {
+  expect(true).toBe(false)
 }

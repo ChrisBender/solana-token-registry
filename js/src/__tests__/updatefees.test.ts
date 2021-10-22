@@ -1,19 +1,21 @@
 import {
-  getRegistryState,
   createInstructionInitializeRegistry,
   createInstructionUpdateFees
 } from '../index'
 
 import {
   TEST_TIMEOUT,
-  USDT_PUBLICKEY,
-  ARBITRARY_TOKEN_ACCOUNT,
-  ARBITRARY_USER_ACCOUNT,
-  ARBITRARY_BIGINT,
+  ARBITRARY_MINT_1,
+  ARBITRARY_MINT_2,
+  ARBITRARY_USER_1,
+  ARBITRARY_USER_2,
+  ARBITRARY_BIGINT_1,
+  ARBITRARY_BIGINT_2,
   getConnection,
   userKeypair,
   deployProgram,
-  sendAndConfirmTx
+  sendAndConfirmTx,
+  assertMetaAccountEquals
 } from './utils'
 
 describe('UpdateFees', () => {
@@ -25,30 +27,80 @@ describe('UpdateFees', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      USDT_PUBLICKEY,
-      ARBITRARY_USER_ACCOUNT,
-      ARBITRARY_BIGINT
+      ARBITRARY_MINT_1,
+      ARBITRARY_USER_1,
+      ARBITRARY_BIGINT_1
+    ))
+    await assertMetaAccountEquals(
+      connection,
+      programId,
+      ARBITRARY_BIGINT_1,
+      ARBITRARY_MINT_1,
+      ARBITRARY_USER_1,
+      userKeypair.publicKey
+    )
+
+    await sendAndConfirmTx(connection, await createInstructionUpdateFees(
+      connection,
+      programId,
+      userKeypair.publicKey,
+      ARBITRARY_MINT_2,
+      ARBITRARY_USER_2,
+      ARBITRARY_BIGINT_2
+    ))
+    await assertMetaAccountEquals(
+      connection,
+      programId,
+      ARBITRARY_BIGINT_2,
+      ARBITRARY_MINT_2,
+      ARBITRARY_USER_2,
+      userKeypair.publicKey
+    )
+  }, TEST_TIMEOUT)
+
+  test.concurrent('Read-over-write for UpdateFees twice', async () => {
+    const connection = getConnection()
+    const programId = await deployProgram(connection, userKeypair)
+
+    await sendAndConfirmTx(connection, await createInstructionInitializeRegistry(
+      connection,
+      programId,
+      userKeypair.publicKey,
+      ARBITRARY_MINT_1,
+      ARBITRARY_USER_1,
+      ARBITRARY_BIGINT_1
     ))
     await sendAndConfirmTx(connection, await createInstructionUpdateFees(
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_TOKEN_ACCOUNT,
-      ARBITRARY_USER_ACCOUNT,
-      ARBITRARY_BIGINT
+      ARBITRARY_MINT_2,
+      ARBITRARY_USER_2,
+      ARBITRARY_BIGINT_2
     ))
-
-    const registryState = await getRegistryState(connection, programId)
-    let registryMetaAccount
-    if (registryState === null) {
-      return
-    } else {
-      registryMetaAccount = registryState[0]
-    }
-
-    expect(registryMetaAccount.feeAmount).toEqual(ARBITRARY_BIGINT)
-    expect(registryMetaAccount.feeMint).toEqual(ARBITRARY_TOKEN_ACCOUNT)
-    expect(registryMetaAccount.feeDestination).toEqual(ARBITRARY_USER_ACCOUNT)
-    expect(registryMetaAccount.feeUpdateAuthority).toEqual(userKeypair.publicKey)
+    await assertMetaAccountEquals(
+      connection,
+      programId,
+      ARBITRARY_BIGINT_2,
+      ARBITRARY_MINT_2,
+      ARBITRARY_USER_2,
+      userKeypair.publicKey
+    )
+    await sendAndConfirmTx(connection, await createInstructionUpdateFees(
+      connection,
+      programId,
+      userKeypair.publicKey,
+      ARBITRARY_MINT_1,
+      ARBITRARY_USER_1,
+      ARBITRARY_BIGINT_1
+    ))
+    await assertMetaAccountEquals(
+      connection,
+      programId,
+      ARBITRARY_BIGINT_1,
+      ARBITRARY_MINT_1,
+      ARBITRARY_USER_1,
+      userKeypair.publicKey
+    )
   }, TEST_TIMEOUT)
 })

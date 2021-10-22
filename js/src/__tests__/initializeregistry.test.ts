@@ -1,6 +1,5 @@
 import {
   getAllTokens,
-  getRegistryState,
   createInstructionInitializeRegistry,
   createInstructionUpdateFees,
   createInstructionCreateEntry,
@@ -12,15 +11,16 @@ import {
 
 import {
   TEST_TIMEOUT,
-  USDT_PUBLICKEY,
-  ARBITRARY_TOKEN_ACCOUNT,
-  ARBITRARY_USER_ACCOUNT,
-  ARBITRARY_BIGINT,
+  ARBITRARY_MINT_1,
+  ARBITRARY_MINT_2,
+  ARBITRARY_USER_1,
+  ARBITRARY_BIGINT_1,
   getConnection,
   unreachable,
   userKeypair,
   deployProgram,
-  sendAndConfirmTx
+  sendAndConfirmTx,
+  assertMetaAccountEquals
 } from './utils'
 
 import {
@@ -36,23 +36,18 @@ describe('InitializeRegistry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      USDT_PUBLICKEY,
-      ARBITRARY_USER_ACCOUNT,
-      ARBITRARY_BIGINT
+      ARBITRARY_MINT_1,
+      ARBITRARY_USER_1,
+      ARBITRARY_BIGINT_1
     ))
-
-    const registryState = await getRegistryState(connection, programId)
-    let registryMetaAccount
-    if (registryState === null) {
-      return
-    } else {
-      registryMetaAccount = registryState[0]
-    }
-
-    expect(registryMetaAccount.feeAmount).toEqual(ARBITRARY_BIGINT)
-    expect(registryMetaAccount.feeMint).toEqual(USDT_PUBLICKEY)
-    expect(registryMetaAccount.feeDestination).toEqual(ARBITRARY_USER_ACCOUNT)
-    expect(registryMetaAccount.feeUpdateAuthority).toEqual(userKeypair.publicKey)
+    await assertMetaAccountEquals(
+      connection,
+      programId,
+      ARBITRARY_BIGINT_1,
+      ARBITRARY_MINT_1,
+      ARBITRARY_USER_1,
+      userKeypair.publicKey
+    )
   }, TEST_TIMEOUT)
 
   test.concurrent('All transactions fail before InitializeRegistry', async () => {
@@ -65,9 +60,9 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        USDT_PUBLICKEY,
-        ARBITRARY_USER_ACCOUNT,
-        ARBITRARY_BIGINT
+        ARBITRARY_MINT_1,
+        ARBITRARY_USER_1,
+        ARBITRARY_BIGINT_1
       ))
       unreachable()
     } catch (error) {
@@ -81,7 +76,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_TOKEN_ACCOUNT,
+        ARBITRARY_MINT_2,
         'wSUSHI',
         'SushiSwap (Wormhole)',
         'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/HbMGwfGjGPchtaPwyrtJFy8APZN5w1hi63xnzmj1f23v/logo.png',
@@ -103,7 +98,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_TOKEN_ACCOUNT
+        ARBITRARY_MINT_2
       ))
       unreachable()
     } catch (error) {
@@ -117,7 +112,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_TOKEN_ACCOUNT,
+        ARBITRARY_MINT_2,
         'wSUSHI',
         'SushiSwap (Wormhole)',
         'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/HbMGwfGjGPchtaPwyrtJFy8APZN5w1hi63xnzmj1f23v/logo.png',
@@ -139,7 +134,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_USER_ACCOUNT
+        ARBITRARY_USER_1
       ))
       unreachable()
     } catch (error) {
@@ -153,7 +148,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_USER_ACCOUNT
+        ARBITRARY_USER_1
       ))
       unreachable()
     } catch (error) {
@@ -170,18 +165,26 @@ describe('InitializeRegistry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      USDT_PUBLICKEY,
-      ARBITRARY_USER_ACCOUNT,
-      ARBITRARY_BIGINT
+      ARBITRARY_MINT_1,
+      ARBITRARY_USER_1,
+      ARBITRARY_BIGINT_1
     ))
+    await assertMetaAccountEquals(
+      connection,
+      programId,
+      ARBITRARY_BIGINT_1,
+      ARBITRARY_MINT_1,
+      ARBITRARY_USER_1,
+      userKeypair.publicKey
+    )
     try {
       await sendAndConfirmTx(connection, await createInstructionInitializeRegistry(
         connection,
         programId,
         userKeypair.publicKey,
-        USDT_PUBLICKEY,
-        ARBITRARY_USER_ACCOUNT,
-        ARBITRARY_BIGINT
+        ARBITRARY_MINT_1,
+        ARBITRARY_USER_1,
+        ARBITRARY_BIGINT_1
       ))
       unreachable()
     } catch (error) {
@@ -199,9 +202,9 @@ describe('InitializeRegistry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      USDT_PUBLICKEY,
-      ARBITRARY_USER_ACCOUNT,
-      ARBITRARY_BIGINT
+      ARBITRARY_MINT_1,
+      ARBITRARY_USER_1,
+      ARBITRARY_BIGINT_1
     ))
     expect(await getAllTokens(connection, programId)).toEqual([])
   }, TEST_TIMEOUT)
