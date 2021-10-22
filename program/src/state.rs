@@ -12,8 +12,6 @@ pub struct RegistryMetaAccount {
     pub fee_destination: [u8; 32],
     /// The address that is allowed to change fee settings.
     pub fee_update_authority: [u8; 32],
-    /// If the registry has been initialized yet.
-    pub initialized: bool,
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Debug, Default)]

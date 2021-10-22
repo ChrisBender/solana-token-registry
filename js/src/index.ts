@@ -2,12 +2,10 @@ import {
   Connection,
   PublicKey,
   SystemProgram,
-  Keypair,
   TransactionInstruction
 } from '@solana/web3.js'
 
 import { deserialize } from 'borsh'
-import { readFileSync } from 'fs'
 
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
 const ATA_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
@@ -26,16 +24,6 @@ interface RegistryNodeAccount {
   tags: string[]
   extensions: string[][]
   updateAuthority: PublicKey
-}
-
-/**
-  * Get the programId from disk.
-  *
-  */
-export function getProgramId (): PublicKey {
-  /* TODO: We only really need the publickey, which is in the stdout of npm run deploy. Just get that string and pass programID as an arg. */
-  const registryKeypair = JSON.parse(readFileSync('./src/registry-keypair.json').toString())
-  return Keypair.fromSecretKey(Uint8Array.from(registryKeypair)).publicKey
 }
 
 /**
@@ -74,14 +62,12 @@ export async function getRegistryState (
     fee_mint = new Uint8Array(32)
     fee_destination = new Uint8Array(32)
     fee_update_authority = new Uint8Array(32)
-    initialized = false
     constructor (fields: {
       head_registry_node: Uint8Array
       fee_amount: number
       fee_mint: Uint8Array
       fee_destination: Uint8Array
       fee_update_authority: Uint8Array
-      initialized: boolean
     } | undefined = undefined) {
       if (fields != null) {
         this.head_registry_node = fields.head_registry_node
@@ -89,7 +75,6 @@ export async function getRegistryState (
         this.fee_mint = fields.fee_mint
         this.fee_destination = fields.fee_destination
         this.fee_update_authority = fields.fee_update_authority
-        this.initialized = fields.initialized
       }
     }
   }
@@ -101,8 +86,7 @@ export async function getRegistryState (
         ['fee_amount', 'u64'],
         ['fee_mint', [32]],
         ['fee_destination', [32]],
-        ['fee_update_authority', [32]],
-        ['initialized', 'u64']
+        ['fee_update_authority', [32]]
       ]
     }]
   ])

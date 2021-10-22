@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "lint": "rustfmt src/*",
-    "build": "rm -f build/* && cargo build-bpf --manifest-path=Cargo.toml --bpf-out-dir=build && cp build/registry-keypair.json ../js/src/",
+    "build": "rm -f build/* && cargo build-bpf --manifest-path=Cargo.toml --bpf-out-dir=build",
     "deploy": "solana program deploy --final ./build/registry.so"
   }
 }

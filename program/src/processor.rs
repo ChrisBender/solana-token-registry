@@ -162,14 +162,12 @@ impl Processor {
         registry_meta.fee_mint = account_fee_mint.key.to_bytes();
         registry_meta.fee_destination = account_fee_destination.key.to_bytes();
         registry_meta.fee_update_authority = account_user.key.to_bytes();
-        registry_meta.initialized = true;
         registry_meta.serialize(&mut &mut account_registry_meta.data.borrow_mut()[..])?;
 
         /* Set the fields of account_registry_head and account_registry_tail */
         let mut registry_head = RegistryNodeAccount::default();
         registry_head.next_registry_node = account_registry_tail.key.to_bytes();
         registry_head.serialize(&mut &mut account_registry_head.data.borrow_mut()[..])?;
-        msg!("new registry_head: {:?}", registry_head);
         let mut registry_tail = RegistryNodeAccount::default();
         registry_tail.prev_registry_node = account_registry_head.key.to_bytes();
         registry_tail.serialize(&mut &mut account_registry_tail.data.borrow_mut()[..])?;
@@ -183,19 +181,21 @@ impl Processor {
         fee_amount: u64,
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
-        let _account_user = next_account_info(accounts_iter)?;
-        let _account_program = next_account_info(accounts_iter)?;
+        let account_user = next_account_info(accounts_iter)?;
         let account_fee_mint = next_account_info(accounts_iter)?;
         let account_fee_destination = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_initialized(account_registry_meta)?;
 
-        /* TODO */
         let mut registry_meta =
             RegistryMetaAccount::try_from_slice(&account_registry_meta.data.borrow())?;
+        if account_user.key.to_bytes() != registry_meta.fee_update_authority {
+            return Err(ProgramError::from(RegistryError::InvalidFeeUpdateAuthority));
+        }
         registry_meta.fee_amount = fee_amount;
         registry_meta.fee_mint = account_fee_mint.key.to_bytes();
         registry_meta.fee_destination = account_fee_destination.key.to_bytes();
+        registry_meta.serialize(&mut &mut account_registry_meta.data.borrow_mut()[..])?;
 
         Ok(())
     }
@@ -297,11 +297,6 @@ impl Processor {
 
     fn assert_initialized(account_registry_meta: &AccountInfo) -> Result<(), RegistryError> {
         if account_registry_meta.data_len() == 0 {
-            return Err(RegistryError::NotYetInitialized);
-        }
-        let registry_meta_account =
-            RegistryMetaAccount::try_from_slice(&account_registry_meta.data.borrow()).unwrap();
-        if !registry_meta_account.initialized {
             return Err(RegistryError::NotYetInitialized);
         }
         Ok(())
