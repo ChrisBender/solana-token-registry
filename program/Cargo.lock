@@ -1619,6 +1619,7 @@ version = "0.1.0"
 dependencies = [
  "arrayref",
  "borsh",
+ "byteorder",
  "num-derive",
  "num-traits",
  "num_enum",

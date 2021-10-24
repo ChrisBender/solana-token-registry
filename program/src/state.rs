@@ -35,3 +35,19 @@ pub struct RegistryNodeAccount {
     /// The address that is allowed to update all token properties (except the mint address), delete the node, or change the RegistryNodeAccount::token_update_authority.
     pub token_update_authority: [u8; 32],
 }
+
+impl RegistryNodeAccount {
+    pub fn max_filled() -> RegistryNodeAccount {
+        RegistryNodeAccount {
+            next_registry_node: [0; 32],
+            prev_registry_node: [0; 32],
+            token_mint: [0; 32],
+            token_symbol: String::from_utf8(vec![b'\0'; 16]).unwrap(),
+            token_name: String::from_utf8(vec![b'\0'; 32]).unwrap(),
+            token_logo_url: String::from_utf8(vec![b'\0'; 256]).unwrap(),
+            token_tags: vec![String::from_utf8(vec![b'\0'; 256]).unwrap(); 2],
+            token_extensions: vec![vec![String::from_utf8(vec![b'\0'; 256]).unwrap(); 2]; 2],
+            token_update_authority: [0; 32],
+        }
+    }
+}

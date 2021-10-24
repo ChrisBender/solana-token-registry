@@ -88,8 +88,8 @@ describe('InitializeRegistry', () => {
       ))
       unreachable()
     } catch (error) {
-      const txLogs = ((error as SendTransactionError).logs as string[]).join(' ')
-      expect(txLogs).toMatch(/RegistryError::NotYetInitialized/)
+      // Note that createInstructionCreateEntry throws an error itself if the registry has not been initialized.
+      expect((error as Error).message).toEqual('Registry has not yet been initialized.')
     }
 
     // RegistryInstruction::DeleteEntry

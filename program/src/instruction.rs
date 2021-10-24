@@ -1,7 +1,7 @@
 use crate::error::RegistryError;
 
 // #[repr(C)]
-pub enum RegistryInstruction<'a> {
+pub enum RegistryInstruction {
     /**
      * Initialize the registry.
      *
@@ -33,11 +33,9 @@ pub enum RegistryInstruction<'a> {
      *
      * Accounts:
      * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryHeadAccount::fee_update_authority`.
-     * 1. [] The program account.
-     * 2. [] The new `fee_mint`.
-     * 3. [] The new `fee_destination`.
-     * 4. [] The RegistryMetaAccount.
-     * .. [] All the RegistryNodeAccounts, in order.
+     * 1. [] The new `fee_mint`.
+     * 2. [] The new `fee_destination`.
+     * 3. [writable] The RegistryMetaAccount.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 1).
@@ -63,8 +61,9 @@ pub enum RegistryInstruction<'a> {
      * 4. [writable] The destination account. Must be the Associated Token Account of `fee_destination`.
      * 5. [] The system program (to create a new account).
      * 6. [] The token program (to transfer tokens).
-     * 7. [] The RegistryMetaAccount.
-     * .. [] All the RegistryNodeAccounts, in order.
+     * 7. [writable] The RegistryMetaAccount.
+     * 8. [writable] The RegistryHeadAccount.
+     * 9. [writable] The new RegistryNodeAccount.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 2).
@@ -84,11 +83,11 @@ pub enum RegistryInstruction<'a> {
      *
      */
     CreateEntry {
-        token_symbol: &'a str,
-        token_name: &'a str,
-        token_logo_url: &'a str,
-        token_tags: Vec<&'a str>,
-        token_extensions: Vec<[&'a str; 2]>,
+        token_symbol: String,
+        token_name: String,
+        token_logo_url: String,
+        token_tags: Vec<String>,
+        token_extensions: Vec<Vec<String>>,
     },
 
     /**
@@ -138,11 +137,11 @@ pub enum RegistryInstruction<'a> {
      *
      */
     UpdateEntry {
-        token_symbol: &'a str,
-        token_name: &'a str,
-        token_logo_url: &'a str,
-        token_tags: Vec<&'a str>,
-        token_extensions: Vec<[&'a str; 2]>,
+        token_symbol: String,
+        token_name: String,
+        token_logo_url: String,
+        token_tags: Vec<String>,
+        token_extensions: Vec<Vec<String>>,
     },
 
     /**
@@ -186,7 +185,7 @@ pub enum RegistryInstruction<'a> {
     TransferTokenAuthority,
 }
 
-impl<'a> RegistryInstruction<'a> {
+impl RegistryInstruction {
     pub fn unpack(input: &[u8]) -> Result<Self, RegistryError> {
         let (tag, rest) = input
             .split_first()
@@ -209,11 +208,14 @@ impl<'a> RegistryInstruction<'a> {
                 }
             }
             2 | 4 => {
-                let token_symbol = "Symbol";
-                let token_name = "Name";
-                let token_logo_url = "Logo URL";
-                let token_tags = vec!["Tag1", "Tag2"];
-                let token_extensions = vec![["UrlKey", "UrlValue"], ["TwitterKey", "TwitterValue"]];
+                let token_symbol = String::from("Symbol");
+                let token_name = String::from("Name");
+                let token_logo_url = String::from("Logo URL");
+                let token_tags = vec![String::from("Tag1"), String::from("Tag2")];
+                let token_extensions = vec![
+                    vec![String::from("UrlKey"), String::from("UrlValue")],
+                    vec![String::from("TwitterKey"), String::from("TwitterValue")],
+                ];
                 match tag {
                     2 => Self::CreateEntry {
                         token_symbol: token_symbol,

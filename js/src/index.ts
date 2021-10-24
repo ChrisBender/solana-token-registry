@@ -11,12 +11,15 @@ const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ
 const ATA_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
 
 interface RegistryMetaAccount {
+  publicKey: PublicKey
   feeAmount: bigint
   feeMint: PublicKey
   feeDestination: PublicKey
   feeUpdateAuthority: PublicKey
 }
 interface RegistryNodeAccount {
+  publicKey: PublicKey
+  nextRegistryNode: PublicKey
   mint: PublicKey
   symbol: string
   name: string
@@ -26,11 +29,49 @@ interface RegistryNodeAccount {
   updateAuthority: PublicKey
 }
 
+// class BorshInstructionData {
+//   token_symbol = ''
+//   token_name = ''
+//   token_logo_url = ''
+//   token_tags = ['']
+//   token_extensions = [['']]
+//   constructor (fields: {
+//     token_symbol: string
+//     token_name: string
+//     token_logo_url: string
+//     token_tags: string[]
+//     token_extensions: string[][]
+//   } | undefined = undefined) {
+//     if (fields != null) {
+//       this.token_symbol = fields.token_symbol
+//       this.token_name = fields.token_name
+//       this.token_logo_url = fields.token_logo_url
+//       this.token_tags = fields.token_tags
+//       this.token_extensions = fields.token_extensions
+//     }
+//   }
+// }
+// const BorshInstructionDataSchema = new Map([
+//   [BorshInstructionData, {
+//     kind: 'struct',
+//     fields: [
+//       ['token_symbol', 'String'],
+//       ['token_name', 'String'],
+//       ['token_logo_url', 'String'],
+//       ['token_tags', ['String']],
+//       ['token_extensions', [['String']]]
+//     ]
+//   }]
+// ])
+
 /**
  * Returns a list of all the registered tokens.
  *
  */
-export async function getAllTokens (connection: Connection, programId: PublicKey): Promise<RegistryNodeAccount[]> {
+export async function getAllTokens (
+  connection: Connection,
+  programId: PublicKey
+): Promise<RegistryNodeAccount[]> {
   const registryState = await getRegistryState(connection, programId)
   if (registryState === null) {
     return []
@@ -142,15 +183,13 @@ export async function getRegistryState (
     }]
   ])
 
-  const registryMetaPublicKey = await getProgramDerivedAddress('meta', programId)
-  const registryHeadPublicKey = await getProgramDerivedAddress('head', programId)
-  const registryTailPublicKey = await getProgramDerivedAddress('tail', programId)
+  const registryMetaPublicKey = await getPDA('meta', programId)
+  const registryHeadPublicKey = await getPDA('head', programId)
   const registryMetaAccountInfo = await connection.getAccountInfo(registryMetaPublicKey)
   const registryHeadAccountInfo = await connection.getAccountInfo(registryHeadPublicKey)
-  const registryTailAccountInfo = await connection.getAccountInfo(registryTailPublicKey)
 
   /* If the registry has not yet been initialized, return null. */
-  if (registryMetaAccountInfo === null || registryHeadAccountInfo === null || registryTailAccountInfo === null) {
+  if (registryMetaAccountInfo === null || registryHeadAccountInfo === null) {
     return null
   }
 
@@ -159,26 +198,25 @@ export async function getRegistryState (
     BorshRegistryMetaAccount,
     registryMetaAccountInfo.data
   )
-
+  let length = registryHeadAccountInfo.data.readUInt32BE(0)
+  // console.log(registryHeadAccountInfo.data.toString('hex'))
+  // console.log(length)
   const borshRegistryHeadAccount = deserialize(
     BorshRegistryNodeAccountSchema,
     BorshRegistryNodeAccount,
-    registryHeadAccountInfo.data
-  )
-
-  const borshRegistryTailAccount = deserialize(
-    BorshRegistryNodeAccountSchema,
-    BorshRegistryNodeAccount,
-    registryTailAccountInfo.data
+    registryHeadAccountInfo.data.slice(4, 4 + length)
   )
 
   const registryMetaAccount = {
+    publicKey: registryMetaPublicKey,
     feeAmount: BigInt(borshRegistryMetaAccount.fee_amount),
     feeMint: new PublicKey(borshRegistryMetaAccount.fee_mint),
     feeDestination: new PublicKey(borshRegistryMetaAccount.fee_destination),
     feeUpdateAuthority: new PublicKey(borshRegistryMetaAccount.fee_update_authority)
   }
   const registryHeadAccount = {
+    publicKey: registryHeadPublicKey,
+    nextRegistryNode: new PublicKey(borshRegistryHeadAccount.next_registry_node),
     mint: new PublicKey(borshRegistryHeadAccount.token_mint),
     symbol: borshRegistryHeadAccount.token_symbol,
     name: borshRegistryHeadAccount.token_name,
@@ -187,17 +225,33 @@ export async function getRegistryState (
     extensions: borshRegistryHeadAccount.token_extensions,
     updateAuthority: new PublicKey(borshRegistryHeadAccount.token_update_authority)
   }
-  const registryTailAccount = {
-    mint: new PublicKey(borshRegistryTailAccount.token_mint),
-    symbol: borshRegistryTailAccount.token_symbol,
-    name: borshRegistryTailAccount.token_name,
-    logoURL: borshRegistryTailAccount.token_logo_url,
-    tags: borshRegistryTailAccount.token_tags,
-    extensions: borshRegistryTailAccount.token_extensions,
-    updateAuthority: new PublicKey(borshRegistryTailAccount.token_update_authority)
-  }
 
-  return [registryMetaAccount, [registryHeadAccount, registryTailAccount]]
+  const registryNodeAccounts = [registryHeadAccount]
+  while (registryNodeAccounts[registryNodeAccounts.length - 1].nextRegistryNode.toString() !== PublicKey.default.toString()) {
+    const registryNodePublicKey = registryNodeAccounts[registryNodeAccounts.length - 1].nextRegistryNode
+    const registryNodeAccountInfo = await connection.getAccountInfo(registryNodePublicKey)
+    // @ts-expect-error
+    length = registryNodeAccountInfo.data.readUInt32BE(0)
+    const borshRegistryNodeAccount = deserialize(
+      BorshRegistryNodeAccountSchema,
+      BorshRegistryNodeAccount,
+      // @ts-expect-error
+      registryNodeAccountInfo.data.slice(4, 4 + length)
+    )
+    const registryNodeAccount = {
+      publicKey: registryNodePublicKey,
+      nextRegistryNode: new PublicKey(borshRegistryNodeAccount.next_registry_node),
+      mint: new PublicKey(borshRegistryNodeAccount.token_mint),
+      symbol: borshRegistryNodeAccount.token_symbol,
+      name: borshRegistryNodeAccount.token_name,
+      logoURL: borshRegistryNodeAccount.token_logo_url,
+      tags: borshRegistryNodeAccount.token_tags,
+      extensions: borshRegistryNodeAccount.token_extensions,
+      updateAuthority: new PublicKey(borshRegistryNodeAccount.token_update_authority)
+    }
+    registryNodeAccounts.push(registryNodeAccount)
+  }
+  return [registryMetaAccount, registryNodeAccounts]
 }
 
 /**
@@ -221,9 +275,11 @@ export async function createInstructionInitializeRegistry (
     { isSigner: false, isWritable: false, pubkey: programId },
     { isSigner: false, isWritable: false, pubkey: feeMintPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey },
-    { isSigner: false, isWritable: false, pubkey: SystemProgram.programId }
+    { isSigner: false, isWritable: false, pubkey: SystemProgram.programId },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('head', programId) },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('tail', programId) }
   ]
-  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: buffer,
@@ -251,9 +307,9 @@ export async function createInstructionUpdateFees (
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeMintPublicKey },
-    { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey }
+    { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) }
   ]
-  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: buffer,
@@ -295,15 +351,26 @@ export async function createInstructionCreateEntry (
     'ascii'
   )
 
+  const registryState = await getRegistryState(connection, programId)
+  let registryNodeAccounts
+  if (registryState === null) {
+    throw Error('Registry has not yet been initialized.')
+  } else {
+    registryNodeAccounts = registryState[1]
+  }
+
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: mintPublicKey },
     { isSigner: false, isWritable: true, pubkey: sourceTokenAccount },
     { isSigner: false, isWritable: true, pubkey: destinationTokenAccount },
     { isSigner: false, isWritable: false, pubkey: SystemProgram.programId },
-    { isSigner: false, isWritable: false, pubkey: TOKEN_PROGRAM_ID }
+    { isSigner: false, isWritable: false, pubkey: TOKEN_PROGRAM_ID },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
+    { isSigner: false, isWritable: true, pubkey: registryNodeAccounts[0].publicKey },
+    { isSigner: false, isWritable: true, pubkey: registryNodeAccounts[1].publicKey },
+    { isSigner: false, isWritable: true, pubkey: await getPDA(mintPublicKey.toBytes(), programId) }
   ]
-  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: buffer,
@@ -327,9 +394,11 @@ export async function createInstructionDeleteEntry (
 
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
-    { isSigner: false, isWritable: false, pubkey: mintPublicKey }
+    { isSigner: false, isWritable: false, pubkey: mintPublicKey },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('head', programId) },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('tail', programId) }
   ]
-  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: Buffer.from(buffer),
@@ -370,9 +439,11 @@ export async function createInstructionUpdateEntry (
 
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
-    { isSigner: false, isWritable: false, pubkey: mintPublicKey }
+    { isSigner: false, isWritable: false, pubkey: mintPublicKey },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('head', programId) },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('tail', programId) }
   ]
-  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: buffer,
@@ -396,9 +467,11 @@ export async function createInstructionTransferFeeAuthority (
 
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
-    { isSigner: false, isWritable: false, pubkey: feeAuthorityPublicKey }
+    { isSigner: false, isWritable: false, pubkey: feeAuthorityPublicKey },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('head', programId) },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('tail', programId) }
   ]
-  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: Buffer.from(buffer),
@@ -422,9 +495,11 @@ export async function createInstructionTransferTokenAuthority (
 
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
-    { isSigner: false, isWritable: false, pubkey: tokenAuthorityPublicKey }
+    { isSigner: false, isWritable: false, pubkey: tokenAuthorityPublicKey },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('head', programId) },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('tail', programId) }
   ]
-  await pushAllRegistryNodes(connection, programId, keys)
 
   return new TransactionInstruction({
     data: Buffer.from(buffer),
@@ -434,25 +509,10 @@ export async function createInstructionTransferTokenAuthority (
 }
 
 /* Utilities */
-interface transactionKey {
-  isSigner: boolean
-  isWritable: boolean
-  pubkey: PublicKey
-}
-async function pushAllRegistryNodes (
-  connection: Connection,
-  programId: PublicKey,
-  keys: transactionKey[]
-): Promise<void> {
-  const registryMetaPublicKey = await getProgramDerivedAddress('meta', programId)
-  const registryHeadPublicKey = await getProgramDerivedAddress('head', programId)
-  const registryTailPublicKey = await getProgramDerivedAddress('tail', programId)
-  keys.push({ isSigner: false, isWritable: true, pubkey: registryMetaPublicKey })
-  keys.push({ isSigner: false, isWritable: true, pubkey: registryHeadPublicKey })
-  keys.push({ isSigner: false, isWritable: true, pubkey: registryTailPublicKey })
-}
-
-async function getProgramDerivedAddress (seed: string, programId: PublicKey): Promise<PublicKey> {
+async function getPDA (
+  seed: string | Uint8Array,
+  programId: PublicKey
+): Promise<PublicKey> {
   const publicKey = (await PublicKey.findProgramAddress(
     [Buffer.from(seed)],
     programId
