@@ -49,7 +49,7 @@ describe('TransferTokenAuthority', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -59,7 +59,7 @@ describe('TransferTokenAuthority', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionTransferTokenAuthority(
       connection,
@@ -68,7 +68,7 @@ describe('TransferTokenAuthority', () => {
       ARBITRARY_MINT_2,
       userKeypair2.publicKey
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -78,7 +78,7 @@ describe('TransferTokenAuthority', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair2.publicKey
       }
-    ])
+    ]))
   }, TEST_TIMEOUT)
 
   test.concurrent('Read-over-write multiple times for TransferTokenAuthority', async () => {
@@ -105,7 +105,7 @@ describe('TransferTokenAuthority', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -115,7 +115,7 @@ describe('TransferTokenAuthority', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionTransferTokenAuthority(
       connection,
@@ -124,7 +124,7 @@ describe('TransferTokenAuthority', () => {
       ARBITRARY_MINT_2,
       userKeypair2.publicKey
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -134,7 +134,7 @@ describe('TransferTokenAuthority', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair2.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionTransferTokenAuthority(
       connection,
@@ -143,7 +143,7 @@ describe('TransferTokenAuthority', () => {
       ARBITRARY_MINT_2,
       userKeypair3.publicKey
     ), [userKeypair, userKeypair2])
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -153,7 +153,7 @@ describe('TransferTokenAuthority', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair3.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionTransferTokenAuthority(
       connection,
@@ -162,7 +162,7 @@ describe('TransferTokenAuthority', () => {
       ARBITRARY_MINT_2,
       userKeypair.publicKey
     ), [userKeypair, userKeypair3])
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -172,7 +172,7 @@ describe('TransferTokenAuthority', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
   }, TEST_TIMEOUT)
 
   test.concurrent('TransferTokenAuthority to yourself is OK', async () => {
@@ -199,7 +199,7 @@ describe('TransferTokenAuthority', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -209,7 +209,7 @@ describe('TransferTokenAuthority', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionTransferTokenAuthority(
       connection,
@@ -218,7 +218,7 @@ describe('TransferTokenAuthority', () => {
       ARBITRARY_MINT_2,
       userKeypair.publicKey
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -228,7 +228,7 @@ describe('TransferTokenAuthority', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
   }, TEST_TIMEOUT)
 
   test.concurrent('TransferTokenAuthority with invalid authority', async () => {
@@ -255,7 +255,7 @@ describe('TransferTokenAuthority', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -265,7 +265,7 @@ describe('TransferTokenAuthority', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     try {
       await sendAndConfirmTx(connection, await createInstructionTransferTokenAuthority(

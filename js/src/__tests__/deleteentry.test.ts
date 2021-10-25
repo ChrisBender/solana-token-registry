@@ -40,7 +40,7 @@ describe('DeleteEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -53,7 +53,7 @@ describe('DeleteEntry', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -63,7 +63,7 @@ describe('DeleteEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionDeleteEntry(
       connection,
@@ -71,7 +71,7 @@ describe('DeleteEntry', () => {
       userKeypair.publicKey,
       ARBITRARY_MINT_2
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
   }, TEST_TIMEOUT)
 
   test.concurrent('Create, Delete, Create, Delete the same mint', async () => {
@@ -86,7 +86,7 @@ describe('DeleteEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -99,7 +99,7 @@ describe('DeleteEntry', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -109,7 +109,7 @@ describe('DeleteEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionDeleteEntry(
       connection,
@@ -117,7 +117,7 @@ describe('DeleteEntry', () => {
       userKeypair.publicKey,
       ARBITRARY_MINT_2
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -130,7 +130,7 @@ describe('DeleteEntry', () => {
       ['TAGS_2_1', 'TAGS_2_2'],
       [['EXTENSIONS_2_KEY', 'EXTENSIONS_2_VAL']]
     ), [userKeypair, userKeypair2])
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_2',
@@ -140,7 +140,7 @@ describe('DeleteEntry', () => {
         extensions: [['EXTENSIONS_2_KEY', 'EXTENSIONS_2_VAL']],
         updateAuthority: userKeypair2.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionDeleteEntry(
       connection,
@@ -148,7 +148,7 @@ describe('DeleteEntry', () => {
       userKeypair2.publicKey,
       ARBITRARY_MINT_2
     ), [userKeypair, userKeypair2])
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
   }, TEST_TIMEOUT)
 
   test.concurrent('DeleteEntry with invalid authority', async () => {
@@ -163,7 +163,7 @@ describe('DeleteEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -176,7 +176,7 @@ describe('DeleteEntry', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -186,7 +186,7 @@ describe('DeleteEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     try {
       await sendAndConfirmTx(connection, await createInstructionDeleteEntry(
@@ -231,7 +231,7 @@ describe('DeleteEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -244,7 +244,7 @@ describe('DeleteEntry', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -254,7 +254,7 @@ describe('DeleteEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -267,7 +267,7 @@ describe('DeleteEntry', () => {
       ['TAGS_2_1', 'TAGS_2_2'],
       [['EXTENSIONS_2_KEY', 'EXTENSIONS_2_VAL']]
     ), [userKeypair, userKeypair2])
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_3,
         symbol: 'SYMBOL_2',
@@ -286,7 +286,7 @@ describe('DeleteEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionDeleteEntry(
       connection,
@@ -294,7 +294,7 @@ describe('DeleteEntry', () => {
       userKeypair.publicKey,
       ARBITRARY_MINT_2
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_3,
         symbol: 'SYMBOL_2',
@@ -304,7 +304,7 @@ describe('DeleteEntry', () => {
         extensions: [['EXTENSIONS_2_KEY', 'EXTENSIONS_2_VAL']],
         updateAuthority: userKeypair2.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionUpdateEntry(
       connection,
@@ -317,7 +317,7 @@ describe('DeleteEntry', () => {
       ['TAGS_2_1_NEW', 'TAGS_2_2_NEW'],
       [['EXTENSIONS_2_KEY_NEW', 'EXTENSIONS_2_VAL_NEW']]
     ), [userKeypair, userKeypair2])
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_3,
         symbol: 'SYMBOL_2_NEW',
@@ -327,7 +327,7 @@ describe('DeleteEntry', () => {
         extensions: [['EXTENSIONS_2_KEY_NEW', 'EXTENSIONS_2_VAL_NEW']],
         updateAuthority: userKeypair2.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -340,7 +340,7 @@ describe('DeleteEntry', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ), [userKeypair, userKeypair3])
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_3,
         symbol: 'SYMBOL_2_NEW',
@@ -359,7 +359,7 @@ describe('DeleteEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair3.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionDeleteEntry(
       connection,
@@ -367,7 +367,7 @@ describe('DeleteEntry', () => {
       userKeypair2.publicKey,
       ARBITRARY_MINT_3
     ), [userKeypair, userKeypair2])
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -377,6 +377,6 @@ describe('DeleteEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair3.publicKey
       }
-    ])
+    ]))
   }, TEST_TIMEOUT)
 })

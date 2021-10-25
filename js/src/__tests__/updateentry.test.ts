@@ -36,7 +36,7 @@ describe('UpdateEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -49,7 +49,7 @@ describe('UpdateEntry', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -59,7 +59,7 @@ describe('UpdateEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionUpdateEntry(
       connection,
@@ -72,7 +72,7 @@ describe('UpdateEntry', () => {
       ['TAGS_1_1_NEW', 'TAGS_1_2_NEW'],
       [['EXTENSIONS_1_KEY_NEW', 'EXTENSIONS_1_VAL_NEW']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1_NEW',
@@ -82,7 +82,7 @@ describe('UpdateEntry', () => {
         extensions: [['EXTENSIONS_1_KEY_NEW', 'EXTENSIONS_1_VAL_NEW']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
   }, TEST_TIMEOUT)
 
   test.concurrent('Read-over-write multiple times for UpdateEntry', async () => {
@@ -97,7 +97,7 @@ describe('UpdateEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -110,7 +110,7 @@ describe('UpdateEntry', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -120,7 +120,7 @@ describe('UpdateEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionUpdateEntry(
       connection,
@@ -133,7 +133,7 @@ describe('UpdateEntry', () => {
       ['TAGS_1_1_NEW', 'TAGS_1_2_NEW'],
       [['EXTENSIONS_1_KEY_NEW', 'EXTENSIONS_1_VAL_NEW']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1_NEW',
@@ -143,7 +143,7 @@ describe('UpdateEntry', () => {
         extensions: [['EXTENSIONS_1_KEY_NEW', 'EXTENSIONS_1_VAL_NEW']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionUpdateEntry(
       connection,
@@ -156,7 +156,7 @@ describe('UpdateEntry', () => {
       ['TAGS_1_1_NEW2', 'TAGS_1_2_NEW2'],
       [['EXTENSIONS_1_KEY_NEW2', 'EXTENSIONS_1_VAL_NEW2']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1_NEW2',
@@ -166,7 +166,7 @@ describe('UpdateEntry', () => {
         extensions: [['EXTENSIONS_1_KEY_NEW2', 'EXTENSIONS_1_VAL_NEW2']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
   }, TEST_TIMEOUT)
 
   test.concurrent('UpdateEntry with invalid authority', async () => {
@@ -181,7 +181,7 @@ describe('UpdateEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -194,7 +194,7 @@ describe('UpdateEntry', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -204,7 +204,7 @@ describe('UpdateEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     try {
       await sendAndConfirmTx(connection, await createInstructionUpdateEntry(
@@ -237,7 +237,7 @@ describe('UpdateEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     try {
       await sendAndConfirmTx(connection, await createInstructionUpdateEntry(

@@ -81,16 +81,16 @@ const BorshCreateEntryInstructionDataSchema = new Map([
 export async function getAllTokens (
   connection: Connection,
   programId: PublicKey
-): Promise<TokenEntry[]> {
+): Promise<Set<TokenEntry>> {
   const registryState = await getRegistryState(connection, programId)
   if (registryState !== null) {
     const registryNodeAccounts = registryState[1]
-    const tokenEntries = []
+    const tokenEntries = new Set<TokenEntry>()
     for (const registryNodeAccount of registryNodeAccounts.slice(1, -1)) {
       if (registryNodeAccount.deleted) {
         continue
       }
-      tokenEntries.push({
+      tokenEntries.add({
         mint: registryNodeAccount.mint,
         symbol: registryNodeAccount.symbol,
         name: registryNodeAccount.name,
@@ -102,7 +102,7 @@ export async function getAllTokens (
     }
     return tokenEntries
   }
-  return []
+  return new Set<TokenEntry>()
 }
 
 /**
@@ -112,7 +112,7 @@ export async function getAllTokens (
 export async function getAllTokensSanitized (
   connection: Connection,
   programId: PublicKey
-): Promise<TokenEntry[]> {
+): Promise<Set<TokenEntry>> {
   return await getAllTokens(connection, programId)
 }
 

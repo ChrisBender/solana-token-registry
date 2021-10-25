@@ -35,7 +35,7 @@ describe('CreateEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -48,7 +48,7 @@ describe('CreateEntry', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -58,7 +58,7 @@ describe('CreateEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
   }, TEST_TIMEOUT)
 
   test.concurrent('Read-over-write multiple times for CreateEntry', async () => {
@@ -73,7 +73,7 @@ describe('CreateEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -86,7 +86,7 @@ describe('CreateEntry', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_1_KEY', 'EXTENSIONS_1_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -96,7 +96,7 @@ describe('CreateEntry', () => {
         extensions: [['EXTENSIONS_1_1_KEY', 'EXTENSIONS_1_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -109,7 +109,7 @@ describe('CreateEntry', () => {
       ['TAGS_2_1', 'TAGS_2_2'],
       [['EXTENSIONS_2_1_KEY', 'EXTENSIONS_2_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_3,
         symbol: 'SYMBOL_2',
@@ -128,7 +128,7 @@ describe('CreateEntry', () => {
         extensions: [['EXTENSIONS_1_1_KEY', 'EXTENSIONS_1_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
   }, TEST_TIMEOUT)
 
   test.concurrent('CreateEntry twice on the same mint should fail', async () => {
@@ -143,7 +143,7 @@ describe('CreateEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     await sendAndConfirmTx(connection, await createInstructionCreateEntry(
       connection,
@@ -156,7 +156,7 @@ describe('CreateEntry', () => {
       ['TAGS_1_1', 'TAGS_1_2'],
       [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([
+    expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
         mint: ARBITRARY_MINT_2,
         symbol: 'SYMBOL_1',
@@ -166,7 +166,7 @@ describe('CreateEntry', () => {
         extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
         updateAuthority: userKeypair.publicKey
       }
-    ])
+    ]))
     try {
       await sendAndConfirmTx(connection, await createInstructionCreateEntry(
         connection,
@@ -198,7 +198,7 @@ describe('CreateEntry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
     try {
       await sendAndConfirmTx(connection, await createInstructionCreateEntry(

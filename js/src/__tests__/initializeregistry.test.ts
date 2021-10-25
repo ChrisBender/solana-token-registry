@@ -198,7 +198,7 @@ describe('InitializeRegistry', () => {
     const connection = getConnection()
     const programId = await deployProgram(connection, userKeypair)
 
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
     await sendAndConfirmTx(connection, await createInstructionInitializeRegistry(
       connection,
       programId,
@@ -207,6 +207,6 @@ describe('InitializeRegistry', () => {
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
-    expect(await getAllTokens(connection, programId)).toEqual([])
+    expect(await getAllTokens(connection, programId)).toEqual(new Set())
   }, TEST_TIMEOUT)
 })
