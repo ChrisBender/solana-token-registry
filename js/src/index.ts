@@ -505,6 +505,7 @@ export async function createInstructionTransferTokenAuthority (
   connection: Connection,
   programId: PublicKey,
   userPublicKey: PublicKey,
+  mintPublicKey: PublicKey,
   newTokenAuthorityPublicKey: PublicKey
 ): Promise<TransactionInstruction> {
   const buffer = Buffer.alloc(1)
@@ -512,10 +513,10 @@ export async function createInstructionTransferTokenAuthority (
 
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
-    { isSigner: false, isWritable: false, pubkey: newTokenAuthorityPublicKey },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('head', programId) },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('tail', programId) }
+    { isSigner: false, isWritable: false, pubkey: mintPublicKey },
+    { isSigner: false, isWritable: false, pubkey: await getPDA('meta', programId) },
+    { isSigner: false, isWritable: true, pubkey: await getPDA(mintPublicKey.toBytes(), programId) },
+    { isSigner: false, isWritable: false, pubkey: newTokenAuthorityPublicKey }
   ]
 
   return new TransactionInstruction({

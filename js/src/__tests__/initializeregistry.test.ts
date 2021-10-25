@@ -148,6 +148,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
+        ARBITRARY_MINT_2,
         ARBITRARY_USER_1
       ))
       unreachable()

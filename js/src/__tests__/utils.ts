@@ -26,6 +26,7 @@ const configFile = '/Users/chris/.config/solana/id.json'
 const userPrivateKeyString = readFileSync(configFile).toString()
 export const userKeypair = Keypair.fromSecretKey(new Uint8Array(JSON.parse(userPrivateKeyString)))
 export const userKeypair2 = Keypair.generate()
+export const userKeypair3 = Keypair.generate()
 
 export function getConnection (): Connection {
   return new Connection('http://127.0.0.1:8899', 'confirmed')

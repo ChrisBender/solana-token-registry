@@ -317,15 +317,33 @@ impl<'a> Processor {
     }
 
     fn process_transfer_token_authority(
-        _program_id: &Pubkey,
+        program_id: &Pubkey,
         accounts: &[AccountInfo],
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
-        let _account_user = next_account_info(accounts_iter)?;
-        let _account_program = next_account_info(accounts_iter)?;
-        let _account_token_authority = next_account_info(accounts_iter)?;
+        let account_user = next_account_info(accounts_iter)?;
+        let account_mint = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_initialized(account_registry_meta)?;
+        let account_registry_to_update = next_account_info(accounts_iter)?;
+        Self::assert_valid_pda(
+            program_id,
+            account_registry_to_update,
+            &account_mint.key.to_bytes(),
+        )?;
+        let account_new_token_authority = next_account_info(accounts_iter)?;
+
+        let mut registry_node_to_update =
+            Self::deserialize_registry_account(account_registry_to_update)?;
+        if account_user.key.to_bytes() != registry_node_to_update.token_update_authority {
+            return Err(ProgramError::from(
+                RegistryError::InvalidTokenUpdateAuthority,
+            ));
+        }
+
+        registry_node_to_update.token_update_authority = account_new_token_authority.key.to_bytes();
+        Self::serialize_registry_account(registry_node_to_update, account_registry_to_update)?;
+
         Ok(())
     }
 
