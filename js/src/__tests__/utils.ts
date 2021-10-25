@@ -25,6 +25,7 @@ export const ARBITRARY_BIGINT_2 = BigInt(987654321)
 const configFile = '/Users/chris/.config/solana/id.json'
 const userPrivateKeyString = readFileSync(configFile).toString()
 export const userKeypair = Keypair.fromSecretKey(new Uint8Array(JSON.parse(userPrivateKeyString)))
+export const userKeypair2 = Keypair.generate()
 
 export function getConnection (): Connection {
   return new Connection('http://127.0.0.1:8899', 'confirmed')
@@ -63,17 +64,15 @@ export async function assertMetaAccountEquals (
 
 export async function sendAndConfirmTx (
   connection: Connection,
-  instruction: TransactionInstruction
+  instruction: TransactionInstruction,
+  signers: Keypair[] = [userKeypair]
 ): Promise<string> {
   const tx = new Transaction({
     feePayer: userKeypair.publicKey,
     recentBlockhash: (await connection.getRecentBlockhash()).blockhash
   })
   tx.add(instruction)
-  const signature = await connection.sendTransaction(
-    tx,
-    [userKeypair]
-  )
+  const signature = await connection.sendTransaction(tx, signers)
   await connection.confirmTransaction(signature)
   return signature
 }

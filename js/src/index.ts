@@ -418,8 +418,7 @@ export async function createInstructionDeleteEntry (
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: mintPublicKey },
     { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('head', programId) },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('tail', programId) }
+    { isSigner: false, isWritable: true, pubkey: await getPDA(mintPublicKey.toBytes(), programId) }
   ]
 
   return new TransactionInstruction({
@@ -462,8 +461,7 @@ export async function createInstructionUpdateEntry (
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: mintPublicKey },
     { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('head', programId) },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('tail', programId) }
+    { isSigner: false, isWritable: true, pubkey: await getPDA(mintPublicKey.toBytes(), programId) }
   ]
 
   return new TransactionInstruction({

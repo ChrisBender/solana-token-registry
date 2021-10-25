@@ -257,21 +257,41 @@ impl<'a> Processor {
     }
 
     fn process_update_entry(
-        _program_id: &Pubkey,
+        program_id: &Pubkey,
         accounts: &[AccountInfo],
-        _token_symbol: String,
-        _token_name: String,
-        _token_logo_url: String,
-        _token_tags: Vec<String>,
-        _token_extensions: Vec<Vec<String>>,
+        token_symbol: String,
+        token_name: String,
+        token_logo_url: String,
+        token_tags: Vec<String>,
+        token_extensions: Vec<Vec<String>>,
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
-        let _account_user = next_account_info(accounts_iter)?;
-        let _account_mint = next_account_info(accounts_iter)?;
+        let account_user = next_account_info(accounts_iter)?;
+        let account_mint = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_initialized(account_registry_meta)?;
-        let _account_registry_head = next_account_info(accounts_iter)?;
-        let _account_registry_tail = next_account_info(accounts_iter)?;
+        let account_registry_to_update = next_account_info(accounts_iter)?;
+        Self::assert_valid_pda(
+            program_id,
+            account_registry_to_update,
+            &account_mint.key.to_bytes(),
+        )?;
+
+        let mut registry_node_to_update =
+            Self::deserialize_registry_account(account_registry_to_update)?;
+        if account_user.key.to_bytes() != registry_node_to_update.token_update_authority {
+            return Err(ProgramError::from(
+                RegistryError::InvalidTokenUpdateAuthority,
+            ));
+        }
+
+        registry_node_to_update.token_symbol = token_symbol;
+        registry_node_to_update.token_name = token_name;
+        registry_node_to_update.token_logo_url = token_logo_url;
+        registry_node_to_update.token_tags = token_tags;
+        registry_node_to_update.token_extensions = token_extensions;
+        Self::serialize_registry_account(registry_node_to_update, account_registry_to_update)?;
+
         Ok(())
     }
 
@@ -374,13 +394,14 @@ impl<'a> Processor {
     fn deserialize_registry_account(
         registry_node_account: &AccountInfo,
     ) -> Result<RegistryNodeAccount, ProgramError> {
+        if registry_node_account.data_len() == 0 {
+            return Err(ProgramError::from(RegistryError::NotYetRegisteredMint));
+        }
         let length_bytes = u32::from_be_bytes(
             (&registry_node_account.data.borrow()[..4])
                 .try_into()
                 .unwrap(),
         ) as usize;
-        msg!("length_bytes: {:?}", length_bytes);
-
         Ok(RegistryNodeAccount::try_from_slice(
             &registry_node_account.data.borrow()[4..4 + length_bytes],
         )?)

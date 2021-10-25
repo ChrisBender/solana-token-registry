@@ -16,6 +16,8 @@ pub enum RegistryError {
     InvalidNumberOfAccounts,
     #[error("The provided mint is already in the registry.")]
     PreviouslyRegisteredMint,
+    #[error("The provided mint has not been registered yet.")]
+    NotYetRegisteredMint,
     #[error("A provided program derived account is not correct.")]
     InvalidProgramDerivedAccount,
     #[error("The provided mint is not owned by the token program.")]
@@ -56,6 +58,9 @@ impl PrintProgramError for RegistryError {
             }
             RegistryError::PreviouslyRegisteredMint => {
                 msg!("RegistryError::PreviouslyRegisteredMint - The provided mint is already in the registry.")
+            }
+            RegistryError::NotYetRegisteredMint => {
+                msg!("RegistryError::NotYetRegisteredMint - The provided mint has not been registered yet.")
             }
             RegistryError::InvalidProgramDerivedAccount => {
                 msg!("RegistryError::InvalidProgramDerivedAccount - A provided program derived account is not correct.")
