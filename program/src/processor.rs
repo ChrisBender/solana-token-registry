@@ -349,6 +349,9 @@ impl<'a> Processor {
         seed: &[u8],
         bump_seed: u8,
     ) -> Result<(), ProgramError> {
+        if account_registry_new.data_len() != 0 {
+            return Err(ProgramError::from(RegistryError::PreviouslyRegisteredMint));
+        }
         let default_registry_node = RegistryNodeAccount::max_filled();
         let mut default_registry_node_buffer: Vec<u8> = Vec::new();
         default_registry_node.serialize(&mut default_registry_node_buffer)?;

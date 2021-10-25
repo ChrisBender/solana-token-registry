@@ -18,6 +18,10 @@ import {
   sendAndConfirmTx
 } from './utils'
 
+import {
+  SendTransactionError
+} from '@solana/web3.js'
+
 describe('CreateEntry', () => {
   test.concurrent('Read-over-write for CreateEntry', async () => {
     const connection = getConnection()
@@ -125,6 +129,61 @@ describe('CreateEntry', () => {
         updateAuthority: userKeypair.publicKey
       }
     ])
+  }, TEST_TIMEOUT)
+
+  test.concurrent('CreateEntry twice on the same mint should fail', async () => {
+    const connection = getConnection()
+    const programId = await deployProgram(connection, userKeypair)
+
+    await sendAndConfirmTx(connection, await createInstructionInitializeRegistry(
+      connection,
+      programId,
+      userKeypair.publicKey,
+      ARBITRARY_MINT_1,
+      ARBITRARY_USER_1,
+      ARBITRARY_BIGINT_1
+    ))
+    expect(await getAllTokens(connection, programId)).toEqual([])
+
+    await sendAndConfirmTx(connection, await createInstructionCreateEntry(
+      connection,
+      programId,
+      userKeypair.publicKey,
+      ARBITRARY_MINT_2,
+      'SYMBOL_1',
+      'NAME_1',
+      'LOGO_URL_1',
+      ['TAGS_1_1', 'TAGS_1_2'],
+      [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
+    ))
+    expect(await getAllTokens(connection, programId)).toEqual([
+      {
+        mint: ARBITRARY_MINT_2,
+        symbol: 'SYMBOL_1',
+        name: 'NAME_1',
+        logoURL: 'LOGO_URL_1',
+        tags: ['TAGS_1_1', 'TAGS_1_2'],
+        extensions: [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']],
+        updateAuthority: userKeypair.publicKey
+      }
+    ])
+    try {
+      await sendAndConfirmTx(connection, await createInstructionCreateEntry(
+        connection,
+        programId,
+        userKeypair.publicKey,
+        ARBITRARY_MINT_2,
+        'SYMBOL_1',
+        'NAME_1',
+        'LOGO_URL_1',
+        ['TAGS_1_1', 'TAGS_1_2'],
+        [['EXTENSIONS_1_KEY', 'EXTENSIONS_1_VAL']]
+      ))
+      unreachable()
+    } catch (error) {
+      const txLogs = ((error as SendTransactionError).logs as string[]).join(' ')
+      expect(txLogs).toMatch(/RegistryError::PreviouslyRegisteredMint/)
+    }
   }, TEST_TIMEOUT)
 
   test.concurrent('CreateEntry with too much data', async () => {
