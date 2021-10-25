@@ -230,8 +230,6 @@ export async function getRegistryState (
     registryMetaAccountInfo.data
   )
   let length = registryHeadAccountInfo.data.readUInt32BE(0)
-  // console.log(registryHeadAccountInfo.data.toString('hex'))
-  // console.log(length)
   const borshRegistryHeadAccount = deserialize(
     BorshRegistryNodeAccountSchema,
     BorshRegistryNodeAccount,

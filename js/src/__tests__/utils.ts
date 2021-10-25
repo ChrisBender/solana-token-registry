@@ -13,7 +13,7 @@ import { getRegistryState } from '../index'
 // Hack to prevent API calls from displaying error messages.
 console.error = () => undefined
 
-export const TEST_TIMEOUT = 200000
+export const TEST_TIMEOUT = 50000
 export const ARBITRARY_MINT_1 = new PublicKey('7Cab8z1Lz1bTC9bQNeY7VQoZw5a2YbZoxmvFSvPgcTEL')
 export const ARBITRARY_MINT_2 = new PublicKey('7STJWT74tAZzhbNNPRH8WuGDy9GZg27968EwALWuezrH')
 export const ARBITRARY_MINT_3 = new PublicKey('3MoHgE6bJ2Ak1tEvTt5SVgSN2oXiwt6Gk5s6wbBxdmmN')
