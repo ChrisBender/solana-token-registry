@@ -51,3 +51,12 @@ impl RegistryNodeAccount {
         }
     }
 }
+
+#[derive(BorshSerialize, BorshDeserialize, Debug, Default)]
+pub struct CreateUpdateEntryInstructionData {
+    pub token_symbol: String,
+    pub token_name: String,
+    pub token_logo_url: String,
+    pub token_tags: Vec<String>,
+    pub token_extensions: Vec<Vec<String>>,
+}

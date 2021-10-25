@@ -5,7 +5,7 @@ import {
   TransactionInstruction
 } from '@solana/web3.js'
 
-import { deserialize } from 'borsh'
+import { serialize, deserialize } from 'borsh'
 
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
 const ATA_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
@@ -28,41 +28,50 @@ interface RegistryNodeAccount {
   extensions: string[][]
   updateAuthority: PublicKey
 }
+interface TokenEntry {
+  mint: PublicKey
+  symbol: string
+  name: string
+  logoURL: string
+  tags: string[]
+  extensions: string[][]
+  updateAuthority: PublicKey
+}
 
-// class BorshInstructionData {
-//   token_symbol = ''
-//   token_name = ''
-//   token_logo_url = ''
-//   token_tags = ['']
-//   token_extensions = [['']]
-//   constructor (fields: {
-//     token_symbol: string
-//     token_name: string
-//     token_logo_url: string
-//     token_tags: string[]
-//     token_extensions: string[][]
-//   } | undefined = undefined) {
-//     if (fields != null) {
-//       this.token_symbol = fields.token_symbol
-//       this.token_name = fields.token_name
-//       this.token_logo_url = fields.token_logo_url
-//       this.token_tags = fields.token_tags
-//       this.token_extensions = fields.token_extensions
-//     }
-//   }
-// }
-// const BorshInstructionDataSchema = new Map([
-//   [BorshInstructionData, {
-//     kind: 'struct',
-//     fields: [
-//       ['token_symbol', 'String'],
-//       ['token_name', 'String'],
-//       ['token_logo_url', 'String'],
-//       ['token_tags', ['String']],
-//       ['token_extensions', [['String']]]
-//     ]
-//   }]
-// ])
+class BorshCreateEntryInstructionData {
+  token_symbol = ''
+  token_name = ''
+  token_logo_url = ''
+  token_tags = ['']
+  token_extensions = [['']]
+  constructor (fields: {
+    token_symbol: string
+    token_name: string
+    token_logo_url: string
+    token_tags: string[]
+    token_extensions: string[][]
+  } | undefined = undefined) {
+    if (fields != null) {
+      this.token_symbol = fields.token_symbol
+      this.token_name = fields.token_name
+      this.token_logo_url = fields.token_logo_url
+      this.token_tags = fields.token_tags
+      this.token_extensions = fields.token_extensions
+    }
+  }
+}
+const BorshCreateEntryInstructionDataSchema = new Map([
+  [BorshCreateEntryInstructionData, {
+    kind: 'struct',
+    fields: [
+      ['token_symbol', 'String'],
+      ['token_name', 'String'],
+      ['token_logo_url', 'String'],
+      ['token_tags', ['String']],
+      ['token_extensions', [['String']]]
+    ]
+  }]
+])
 
 /**
  * Returns a list of all the registered tokens.
@@ -71,21 +80,35 @@ interface RegistryNodeAccount {
 export async function getAllTokens (
   connection: Connection,
   programId: PublicKey
-): Promise<RegistryNodeAccount[]> {
+): Promise<TokenEntry[]> {
   const registryState = await getRegistryState(connection, programId)
-  if (registryState === null) {
-    return []
-  } else {
+  if (registryState !== null) {
     const registryNodeAccounts = registryState[1]
-    return registryNodeAccounts.slice(1, -1)
+    const tokenEntries = []
+    for (const registryNodeAccount of registryNodeAccounts.slice(1, -1)) {
+      tokenEntries.push({
+        mint: registryNodeAccount.mint,
+        symbol: registryNodeAccount.symbol,
+        name: registryNodeAccount.name,
+        logoURL: registryNodeAccount.logoURL,
+        tags: registryNodeAccount.tags,
+        extensions: registryNodeAccount.extensions,
+        updateAuthority: registryNodeAccount.updateAuthority
+      })
+    }
+    return tokenEntries
   }
+  return []
 }
 
 /**
  * Returns a sanitized list of all the registered tokens. Throw away all duplicate tickers and names, only keeping the ticker or name with highest active DEX volume.
  *
  */
-export async function getAllTokensSanitized (connection: Connection, programId: PublicKey): Promise<RegistryNodeAccount[]> {
+export async function getAllTokensSanitized (
+  connection: Connection,
+  programId: PublicKey
+): Promise<TokenEntry[]> {
   return await getAllTokens(connection, programId)
 }
 
@@ -336,20 +359,19 @@ export async function createInstructionCreateEntry (
   const sourceTokenAccount = await getATA(connection, userPublicKey, mintPublicKey)
   const destinationTokenAccount = await getATA(connection, userPublicKey, mintPublicKey)
 
-  const serializedTokenTags = JSON.stringify(tokenTags)
-  const serializedTokenExtensions = JSON.stringify(tokenExtensions)
-  const buffer = Buffer.alloc(
-    1 + tokenSymbol.length + tokenName.length + tokenLogoUrl.length +
-    serializedTokenTags.length + serializedTokenExtensions.length + 5
+  const serializedFlag = Buffer.alloc(1)
+  serializedFlag.writeUInt8(2)
+  const serializedInstructionData = serialize(
+    BorshCreateEntryInstructionDataSchema,
+    new BorshCreateEntryInstructionData({
+      token_symbol: tokenSymbol,
+      token_name: tokenName,
+      token_logo_url: tokenLogoUrl,
+      token_tags: tokenTags,
+      token_extensions: tokenExtensions
+    })
   )
-  buffer.writeUInt8(2)
-  buffer.write(
-    tokenSymbol + '\0' + tokenName + '\0' + tokenLogoUrl + '\0' +
-    serializedTokenTags + '\0' + serializedTokenExtensions + '\0',
-    1,
-    buffer.length - 1,
-    'ascii'
-  )
+  const buffer = Buffer.concat([serializedFlag, serializedInstructionData])
 
   const registryState = await getRegistryState(connection, programId)
   let registryNodeAccounts
@@ -422,20 +444,19 @@ export async function createInstructionUpdateEntry (
   tokenTags: string[],
   tokenExtensions: Array<[string, string]>
 ): Promise<TransactionInstruction> {
-  const serializedTokenTags = JSON.stringify(tokenTags)
-  const serializedTokenExtensions = JSON.stringify(tokenExtensions)
-  const buffer = Buffer.alloc(
-    1 + tokenSymbol.length + tokenName.length + tokenLogoUrl.length +
-    serializedTokenTags.length + serializedTokenExtensions.length + 5
+  const serializedFlag = Buffer.alloc(1)
+  serializedFlag.writeUInt8(4)
+  const serializedInstructionData = serialize(
+    BorshCreateEntryInstructionDataSchema,
+    new BorshCreateEntryInstructionData({
+      token_symbol: tokenSymbol,
+      token_name: tokenName,
+      token_logo_url: tokenLogoUrl,
+      token_tags: tokenTags,
+      token_extensions: tokenExtensions
+    })
   )
-  buffer.writeUInt8(4)
-  buffer.write(
-    tokenSymbol + '\0' + tokenName + '\0' + tokenLogoUrl + '\0' +
-    serializedTokenTags + '\0' + serializedTokenExtensions + '\0',
-    1,
-    buffer.length - 1,
-    'ascii'
-  )
+  const buffer = Buffer.concat([serializedFlag, serializedInstructionData])
 
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },

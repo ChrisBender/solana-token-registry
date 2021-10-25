@@ -1,4 +1,5 @@
-use crate::error::RegistryError;
+use crate::{error::RegistryError, state::CreateUpdateEntryInstructionData};
+use borsh::BorshDeserialize;
 
 // #[repr(C)]
 pub enum RegistryInstruction {
@@ -208,28 +209,23 @@ impl RegistryInstruction {
                 }
             }
             2 | 4 => {
-                let token_symbol = String::from("Symbol");
-                let token_name = String::from("Name");
-                let token_logo_url = String::from("Logo URL");
-                let token_tags = vec![String::from("Tag1"), String::from("Tag2")];
-                let token_extensions = vec![
-                    vec![String::from("UrlKey"), String::from("UrlValue")],
-                    vec![String::from("TwitterKey"), String::from("TwitterValue")],
-                ];
+                let parsed_instruction_data =
+                    CreateUpdateEntryInstructionData::try_from_slice(rest)
+                        .or(Err(RegistryError::InvalidInstructionData))?;
                 match tag {
                     2 => Self::CreateEntry {
-                        token_symbol: token_symbol,
-                        token_name: token_name,
-                        token_logo_url: token_logo_url,
-                        token_tags: token_tags,
-                        token_extensions: token_extensions,
+                        token_symbol: parsed_instruction_data.token_symbol,
+                        token_name: parsed_instruction_data.token_name,
+                        token_logo_url: parsed_instruction_data.token_logo_url,
+                        token_tags: parsed_instruction_data.token_tags,
+                        token_extensions: parsed_instruction_data.token_extensions,
                     },
                     4 => Self::UpdateEntry {
-                        token_symbol: token_symbol,
-                        token_name: token_name,
-                        token_logo_url: token_logo_url,
-                        token_tags: token_tags,
-                        token_extensions: token_extensions,
+                        token_symbol: parsed_instruction_data.token_symbol,
+                        token_name: parsed_instruction_data.token_name,
+                        token_logo_url: parsed_instruction_data.token_logo_url,
+                        token_tags: parsed_instruction_data.token_tags,
+                        token_extensions: parsed_instruction_data.token_extensions,
                     },
                     _ => {
                         return Err(RegistryError::InvalidInstructionData);

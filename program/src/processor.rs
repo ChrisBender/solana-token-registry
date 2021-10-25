@@ -267,10 +267,11 @@ impl<'a> Processor {
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
         let _account_user = next_account_info(accounts_iter)?;
-        let _account_program = next_account_info(accounts_iter)?;
         let _account_mint = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_initialized(account_registry_meta)?;
+        let _account_registry_head = next_account_info(accounts_iter)?;
+        let _account_registry_tail = next_account_info(accounts_iter)?;
         Ok(())
     }
 
