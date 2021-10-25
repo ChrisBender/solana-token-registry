@@ -300,11 +300,19 @@ impl<'a> Processor {
         accounts: &[AccountInfo],
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
-        let _account_user = next_account_info(accounts_iter)?;
-        let _account_program = next_account_info(accounts_iter)?;
-        let _account_fee_authority = next_account_info(accounts_iter)?;
+        let account_user = next_account_info(accounts_iter)?;
+        let account_new_fee_authority = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_initialized(account_registry_meta)?;
+
+        let mut registry_meta =
+            RegistryMetaAccount::try_from_slice(&account_registry_meta.data.borrow())?;
+        if account_user.key.to_bytes() != registry_meta.fee_update_authority {
+            return Err(ProgramError::from(RegistryError::InvalidFeeUpdateAuthority));
+        }
+        registry_meta.fee_update_authority = account_new_fee_authority.key.to_bytes();
+        registry_meta.serialize(&mut &mut account_registry_meta.data.borrow_mut()[..])?;
+
         Ok(())
     }
 

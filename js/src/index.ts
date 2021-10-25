@@ -479,17 +479,15 @@ export async function createInstructionTransferFeeAuthority (
   connection: Connection,
   programId: PublicKey,
   userPublicKey: PublicKey,
-  feeAuthorityPublicKey: PublicKey
+  newFeeAuthorityPublicKey: PublicKey
 ): Promise<TransactionInstruction> {
   const buffer = Buffer.alloc(1)
   buffer.writeUInt8(5)
 
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
-    { isSigner: false, isWritable: false, pubkey: feeAuthorityPublicKey },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('head', programId) },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('tail', programId) }
+    { isSigner: false, isWritable: false, pubkey: newFeeAuthorityPublicKey },
+    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) }
   ]
 
   return new TransactionInstruction({
@@ -507,14 +505,14 @@ export async function createInstructionTransferTokenAuthority (
   connection: Connection,
   programId: PublicKey,
   userPublicKey: PublicKey,
-  tokenAuthorityPublicKey: PublicKey
+  newTokenAuthorityPublicKey: PublicKey
 ): Promise<TransactionInstruction> {
   const buffer = Buffer.alloc(1)
   buffer.writeUInt8(6)
 
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
-    { isSigner: false, isWritable: false, pubkey: tokenAuthorityPublicKey },
+    { isSigner: false, isWritable: false, pubkey: newTokenAuthorityPublicKey },
     { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
     { isSigner: false, isWritable: true, pubkey: await getPDA('head', programId) },
     { isSigner: false, isWritable: true, pubkey: await getPDA('tail', programId) }
