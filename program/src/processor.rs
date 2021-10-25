@@ -241,6 +241,7 @@ impl<'a> Processor {
         registry_node_new.token_tags = token_tags;
         registry_node_new.token_extensions = token_extensions;
         registry_node_new.token_update_authority = account_user.key.to_bytes();
+        registry_node_new.deleted = false;
         Self::serialize_registry_account(registry_node_new, account_registry_new)?;
 
         Ok(())

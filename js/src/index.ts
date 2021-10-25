@@ -27,6 +27,7 @@ interface RegistryNodeAccount {
   tags: string[]
   extensions: string[][]
   updateAuthority: PublicKey
+  deleted: boolean
 }
 interface TokenEntry {
   mint: PublicKey
@@ -86,6 +87,9 @@ export async function getAllTokens (
     const registryNodeAccounts = registryState[1]
     const tokenEntries = []
     for (const registryNodeAccount of registryNodeAccounts.slice(1, -1)) {
+      if (registryNodeAccount.deleted) {
+        continue
+      }
       tokenEntries.push({
         mint: registryNodeAccount.mint,
         symbol: registryNodeAccount.symbol,
@@ -165,6 +169,7 @@ export async function getRegistryState (
     token_tags = ['']
     token_extensions = [['']]
     token_update_authority = new Uint8Array(32)
+    deleted = false
     constructor (fields: {
       next_registry_node: Uint8Array
       prev_registry_node: Uint8Array
@@ -175,6 +180,7 @@ export async function getRegistryState (
       token_tags: string[]
       token_extensions: string[][]
       token_update_authority: Uint8Array
+      deleted: boolean
     } | undefined = undefined) {
       if (fields != null) {
         this.next_registry_node = fields.next_registry_node
@@ -186,6 +192,7 @@ export async function getRegistryState (
         this.token_tags = fields.token_tags
         this.token_extensions = fields.token_extensions
         this.token_update_authority = fields.token_update_authority
+        this.deleted = fields.deleted
       }
     }
   }
@@ -201,7 +208,8 @@ export async function getRegistryState (
         ['token_logo_url', 'String'],
         ['token_tags', ['String']],
         ['token_extensions', [['String']]],
-        ['token_update_authority', [32]]
+        ['token_update_authority', [32]],
+        ['deleted', 'u8']
       ]
     }]
   ])
@@ -246,7 +254,8 @@ export async function getRegistryState (
     logoURL: borshRegistryHeadAccount.token_logo_url,
     tags: borshRegistryHeadAccount.token_tags,
     extensions: borshRegistryHeadAccount.token_extensions,
-    updateAuthority: new PublicKey(borshRegistryHeadAccount.token_update_authority)
+    updateAuthority: new PublicKey(borshRegistryHeadAccount.token_update_authority),
+    deleted: borshRegistryHeadAccount.deleted
   }
 
   const registryNodeAccounts = [registryHeadAccount]
@@ -270,7 +279,8 @@ export async function getRegistryState (
       logoURL: borshRegistryNodeAccount.token_logo_url,
       tags: borshRegistryNodeAccount.token_tags,
       extensions: borshRegistryNodeAccount.token_extensions,
-      updateAuthority: new PublicKey(borshRegistryNodeAccount.token_update_authority)
+      updateAuthority: new PublicKey(borshRegistryNodeAccount.token_update_authority),
+      deleted: borshRegistryNodeAccount.deleted
     }
     registryNodeAccounts.push(registryNodeAccount)
   }

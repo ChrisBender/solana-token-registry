@@ -34,6 +34,8 @@ pub struct RegistryNodeAccount {
     pub token_extensions: Vec<Vec<String>>,
     /// The address that is allowed to update all token properties (except the mint address), delete the node, or change the RegistryNodeAccount::token_update_authority.
     pub token_update_authority: [u8; 32],
+    /// Has this account been deleted?
+    pub deleted: bool,
 }
 
 impl RegistryNodeAccount {
@@ -48,6 +50,7 @@ impl RegistryNodeAccount {
             token_tags: vec![String::from_utf8(vec![b'\0'; 256]).unwrap(); 2],
             token_extensions: vec![vec![String::from_utf8(vec![b'\0'; 256]).unwrap(); 2]; 2],
             token_update_authority: [0; 32],
+            deleted: false,
         }
     }
 }
