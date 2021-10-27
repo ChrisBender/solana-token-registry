@@ -7,8 +7,7 @@ import {
 
 import {
   TEST_TIMEOUT,
-  ARBITRARY_MINT_1,
-  ARBITRARY_MINT_2,
+  ARBITRARY_MINTS,
   ARBITRARY_USER_1,
   ARBITRARY_BIGINT_1,
   getConnection,
@@ -33,7 +32,7 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -42,7 +41,7 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -51,7 +50,7 @@ describe('TransferTokenAuthority', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -65,12 +64,12 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       userKeypair2.publicKey
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -89,7 +88,7 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -98,7 +97,7 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -107,7 +106,7 @@ describe('TransferTokenAuthority', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -121,12 +120,12 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       userKeypair2.publicKey
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -140,12 +139,12 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair2.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       userKeypair3.publicKey
     ), [userKeypair, userKeypair2])
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -159,12 +158,12 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair3.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       userKeypair.publicKey
     ), [userKeypair, userKeypair3])
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -183,7 +182,7 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -192,7 +191,7 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -201,7 +200,7 @@ describe('TransferTokenAuthority', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -215,12 +214,12 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       userKeypair.publicKey
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -239,7 +238,7 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -248,7 +247,7 @@ describe('TransferTokenAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -257,7 +256,7 @@ describe('TransferTokenAuthority', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -272,7 +271,7 @@ describe('TransferTokenAuthority', () => {
         connection,
         programId,
         userKeypair2.publicKey,
-        ARBITRARY_MINT_2,
+        ARBITRARY_MINTS[1],
         userKeypair3.publicKey
       ), [userKeypair, userKeypair2])
       unreachable()

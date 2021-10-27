@@ -6,6 +6,11 @@ import {
   TransactionInstruction
 } from '@solana/web3.js'
 
+import {
+  TOKEN_PROGRAM_ID,
+  Token
+} from '@solana/spl-token'
+
 import { readFileSync } from 'fs'
 import { execSync } from 'child_process'
 import { getRegistryState } from '../index'
@@ -13,10 +18,8 @@ import { getRegistryState } from '../index'
 // Hack to prevent API calls from displaying error messages.
 console.error = () => undefined
 
-export const TEST_TIMEOUT = 50000
-export const ARBITRARY_MINT_1 = new PublicKey('7Cab8z1Lz1bTC9bQNeY7VQoZw5a2YbZoxmvFSvPgcTEL')
-export const ARBITRARY_MINT_2 = new PublicKey('7STJWT74tAZzhbNNPRH8WuGDy9GZg27968EwALWuezrH')
-export const ARBITRARY_MINT_3 = new PublicKey('3MoHgE6bJ2Ak1tEvTt5SVgSN2oXiwt6Gk5s6wbBxdmmN')
+export const TEST_TIMEOUT = 100000
+export const ARBITRARY_MINTS: PublicKey[] = []
 export const ARBITRARY_USER_1 = new PublicKey('DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEAD')
 export const ARBITRARY_USER_2 = new PublicKey('DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFBEEF')
 export const ARBITRARY_BIGINT_1 = BigInt(123456789)
@@ -36,8 +39,31 @@ export async function deployProgram (
   connection: Connection,
   userKeypair: Keypair
 ): Promise<PublicKey> {
+  /* Generate a Program ID and deploy the program. */
   const programId = Keypair.generate()
   execSync('echo "[' + programId.secretKey.toString() + ']" | solana program deploy --final --program-id - ../program/build/registry.so')
+
+  /* Initialize a few mints, create ATA for all userKeypairs, and mint some tokens. */
+  if (ARBITRARY_MINTS.length === 0) {
+    for (let i = 0; i < 3; i++) {
+      const token = await Token.createMint(
+        connection,
+        userKeypair,
+        userKeypair.publicKey,
+        null,
+        9,
+        TOKEN_PROGRAM_ID
+      )
+      ARBITRARY_MINTS.push(token.publicKey)
+      const userKeypairATA = await token.createAssociatedTokenAccount(userKeypair.publicKey)
+      const userKeypair2ATA = await token.createAssociatedTokenAccount(userKeypair2.publicKey)
+      const userKeypair3ATA = await token.createAssociatedTokenAccount(userKeypair3.publicKey)
+      await token.mintTo(userKeypairATA, userKeypair, [], 1e10)
+      await token.mintTo(userKeypair2ATA, userKeypair, [], 1e10)
+      await token.mintTo(userKeypair3ATA, userKeypair, [], 1e10)
+    }
+  }
+
   return programId.publicKey
 }
 

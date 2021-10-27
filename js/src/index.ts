@@ -2,7 +2,8 @@ import {
   Connection,
   PublicKey,
   SystemProgram,
-  TransactionInstruction
+  TransactionInstruction,
+  SYSVAR_RENT_PUBKEY
 } from '@solana/web3.js'
 
 import { serialize, deserialize } from 'borsh'
@@ -301,12 +302,22 @@ export async function createInstructionInitializeRegistry (
   buffer.writeUInt8(0)
   buffer.writeBigUInt64BE(feeAmount, 1)
 
+  const destinationTokenAccount = await getATA(
+    connection,
+    feeDestinationPublicKey,
+    feeMintPublicKey
+  )
+
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: programId },
     { isSigner: false, isWritable: false, pubkey: feeMintPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey },
+    { isSigner: false, isWritable: true, pubkey: destinationTokenAccount },
     { isSigner: false, isWritable: false, pubkey: SystemProgram.programId },
+    { isSigner: false, isWritable: false, pubkey: TOKEN_PROGRAM_ID },
+    { isSigner: false, isWritable: false, pubkey: ATA_PROGRAM_ID },
+    { isSigner: false, isWritable: false, pubkey: SYSVAR_RENT_PUBKEY },
     { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
     { isSigner: false, isWritable: true, pubkey: await getPDA('head', programId) },
     { isSigner: false, isWritable: true, pubkey: await getPDA('tail', programId) }
@@ -364,9 +375,6 @@ export async function createInstructionCreateEntry (
   tokenTags: string[],
   tokenExtensions: Array<[string, string]>
 ): Promise<TransactionInstruction> {
-  const sourceTokenAccount = await getATA(connection, userPublicKey, mintPublicKey)
-  const destinationTokenAccount = await getATA(connection, userPublicKey, mintPublicKey)
-
   const serializedFlag = Buffer.alloc(1)
   serializedFlag.writeUInt8(2)
   const serializedInstructionData = serialize(
@@ -382,12 +390,19 @@ export async function createInstructionCreateEntry (
   const buffer = Buffer.concat([serializedFlag, serializedInstructionData])
 
   const registryState = await getRegistryState(connection, programId)
-  let registryNodeAccounts
+  let registryMetaAccount, registryNodeAccounts
   if (registryState === null) {
     throw Error('Registry has not yet been initialized.')
   } else {
-    registryNodeAccounts = registryState[1]
+    [registryMetaAccount, registryNodeAccounts] = registryState
   }
+
+  const sourceTokenAccount = await getATA(connection, userPublicKey, registryMetaAccount.feeMint)
+  const destinationTokenAccount = await getATA(
+    connection,
+    registryMetaAccount.feeDestination,
+    registryMetaAccount.feeMint
+  )
 
   const keys = [
     { isSigner: true, isWritable: true, pubkey: userPublicKey },

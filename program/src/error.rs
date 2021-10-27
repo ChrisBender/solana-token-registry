@@ -24,10 +24,10 @@ pub enum RegistryError {
     InvalidMint,
     #[error("The provided fee mint is not owned by the token program.")]
     InvalidFeeMint,
-    #[error("The provided source account is not the Associated Token Account of the fee-payer.")]
-    InvalidSourceAccount,
-    #[error("The provided destination account is not the Associated Token Account of the fee destination.")]
-    InvalidDestinationAccount,
+    #[error("The provided account is not a valid Associated Token Account.")]
+    InvalidAssociatedTokenAccount,
+    #[error("The provided Associated Token Account has no data.")]
+    UninitializedAssociatedTokenAccount,
     #[error("The provided system program is not the real system program.")]
     InvalidSystemProgram,
     #[error("The provided token program is not the real token program.")]
@@ -71,11 +71,11 @@ impl PrintProgramError for RegistryError {
             RegistryError::InvalidFeeMint => {
                 msg!("RegistryError::InvalidFeeMint - The provided fee mint is not owned by the token program.")
             }
-            RegistryError::InvalidSourceAccount => {
-                msg!("RegistryError::InvalidSourceAccount - The provided source account is not the Associated Token Account of the fee-payer.")
+            RegistryError::InvalidAssociatedTokenAccount => {
+                msg!("RegistryError::InvalidAssociatedTokenAccount - The provided account is not a valid Associated Token Account.")
             }
-            RegistryError::InvalidDestinationAccount => {
-                msg!("RegistryError::InvalidDestinationAccount - The provided destination account is not the Associated Token Account of the fee destination.")
+            RegistryError::UninitializedAssociatedTokenAccount => {
+                msg!("RegistryError::UninitializedAssociatedTokenAccount - The provided Associated Token Account has no data.")
             }
             RegistryError::InvalidSystemProgram => {
                 msg!("RegistryError::InvalidSystemProgram - The provided system program is not the real system program.")

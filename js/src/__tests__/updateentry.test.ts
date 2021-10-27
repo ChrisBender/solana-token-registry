@@ -7,8 +7,7 @@ import {
 
 import {
   TEST_TIMEOUT,
-  ARBITRARY_MINT_1,
-  ARBITRARY_MINT_2,
+  ARBITRARY_MINTS,
   ARBITRARY_USER_1,
   ARBITRARY_BIGINT_1,
   getConnection,
@@ -32,7 +31,7 @@ describe('UpdateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -42,7 +41,7 @@ describe('UpdateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -51,7 +50,7 @@ describe('UpdateEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -65,7 +64,7 @@ describe('UpdateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1_NEW',
       'NAME_1_NEW',
       'LOGO_URL_1_NEW',
@@ -74,7 +73,7 @@ describe('UpdateEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1_NEW',
         name: 'NAME_1_NEW',
         logoURL: 'LOGO_URL_1_NEW',
@@ -93,7 +92,7 @@ describe('UpdateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -103,7 +102,7 @@ describe('UpdateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -112,7 +111,7 @@ describe('UpdateEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -126,7 +125,7 @@ describe('UpdateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1_NEW',
       'NAME_1_NEW',
       'LOGO_URL_1_NEW',
@@ -135,7 +134,7 @@ describe('UpdateEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1_NEW',
         name: 'NAME_1_NEW',
         logoURL: 'LOGO_URL_1_NEW',
@@ -149,7 +148,7 @@ describe('UpdateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1_NEW2',
       'NAME_1_NEW2',
       'LOGO_URL_1_NEW2',
@@ -158,7 +157,7 @@ describe('UpdateEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1_NEW2',
         name: 'NAME_1_NEW2',
         logoURL: 'LOGO_URL_1_NEW2',
@@ -177,7 +176,7 @@ describe('UpdateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -187,7 +186,7 @@ describe('UpdateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -196,7 +195,7 @@ describe('UpdateEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -211,7 +210,7 @@ describe('UpdateEntry', () => {
         connection,
         programId,
         userKeypair2.publicKey, // This pubkey does not match userKeypair.publicKey
-        ARBITRARY_MINT_2,
+        ARBITRARY_MINTS[1],
         'SYMBOL_1_NEW',
         'NAME_1_NEW',
         'LOGO_URL_1_NEW',
@@ -233,7 +232,7 @@ describe('UpdateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -244,7 +243,7 @@ describe('UpdateEntry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_MINT_2,
+        ARBITRARY_MINTS[1],
         'SYMBOL_1',
         'NAME_1',
         'LOGO_URL_1',

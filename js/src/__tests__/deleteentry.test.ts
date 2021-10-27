@@ -8,9 +8,7 @@ import {
 
 import {
   TEST_TIMEOUT,
-  ARBITRARY_MINT_1,
-  ARBITRARY_MINT_2,
-  ARBITRARY_MINT_3,
+  ARBITRARY_MINTS,
   ARBITRARY_USER_1,
   ARBITRARY_BIGINT_1,
   getConnection,
@@ -36,7 +34,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -46,7 +44,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -55,7 +53,7 @@ describe('DeleteEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -69,7 +67,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2
+      ARBITRARY_MINTS[1]
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set())
   }, TEST_TIMEOUT)
@@ -82,7 +80,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -92,7 +90,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -101,7 +99,7 @@ describe('DeleteEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -115,7 +113,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2
+      ARBITRARY_MINTS[1]
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set())
 
@@ -123,7 +121,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair2.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_2',
       'NAME_2',
       'LOGO_URL_2',
@@ -132,7 +130,7 @@ describe('DeleteEntry', () => {
     ), [userKeypair, userKeypair2])
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_2',
         name: 'NAME_2',
         logoURL: 'LOGO_URL_2',
@@ -146,7 +144,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair2.publicKey,
-      ARBITRARY_MINT_2
+      ARBITRARY_MINTS[1]
     ), [userKeypair, userKeypair2])
     expect(await getAllTokens(connection, programId)).toEqual(new Set())
   }, TEST_TIMEOUT)
@@ -159,7 +157,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -169,7 +167,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -178,7 +176,7 @@ describe('DeleteEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -193,7 +191,7 @@ describe('DeleteEntry', () => {
         connection,
         programId,
         userKeypair2.publicKey,
-        ARBITRARY_MINT_2
+        ARBITRARY_MINTS[1]
       ), [userKeypair, userKeypair2])
     } catch (error) {
       const txLogs = ((error as SendTransactionError).logs as string[]).join(' ')
@@ -227,7 +225,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -237,7 +235,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -246,7 +244,7 @@ describe('DeleteEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -260,7 +258,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair2.publicKey,
-      ARBITRARY_MINT_3,
+      ARBITRARY_MINTS[2],
       'SYMBOL_2',
       'NAME_2',
       'LOGO_URL_2',
@@ -269,7 +267,7 @@ describe('DeleteEntry', () => {
     ), [userKeypair, userKeypair2])
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_3,
+        mint: ARBITRARY_MINTS[2],
         symbol: 'SYMBOL_2',
         name: 'NAME_2',
         logoURL: 'LOGO_URL_2',
@@ -278,7 +276,7 @@ describe('DeleteEntry', () => {
         updateAuthority: userKeypair2.publicKey
       },
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -292,11 +290,11 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2
+      ARBITRARY_MINTS[1]
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_3,
+        mint: ARBITRARY_MINTS[2],
         symbol: 'SYMBOL_2',
         name: 'NAME_2',
         logoURL: 'LOGO_URL_2',
@@ -310,7 +308,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair2.publicKey,
-      ARBITRARY_MINT_3,
+      ARBITRARY_MINTS[2],
       'SYMBOL_2_NEW',
       'NAME_2_NEW',
       'LOGO_URL_2_NEW',
@@ -319,7 +317,7 @@ describe('DeleteEntry', () => {
     ), [userKeypair, userKeypair2])
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_3,
+        mint: ARBITRARY_MINTS[2],
         symbol: 'SYMBOL_2_NEW',
         name: 'NAME_2_NEW',
         logoURL: 'LOGO_URL_2_NEW',
@@ -333,7 +331,7 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair3.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -342,7 +340,7 @@ describe('DeleteEntry', () => {
     ), [userKeypair, userKeypair3])
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_3,
+        mint: ARBITRARY_MINTS[2],
         symbol: 'SYMBOL_2_NEW',
         name: 'NAME_2_NEW',
         logoURL: 'LOGO_URL_2_NEW',
@@ -351,7 +349,7 @@ describe('DeleteEntry', () => {
         updateAuthority: userKeypair2.publicKey
       },
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -365,11 +363,11 @@ describe('DeleteEntry', () => {
       connection,
       programId,
       userKeypair2.publicKey,
-      ARBITRARY_MINT_3
+      ARBITRARY_MINTS[2]
     ), [userKeypair, userKeypair2])
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',

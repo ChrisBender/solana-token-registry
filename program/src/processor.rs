@@ -9,7 +9,6 @@ use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
     msg,
-    program::invoke_signed,
     program_error::ProgramError,
     pubkey::Pubkey,
     rent::Rent,
@@ -90,8 +89,18 @@ impl<'a> Processor {
         let account_user = next_account_info(accounts_iter)?;
         let _account_program = next_account_info(accounts_iter)?;
         let account_fee_mint = next_account_info(accounts_iter)?;
+        Self::assert_valid_mint(account_fee_mint)?;
         let account_fee_destination = next_account_info(accounts_iter)?;
-        let _account_system_program = next_account_info(accounts_iter)?;
+        let account_fee_destination_ata = next_account_info(accounts_iter)?;
+        Self::assert_valid_ata(
+            &account_fee_destination.key,
+            account_fee_mint.key,
+            &account_fee_destination_ata,
+        )?;
+        let account_system_program = next_account_info(accounts_iter)?;
+        let account_token_program = next_account_info(accounts_iter)?;
+        let account_ata_program = next_account_info(accounts_iter)?;
+        let account_sysvar_rent = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         let account_registry_meta_bump_seed =
             Self::assert_valid_pda(program_id, account_registry_meta, b"meta")?;
@@ -101,13 +110,38 @@ impl<'a> Processor {
         let account_registry_tail = next_account_info(accounts_iter)?;
         let account_registry_tail_bump_seed =
             Self::assert_valid_pda(program_id, account_registry_tail, b"tail")?;
-
         /* Assert that the accounts have not already been created. */
         if account_registry_meta.data_len() != 0
             || account_registry_head.data_len() != 0
             || account_registry_tail.data_len() != 0
         {
             return Err(ProgramError::from(RegistryError::AlreadyInitialized));
+        }
+
+        // If the fee destination ATA has not yet been initialized, do so.
+        if account_fee_destination_ata.data_len() == 0 {
+            // account_token_program.key == spl_token::ID
+            // TODO
+            let create_account_instr =
+                spl_associated_token_account::create_associated_token_account(
+                    account_user.key,
+                    account_fee_destination.key,
+                    account_fee_mint.key,
+                );
+            //msg!("create_account_instr: {:?}", create_account_instr);
+            solana_program::program::invoke(
+                &create_account_instr,
+                &[
+                    account_ata_program.clone(),
+                    account_user.clone(),
+                    account_fee_destination_ata.clone(),
+                    account_fee_destination.clone(),
+                    account_fee_mint.clone(),
+                    account_system_program.clone(),
+                    account_token_program.clone(),
+                    account_sysvar_rent.clone(),
+                ],
+            )?;
         }
 
         /* Create the account_registry_meta */
@@ -119,7 +153,7 @@ impl<'a> Processor {
             account_registry_meta_space as u64,
             program_id,
         );
-        invoke_signed(
+        solana_program::program::invoke_signed(
             &initialize_instruction_meta,
             &[account_user.clone(), account_registry_meta.clone()],
             &[&[b"meta", &[account_registry_meta_bump_seed]]],
@@ -198,10 +232,10 @@ impl<'a> Processor {
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
         let account_mint = next_account_info(accounts_iter)?;
-        let _account_fee_source_ata = next_account_info(accounts_iter)?;
-        let _account_fee_destination_ata = next_account_info(accounts_iter)?;
+        let account_fee_source_ata = next_account_info(accounts_iter)?;
+        let account_fee_destination_ata = next_account_info(accounts_iter)?;
         let _account_system_program = next_account_info(accounts_iter)?;
-        let _account_token_program = next_account_info(accounts_iter)?;
+        let account_token_program = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_initialized(account_registry_meta)?;
         let account_registry_head = next_account_info(accounts_iter)?;
@@ -212,6 +246,42 @@ impl<'a> Processor {
             account_registry_new,
             &account_mint.key.to_bytes(),
         )?;
+
+        /* Transfer fee_amount to the ATA of fee_destination. */
+        let registry_meta =
+            RegistryMetaAccount::try_from_slice(&account_registry_meta.data.borrow())?;
+        Self::assert_valid_ata(
+            account_user.key,
+            &Pubkey::new(&registry_meta.fee_mint),
+            &account_fee_source_ata,
+        )?;
+        Self::assert_initialized_ata(&account_fee_source_ata)?;
+        Self::assert_valid_ata(
+            &Pubkey::new(&registry_meta.fee_destination),
+            &Pubkey::new(&registry_meta.fee_mint),
+            &account_fee_destination_ata,
+        )?;
+        Self::assert_initialized_ata(&account_fee_destination_ata)?;
+
+        if account_user.key.to_bytes() != registry_meta.fee_update_authority {
+            let transfer_instruction = spl_token::instruction::transfer(
+                account_token_program.key,
+                account_fee_source_ata.key,
+                account_fee_destination_ata.key,
+                account_user.key,
+                &[account_user.key],
+                registry_meta.fee_amount,
+            )?;
+            solana_program::program::invoke(
+                &transfer_instruction,
+                &[
+                    account_token_program.clone(),
+                    account_fee_source_ata.clone(),
+                    account_fee_destination_ata.clone(),
+                    account_user.clone(),
+                ],
+            )?;
+        }
 
         let mut registry_node_new;
         if account_registry_new.data_len() == 0 {
@@ -373,27 +443,6 @@ impl<'a> Processor {
         Ok(())
     }
 
-    fn assert_valid_pda(
-        program_id: &Pubkey,
-        account: &AccountInfo,
-        seed: &[u8],
-    ) -> Result<u8, RegistryError> {
-        let subseed = &seed[..std::cmp::min(32, seed.len())];
-        let (derived_pubkey, derived_bump_seed) =
-            Pubkey::find_program_address(&[subseed], program_id);
-        if *account.key != derived_pubkey {
-            return Err(RegistryError::InvalidProgramDerivedAccount);
-        }
-        Ok(derived_bump_seed)
-    }
-
-    fn assert_initialized(account_registry_meta: &AccountInfo) -> Result<(), RegistryError> {
-        if account_registry_meta.data_len() == 0 {
-            return Err(RegistryError::NotYetInitialized);
-        }
-        Ok(())
-    }
-
     fn initialize_new_registry_account(
         program_id: &Pubkey,
         account_user: &AccountInfo<'a>,
@@ -415,7 +464,7 @@ impl<'a> Processor {
             account_registry_node_space as u64,
             program_id,
         );
-        invoke_signed(
+        solana_program::program::invoke_signed(
             &initialize_instruction,
             &[account_user.clone(), account_registry_new.clone()],
             &[&[seed, &[bump_seed]]],
@@ -460,5 +509,53 @@ impl<'a> Processor {
         Ok(RegistryNodeAccount::try_from_slice(
             &registry_node_account.data.borrow()[4..4 + length_bytes],
         )?)
+    }
+
+    fn assert_valid_pda(
+        program_id: &Pubkey,
+        account: &AccountInfo,
+        seed: &[u8],
+    ) -> Result<u8, RegistryError> {
+        let subseed = &seed[..std::cmp::min(32, seed.len())];
+        let (derived_pubkey, derived_bump_seed) =
+            Pubkey::find_program_address(&[subseed], program_id);
+        if *account.key != derived_pubkey {
+            return Err(RegistryError::InvalidProgramDerivedAccount);
+        }
+        Ok(derived_bump_seed)
+    }
+
+    fn assert_valid_ata(
+        user_pubkey: &Pubkey,
+        mint_pubkey: &Pubkey,
+        account_ata: &AccountInfo,
+    ) -> Result<(), RegistryError> {
+        let derived_ata_pubkey =
+            spl_associated_token_account::get_associated_token_address(user_pubkey, mint_pubkey);
+        if derived_ata_pubkey != *account_ata.key {
+            return Err(RegistryError::InvalidAssociatedTokenAccount);
+        }
+        Ok(())
+    }
+
+    fn assert_initialized_ata(account_ata: &AccountInfo) -> Result<(), RegistryError> {
+        if account_ata.data_len() == 0 {
+            return Err(RegistryError::UninitializedAssociatedTokenAccount);
+        }
+        Ok(())
+    }
+
+    fn assert_initialized(account_registry_meta: &AccountInfo) -> Result<(), RegistryError> {
+        if account_registry_meta.data_len() == 0 {
+            return Err(RegistryError::NotYetInitialized);
+        }
+        Ok(())
+    }
+
+    fn assert_valid_mint(account_mint: &AccountInfo) -> Result<(), RegistryError> {
+        if *account_mint.owner != spl_token::ID {
+            return Err(RegistryError::InvalidMint);
+        }
+        Ok(())
     }
 }

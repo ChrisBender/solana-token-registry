@@ -11,8 +11,7 @@ import {
 
 import {
   TEST_TIMEOUT,
-  ARBITRARY_MINT_1,
-  ARBITRARY_MINT_2,
+  ARBITRARY_MINTS,
   ARBITRARY_USER_1,
   ARBITRARY_BIGINT_1,
   getConnection,
@@ -36,7 +35,7 @@ describe('InitializeRegistry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -44,7 +43,7 @@ describe('InitializeRegistry', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair.publicKey
     )
@@ -60,7 +59,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_MINT_1,
+        ARBITRARY_MINTS[0],
         ARBITRARY_USER_1,
         ARBITRARY_BIGINT_1
       ))
@@ -76,7 +75,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_MINT_2,
+        ARBITRARY_MINTS[1],
         'wSUSHI',
         'SushiSwap (Wormhole)',
         'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/HbMGwfGjGPchtaPwyrtJFy8APZN5w1hi63xnzmj1f23v/logo.png',
@@ -98,7 +97,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_MINT_2
+        ARBITRARY_MINTS[1]
       ))
       unreachable()
     } catch (error) {
@@ -112,7 +111,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_MINT_2,
+        ARBITRARY_MINTS[1],
         'wSUSHI',
         'SushiSwap (Wormhole)',
         'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/HbMGwfGjGPchtaPwyrtJFy8APZN5w1hi63xnzmj1f23v/logo.png',
@@ -148,7 +147,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_MINT_2,
+        ARBITRARY_MINTS[1],
         ARBITRARY_USER_1
       ))
       unreachable()
@@ -166,7 +165,7 @@ describe('InitializeRegistry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -174,7 +173,7 @@ describe('InitializeRegistry', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair.publicKey
     )
@@ -183,7 +182,7 @@ describe('InitializeRegistry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_MINT_1,
+        ARBITRARY_MINTS[0],
         ARBITRARY_USER_1,
         ARBITRARY_BIGINT_1
       ))
@@ -203,7 +202,7 @@ describe('InitializeRegistry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))

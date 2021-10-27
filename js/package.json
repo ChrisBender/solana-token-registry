@@ -8,6 +8,7 @@
     "deploy": ""
   },
   "dependencies": {
+    "@solana/spl-token": "^0.1.8",
     "@solana/web3.js": "^1.29.2",
     "borsh": "0.6.0"
   },

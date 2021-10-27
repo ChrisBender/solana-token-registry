@@ -5,8 +5,7 @@ import {
 
 import {
   TEST_TIMEOUT,
-  ARBITRARY_MINT_1,
-  ARBITRARY_MINT_2,
+  ARBITRARY_MINTS,
   ARBITRARY_USER_1,
   ARBITRARY_USER_2,
   ARBITRARY_BIGINT_1,
@@ -27,7 +26,7 @@ describe('UpdateFees', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -35,7 +34,7 @@ describe('UpdateFees', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair.publicKey
     )
@@ -44,7 +43,7 @@ describe('UpdateFees', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       ARBITRARY_USER_2,
       ARBITRARY_BIGINT_2
     ))
@@ -52,7 +51,7 @@ describe('UpdateFees', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_2,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       ARBITRARY_USER_2,
       userKeypair.publicKey
     )
@@ -66,7 +65,7 @@ describe('UpdateFees', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -74,7 +73,7 @@ describe('UpdateFees', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       ARBITRARY_USER_2,
       ARBITRARY_BIGINT_2
     ))
@@ -82,7 +81,7 @@ describe('UpdateFees', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_2,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       ARBITRARY_USER_2,
       userKeypair.publicKey
     )
@@ -90,7 +89,7 @@ describe('UpdateFees', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -98,7 +97,7 @@ describe('UpdateFees', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair.publicKey
     )

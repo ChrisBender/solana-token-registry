@@ -5,7 +5,7 @@ import {
 
 import {
   TEST_TIMEOUT,
-  ARBITRARY_MINT_1,
+  ARBITRARY_MINTS,
   ARBITRARY_USER_1,
   ARBITRARY_BIGINT_1,
   getConnection,
@@ -30,7 +30,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -38,7 +38,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair.publicKey
     )
@@ -53,7 +53,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair2.publicKey
     )
@@ -67,7 +67,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -75,7 +75,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair.publicKey
     )
@@ -90,7 +90,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair2.publicKey
     )
@@ -105,7 +105,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair.publicKey
     )
@@ -119,7 +119,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -127,7 +127,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair.publicKey
     )
@@ -142,7 +142,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair.publicKey
     )
@@ -156,7 +156,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -164,7 +164,7 @@ describe('TransferFeeAuthority', () => {
       connection,
       programId,
       ARBITRARY_BIGINT_1,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       userKeypair.publicKey
     )

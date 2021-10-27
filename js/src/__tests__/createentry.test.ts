@@ -6,9 +6,7 @@ import {
 
 import {
   TEST_TIMEOUT,
-  ARBITRARY_MINT_1,
-  ARBITRARY_MINT_2,
-  ARBITRARY_MINT_3,
+  ARBITRARY_MINTS,
   ARBITRARY_USER_1,
   ARBITRARY_BIGINT_1,
   getConnection,
@@ -31,7 +29,7 @@ describe('CreateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -41,7 +39,7 @@ describe('CreateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -50,7 +48,7 @@ describe('CreateEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -69,7 +67,7 @@ describe('CreateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -79,7 +77,7 @@ describe('CreateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -88,7 +86,7 @@ describe('CreateEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -102,7 +100,7 @@ describe('CreateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_3,
+      ARBITRARY_MINTS[2],
       'SYMBOL_2',
       'NAME_2',
       'LOGO_URL_2',
@@ -111,7 +109,7 @@ describe('CreateEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_3,
+        mint: ARBITRARY_MINTS[2],
         symbol: 'SYMBOL_2',
         name: 'NAME_2',
         logoURL: 'LOGO_URL_2',
@@ -120,7 +118,7 @@ describe('CreateEntry', () => {
         updateAuthority: userKeypair.publicKey
       },
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -139,7 +137,7 @@ describe('CreateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -149,7 +147,7 @@ describe('CreateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_2,
+      ARBITRARY_MINTS[1],
       'SYMBOL_1',
       'NAME_1',
       'LOGO_URL_1',
@@ -158,7 +156,7 @@ describe('CreateEntry', () => {
     ))
     expect(await getAllTokens(connection, programId)).toEqual(new Set([
       {
-        mint: ARBITRARY_MINT_2,
+        mint: ARBITRARY_MINTS[1],
         symbol: 'SYMBOL_1',
         name: 'NAME_1',
         logoURL: 'LOGO_URL_1',
@@ -172,7 +170,7 @@ describe('CreateEntry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_MINT_2,
+        ARBITRARY_MINTS[1],
         'SYMBOL_1',
         'NAME_1',
         'LOGO_URL_1',
@@ -194,7 +192,7 @@ describe('CreateEntry', () => {
       connection,
       programId,
       userKeypair.publicKey,
-      ARBITRARY_MINT_1,
+      ARBITRARY_MINTS[0],
       ARBITRARY_USER_1,
       ARBITRARY_BIGINT_1
     ))
@@ -205,7 +203,7 @@ describe('CreateEntry', () => {
         connection,
         programId,
         userKeypair.publicKey,
-        ARBITRARY_MINT_2,
+        ARBITRARY_MINTS[1],
         'SYMBOL_1',
         'NAME_1',
         'X'.repeat(2500), // More data than the Solana transaction limit of 1232 bytes.
