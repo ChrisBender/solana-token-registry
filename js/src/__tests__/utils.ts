@@ -3,7 +3,9 @@ import {
   PublicKey,
   Keypair,
   Transaction,
-  TransactionInstruction
+  TransactionInstruction,
+  SystemProgram,
+  LAMPORTS_PER_SOL
 } from '@solana/web3.js'
 
 import {
@@ -43,28 +45,45 @@ export async function deployProgram (
   const programId = Keypair.generate()
   execSync('echo "[' + programId.secretKey.toString() + ']" | solana program deploy --final --program-id - ../program/build/registry.so')
 
-  /* Initialize a few mints, create ATA for all userKeypairs, and mint some tokens. */
-  if (ARBITRARY_MINTS.length === 0) {
-    for (let i = 0; i < 3; i++) {
-      const token = await Token.createMint(
-        connection,
-        userKeypair,
-        userKeypair.publicKey,
-        null,
-        9,
-        TOKEN_PROGRAM_ID
-      )
-      ARBITRARY_MINTS.push(token.publicKey)
-      const userKeypairATA = await token.createAssociatedTokenAccount(userKeypair.publicKey)
-      const userKeypair2ATA = await token.createAssociatedTokenAccount(userKeypair2.publicKey)
-      const userKeypair3ATA = await token.createAssociatedTokenAccount(userKeypair3.publicKey)
-      await token.mintTo(userKeypairATA, userKeypair, [], 1e10)
-      await token.mintTo(userKeypair2ATA, userKeypair, [], 1e10)
-      await token.mintTo(userKeypair3ATA, userKeypair, [], 1e10)
-    }
+  /* Initialize a few mints, create ATA for all userKeypairs, mint some tokens, and transfer SOL. */
+  for (let i = 0; i < 3; i++) {
+    const token = await Token.createMint(
+      connection,
+      userKeypair,
+      userKeypair.publicKey,
+      null,
+      9,
+      TOKEN_PROGRAM_ID
+    )
+    ARBITRARY_MINTS.push(token.publicKey)
+    const userKeypairATA = await token.createAssociatedTokenAccount(userKeypair.publicKey)
+    const userKeypair2ATA = await token.createAssociatedTokenAccount(userKeypair2.publicKey)
+    const userKeypair3ATA = await token.createAssociatedTokenAccount(userKeypair3.publicKey)
+    await token.mintTo(userKeypairATA, userKeypair, [], 1e10)
+    await token.mintTo(userKeypair2ATA, userKeypair, [], 1e10)
+    await token.mintTo(userKeypair3ATA, userKeypair, [], 1e10)
   }
 
   return programId.publicKey
+}
+
+export async function transferSolToUserKeypairs (connection: Connection): Promise<void> {
+  await sendAndConfirmTx(
+    connection,
+    SystemProgram.transfer({
+      fromPubkey: userKeypair.publicKey,
+      lamports: 1 * LAMPORTS_PER_SOL,
+      toPubkey: userKeypair2.publicKey
+    })
+  )
+  await sendAndConfirmTx(
+    connection,
+    SystemProgram.transfer({
+      fromPubkey: userKeypair.publicKey,
+      lamports: 1 * LAMPORTS_PER_SOL,
+      toPubkey: userKeypair3.publicKey
+    })
+  )
 }
 
 export async function assertMetaAccountEquals (

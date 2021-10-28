@@ -16,13 +16,12 @@ import {
   userKeypair2,
   userKeypair3,
   deployProgram,
-  sendAndConfirmTx
+  sendAndConfirmTx,
+  transferSolToUserKeypairs
 } from './utils'
 
 import {
-  SendTransactionError,
-  SystemProgram,
-  LAMPORTS_PER_SOL
+  SendTransactionError
 } from '@solana/web3.js'
 
 describe('DeleteEntry', () => {
@@ -202,24 +201,7 @@ describe('DeleteEntry', () => {
   test.concurrent('Create, Update, and Delete multiple mints', async () => {
     const connection = getConnection()
     const programId = await deployProgram(connection, userKeypair)
-
-    /* Give 1 SOL to userKeypair2 and userKeypair3 */
-    await sendAndConfirmTx(
-      connection,
-      SystemProgram.transfer({
-        fromPubkey: userKeypair.publicKey,
-        lamports: 1 * LAMPORTS_PER_SOL,
-        toPubkey: userKeypair2.publicKey
-      })
-    )
-    await sendAndConfirmTx(
-      connection,
-      SystemProgram.transfer({
-        fromPubkey: userKeypair.publicKey,
-        lamports: 1 * LAMPORTS_PER_SOL,
-        toPubkey: userKeypair3.publicKey
-      })
-    )
+    await transferSolToUserKeypairs(connection)
 
     await sendAndConfirmTx(connection, await createInstructionInitializeRegistry(
       connection,
