@@ -14,6 +14,10 @@ pub enum RegistryError {
     AlreadyInitialized,
     #[error("Passed an invalid number of accounts.")]
     InvalidNumberOfAccounts,
+    #[error("The provided user account is not a signer.")]
+    InvalidUserAccount,
+    #[error("The provided system account is not owned by the system program.")]
+    InvalidSystemAccount,
     #[error("The provided mint is already in the registry.")]
     PreviouslyRegisteredMint,
     #[error("The provided mint has not been registered yet.")]
@@ -55,6 +59,12 @@ impl PrintProgramError for RegistryError {
             }
             RegistryError::InvalidNumberOfAccounts => {
                 msg!("RegistryError::InvalidNumberOfAccounts - Passed an invalid number of accounts.")
+            }
+            RegistryError::InvalidUserAccount => {
+                msg!("RegistryError::InvalidUserAccount - The provided user account is not a signer.")
+            }
+            RegistryError::InvalidSystemAccount => {
+                msg!("RegistryError::InvalidSystemAccount - The provided system account is not owned by the system program.")
             }
             RegistryError::PreviouslyRegisteredMint => {
                 msg!("RegistryError::PreviouslyRegisteredMint - The provided mint is already in the registry.")

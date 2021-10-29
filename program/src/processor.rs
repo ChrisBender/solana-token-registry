@@ -12,7 +12,7 @@ use solana_program::{
     program_error::ProgramError,
     pubkey::Pubkey,
     rent::Rent,
-    system_instruction,
+    system_instruction, system_program,
 };
 use std::{convert::TryInto, io::Write, mem::size_of};
 
@@ -87,6 +87,7 @@ impl<'a> Processor {
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_user(account_user)?;
         let account_fee_mint = next_account_info(accounts_iter)?;
         Self::assert_valid_mint(account_fee_mint)?;
         let account_fee_destination = next_account_info(accounts_iter)?;
@@ -198,6 +199,7 @@ impl<'a> Processor {
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_user(account_user)?;
         let account_fee_mint = next_account_info(accounts_iter)?;
         let account_fee_destination = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
@@ -227,6 +229,7 @@ impl<'a> Processor {
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_user(account_user)?;
         let account_mint = next_account_info(accounts_iter)?;
         let account_fee_source_ata = next_account_info(accounts_iter)?;
         let account_fee_destination_ata = next_account_info(accounts_iter)?;
@@ -324,6 +327,7 @@ impl<'a> Processor {
     fn process_delete_entry(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_user(account_user)?;
         let account_mint = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_initialized(account_registry_meta)?;
@@ -359,6 +363,7 @@ impl<'a> Processor {
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_user(account_user)?;
         let account_mint = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_initialized(account_registry_meta)?;
@@ -393,6 +398,7 @@ impl<'a> Processor {
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_user(account_user)?;
         let account_new_fee_authority = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_initialized(account_registry_meta)?;
@@ -414,6 +420,7 @@ impl<'a> Processor {
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_user(account_user)?;
         let account_mint = next_account_info(accounts_iter)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_initialized(account_registry_meta)?;
@@ -537,6 +544,21 @@ impl<'a> Processor {
     fn assert_initialized_ata(account_ata: &AccountInfo) -> Result<(), RegistryError> {
         if account_ata.data_len() == 0 {
             return Err(RegistryError::UninitializedAssociatedTokenAccount);
+        }
+        Ok(())
+    }
+
+    fn assert_valid_account_user(account_user: &AccountInfo) -> Result<(), RegistryError> {
+        if !account_user.is_signer {
+            return Err(RegistryError::InvalidUserAccount);
+        }
+        Self::assert_valid_system_account(account_user)?;
+        Ok(())
+    }
+
+    fn assert_valid_system_account(account: &AccountInfo) -> Result<(), RegistryError> {
+        if *account.owner != system_program::id() {
+            return Err(RegistryError::InvalidSystemAccount);
         }
         Ok(())
     }
