@@ -87,7 +87,6 @@ impl<'a> Processor {
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
-        let _account_program = next_account_info(accounts_iter)?;
         let account_fee_mint = next_account_info(accounts_iter)?;
         Self::assert_valid_mint(account_fee_mint)?;
         let account_fee_destination = next_account_info(accounts_iter)?;
@@ -120,15 +119,12 @@ impl<'a> Processor {
 
         // If the fee destination ATA has not yet been initialized, do so.
         if account_fee_destination_ata.data_len() == 0 {
-            // account_token_program.key == spl_token::ID
-            // TODO
             let create_account_instr =
                 spl_associated_token_account::create_associated_token_account(
                     account_user.key,
                     account_fee_destination.key,
                     account_fee_mint.key,
                 );
-            //msg!("create_account_instr: {:?}", create_account_instr);
             solana_program::program::invoke(
                 &create_account_instr,
                 &[

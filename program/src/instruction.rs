@@ -1,20 +1,23 @@
 use crate::{error::RegistryError, state::CreateUpdateEntryInstructionData};
 use borsh::BorshDeserialize;
 
-// #[repr(C)]
 pub enum RegistryInstruction {
     /**
      * Initialize the registry.
      *
      * Accounts:
-     * 0. [writable, signer] Fee-payer.
-     * 1. [] The program account.
-     * 2. [] The initial `fee_mint`.
-     * 3. [] The initial `fee_destination`.
+     * 0. [signer] Fee-payer. Will be given `fee_update_authority`. Must be owned by the
+     *    system program.
+     * 1. [] The initial `fee_mint`. Must be owned by the token program.
+     * 2. [] The initial `fee_destination`. Must be owned by the system program.
+     * 3. [writable] The ATA of the fee destination for the fee mint.
      * 4. [] The system program.
-     * 5. [writable] The RegistryMetaAccount.
-     * 6. [writable] The RegistryHeadAccount.
-     * 7. [writable] The RegistryTailAccount.
+     * 5. [] The token program.
+     * 6. [] The ATA program.
+     * 7. [] The sysvar rent program.
+     * 8. [writable] The RegistryMetaAccount.
+     * 9. [writable] The RegistryHeadAccount.
+     * 10. [writable] The RegistryTailAccount.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 0).
@@ -33,9 +36,9 @@ pub enum RegistryInstruction {
      * Update the fees for token registration.
      *
      * Accounts:
-     * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryHeadAccount::fee_update_authority`.
-     * 1. [] The new `fee_mint`.
-     * 2. [] The new `fee_destination`.
+     * 0. [signer] Fee-payer. Must have pubkey matching `RegistryHeadAccount::fee_update_authority`.
+     * 1. [] The new `fee_mint`. Must be owned by the token program.
+     * 2. [] The new `fee_destination`. Must be owned by the system program.
      * 3. [writable] The RegistryMetaAccount.
      *
      * Instruction Data:
@@ -55,24 +58,20 @@ pub enum RegistryInstruction {
      * Create a new registry node for the supplied mint address.
      *
      * Accounts:
-     * 0. [writable, signer] Fee-payer. Will be assigned to the `RegistryNodeAccount::token_update_authority`.
-     * 1. [] The program account.
-     * 2. [] Mint address to create a `RegistryNode` for. Must have not been registered before. Must be owned by the token program.
-     * 3. [writable] The source account. Must be the Associated Token Account of the fee-payer.
-     * 4. [writable] The destination account. Must be the Associated Token Account of `fee_destination`.
-     * 5. [] The system program (to create a new account).
-     * 6. [] The token program (to transfer tokens).
-     * 7. [writable] The RegistryMetaAccount.
-     * 8. [writable] The RegistryHeadAccount.
+     * 0. [signer, writable] Fee-payer. Will be given `token_update_authority`.
+     * 1. [] Mint address to create a `RegistryNode` for. Must have not been registered before. Must be owned by the token program.
+     * 2. [writable] The source account. Must be the ATA of the fee-payer.
+     * 3. [writable] The destination account. Must be the ATA of `fee_destination`.
+     * 4. [] The system program.
+     * 5. [] The token program.
+     * 6. [] The RegistryMetaAccount.
+     * 7. [writable] The RegistryHeadAccount.
+     * 8. [writable] The first RegistryNodeAccount after the RegistryHeadAccount.
      * 9. [writable] The new RegistryNodeAccount.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 2).
-     * Bytes 1-?: A zero-terminated string for the `token_symbol`.
-     * Bytes ?-?: A zero-terminated string for the `token_name`.
-     * Bytes ?-?: A zero-terminated string for the `token_logo_url`.
-     * Bytes ?-?: A zero-terminated string representing a JSON-parsable list of tags for `token_tags`.
-     * Bytes ?-?: A zero-terminated string representing a JSON-parsable list of lists for `token_extensions`.
+     * Bytes 1-?: The borsh serialization of a CreateUpdateEntryInstructionData.
      *
      * Errors:
      * `NotYetInitialized` if the registry has not yet been initialized.
@@ -95,11 +94,10 @@ pub enum RegistryInstruction {
      * Delete the (unique) registry node corresponding the supplied mint address.
      *
      * Accounts:
-     * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryNodeAccount::token_update_authority`.
-     * 1. [] The program account.
-     * 2. [] The address of the mint to be deleted.
-     * 3. [] The RegistryMetaAccount.
-     * .. [] All the RegistryNodeAccounts, in order.
+     * 0. [signer] Fee-payer. Must have pubkey matching `token_update_authority`.
+     * 1. [] The address of the mint to be deleted.
+     * 2. [] The RegistryMetaAccount.
+     * 3. [writable] The RegistryNodeAccount corresponding to the mint to be deleted.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 3).
@@ -116,19 +114,14 @@ pub enum RegistryInstruction {
      * Update the registry node corresponding to the supplied mint address.
      *
      * Accounts:
-     * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryNodeAccount::token_update_authority`.
-     * 1. [] The program account.
-     * 2. [] The address of the mint to be updated.
-     * 3. [] The RegistryMetaAccount.
-     * .. [] All the RegistryNodeAccounts, in order.
+     * 0. [signer] Fee-payer. Must have pubkey matching `token_update_authority`.
+     * 1. [] The address of the mint to be updated. Must already be in the registry.
+     * 2. [] The RegistryMetaAccount.
+     * 3. [writable] The RegistryNodeAccount to update.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 4).
-     * Bytes 1-?: A zero-terminated string for the `token_symbol`.
-     * Bytes ?-?: A zero-terminated string for the `token_name`.
-     * Bytes ?-?: A zero-terminated string for the `token_logo_url`.
-     * Bytes ?-?: A zero-terminated string representing a JSON-parsable list of tags for `token_tags`.
-     * Bytes ?-?: A zero-terminated string representing a JSON-parsable list of lists for `token_extensions`.
+     * Bytes 1-?: The borsh serialization of a CreateUpdateEntryInstructionData.
      *
      * Errors:
      * `NotYetInitialized` if the registry has not yet been initialized.
@@ -149,11 +142,9 @@ pub enum RegistryInstruction {
      * Transfer the `RegistryMetaAccount::fee_update_authority` to a different account.
      *
      * Accounts:
-     * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryMetaAccount::fee_update_authority`.
-     * 1. [] The program account.
-     * 2. [] The new account to transfer authority to. Must be owned by the system program.
-     * 3. [] The RegistryMetaAccount.
-     * .. [] All the RegistryNodeAccounts, in order.
+     * 0. [signer] Fee-payer. Must have pubkey matching `fee_update_authority`.
+     * 1. [] The new account to transfer authority to. Must be owned by the system program.
+     * 2. [writable] The RegistryMetaAccount.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 5).
@@ -169,11 +160,11 @@ pub enum RegistryInstruction {
      * Transfer the `RegistryNodeAccount::token_update_authority` to a different account.
      *
      * Accounts:
-     * 0. [writable, signer] Fee-payer. Must have pubkey matching `RegistryTokenAccount::token_update_authority`.
-     * 1. [] The program account.
-     * 2. [] The new account to transfer authority to. Must be owned by the system program.
-     * 3. [] The RegistryMetaAccount.
-     * .. [] All the RegistryNodeAccounts, in order.
+     * 0. [signer] Fee-payer. Must have pubkey matching `token_update_authority`.
+     * 1. [] The address of the mint to be updated. Must already be in the registry.
+     * 2. [] The RegistryMetaAccount.
+     * 3. [writable] The RegistryNodeAccount to update.
+     * 4. [] The new account to transfer authority to. Must be owned by the system program.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 6).

@@ -309,8 +309,7 @@ export async function createInstructionInitializeRegistry (
   )
 
   const keys = [
-    { isSigner: true, isWritable: true, pubkey: userPublicKey },
-    { isSigner: false, isWritable: false, pubkey: programId },
+    { isSigner: true, isWritable: false, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeMintPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey },
     { isSigner: false, isWritable: true, pubkey: destinationTokenAccount },
@@ -347,7 +346,7 @@ export async function createInstructionUpdateFees (
   buffer.writeBigUInt64BE(feeAmount, 1)
 
   const keys = [
-    { isSigner: true, isWritable: true, pubkey: userPublicKey },
+    { isSigner: true, isWritable: false, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeMintPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey },
     { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) }
@@ -411,7 +410,7 @@ export async function createInstructionCreateEntry (
     { isSigner: false, isWritable: true, pubkey: destinationTokenAccount },
     { isSigner: false, isWritable: false, pubkey: SystemProgram.programId },
     { isSigner: false, isWritable: false, pubkey: TOKEN_PROGRAM_ID },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
+    { isSigner: false, isWritable: false, pubkey: await getPDA('meta', programId) },
     { isSigner: false, isWritable: true, pubkey: registryNodeAccounts[0].publicKey },
     { isSigner: false, isWritable: true, pubkey: registryNodeAccounts[1].publicKey },
     { isSigner: false, isWritable: true, pubkey: await getPDA(mintPublicKey.toBytes(), programId) }
@@ -438,9 +437,9 @@ export async function createInstructionDeleteEntry (
   buffer.writeUInt8(3)
 
   const keys = [
-    { isSigner: true, isWritable: true, pubkey: userPublicKey },
+    { isSigner: true, isWritable: false, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: mintPublicKey },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
+    { isSigner: false, isWritable: false, pubkey: await getPDA('meta', programId) },
     { isSigner: false, isWritable: true, pubkey: await getPDA(mintPublicKey.toBytes(), programId) }
   ]
 
@@ -481,9 +480,9 @@ export async function createInstructionUpdateEntry (
   const buffer = Buffer.concat([serializedFlag, serializedInstructionData])
 
   const keys = [
-    { isSigner: true, isWritable: true, pubkey: userPublicKey },
+    { isSigner: true, isWritable: false, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: mintPublicKey },
-    { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) },
+    { isSigner: false, isWritable: false, pubkey: await getPDA('meta', programId) },
     { isSigner: false, isWritable: true, pubkey: await getPDA(mintPublicKey.toBytes(), programId) }
   ]
 
@@ -508,7 +507,7 @@ export async function createInstructionTransferFeeAuthority (
   buffer.writeUInt8(5)
 
   const keys = [
-    { isSigner: true, isWritable: true, pubkey: userPublicKey },
+    { isSigner: true, isWritable: false, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: newFeeAuthorityPublicKey },
     { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) }
   ]
@@ -535,7 +534,7 @@ export async function createInstructionTransferTokenAuthority (
   buffer.writeUInt8(6)
 
   const keys = [
-    { isSigner: true, isWritable: true, pubkey: userPublicKey },
+    { isSigner: true, isWritable: false, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: mintPublicKey },
     { isSigner: false, isWritable: false, pubkey: await getPDA('meta', programId) },
     { isSigner: false, isWritable: true, pubkey: await getPDA(mintPublicKey.toBytes(), programId) },
