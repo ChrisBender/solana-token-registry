@@ -89,18 +89,24 @@ impl<'a> Processor {
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
         let account_fee_mint = next_account_info(accounts_iter)?;
-        Self::assert_valid_mint(account_fee_mint)?;
+        Self::assert_valid_account_mint(account_fee_mint)?;
+        Self::assert_initialized_account_mint(account_fee_mint)?;
         let account_fee_destination = next_account_info(accounts_iter)?;
+        Self::assert_valid_system_account(account_fee_destination)?;
         let account_fee_destination_ata = next_account_info(accounts_iter)?;
         Self::assert_valid_ata(
-            &account_fee_destination.key,
+            account_fee_destination.key,
             account_fee_mint.key,
             &account_fee_destination_ata,
         )?;
         let account_system_program = next_account_info(accounts_iter)?;
+        Self::assert_valid_system_program(account_system_program)?;
         let account_token_program = next_account_info(accounts_iter)?;
+        Self::assert_valid_token_program(account_token_program)?;
         let account_ata_program = next_account_info(accounts_iter)?;
+        Self::assert_valid_ata_program(account_ata_program)?;
         let account_sysvar_rent = next_account_info(accounts_iter)?;
+        Self::assert_valid_sysvar_rent(account_sysvar_rent)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
         let account_registry_meta_bump_seed =
             Self::assert_valid_pda(program_id, account_registry_meta, b"meta")?;
@@ -110,6 +116,7 @@ impl<'a> Processor {
         let account_registry_tail = next_account_info(accounts_iter)?;
         let account_registry_tail_bump_seed =
             Self::assert_valid_pda(program_id, account_registry_tail, b"tail")?;
+
         /* Assert that the accounts have not already been created. */
         if account_registry_meta.data_len() != 0
             || account_registry_head.data_len() != 0
@@ -193,7 +200,7 @@ impl<'a> Processor {
     }
 
     fn process_update_fees(
-        _program_id: &Pubkey,
+        program_id: &Pubkey,
         accounts: &[AccountInfo],
         fee_amount: u64,
     ) -> ProgramResult {
@@ -201,8 +208,11 @@ impl<'a> Processor {
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
         let account_fee_mint = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_mint(account_fee_mint)?;
         let account_fee_destination = next_account_info(accounts_iter)?;
+        Self::assert_valid_system_account(account_fee_destination)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
+        Self::assert_valid_pda(program_id, account_registry_meta, b"meta")?;
         Self::assert_initialized(account_registry_meta)?;
 
         let mut registry_meta =
@@ -231,14 +241,21 @@ impl<'a> Processor {
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
         let account_mint = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_mint(account_mint)?;
+        Self::assert_initialized_account_mint(account_mint)?;
         let account_fee_source_ata = next_account_info(accounts_iter)?;
         let account_fee_destination_ata = next_account_info(accounts_iter)?;
-        let _account_system_program = next_account_info(accounts_iter)?;
+        let account_system_program = next_account_info(accounts_iter)?;
+        Self::assert_valid_system_program(account_system_program)?;
         let account_token_program = next_account_info(accounts_iter)?;
+        Self::assert_valid_token_program(account_token_program)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
+        Self::assert_valid_pda(program_id, account_registry_meta, b"meta")?;
         Self::assert_initialized(account_registry_meta)?;
         let account_registry_head = next_account_info(accounts_iter)?;
+        Self::assert_valid_pda(program_id, account_registry_head, b"head")?;
         let account_registry_first = next_account_info(accounts_iter)?;
+        Self::assert_valid_registry_first(account_registry_head, account_registry_first)?;
         let account_registry_new = next_account_info(accounts_iter)?;
         let account_registry_new_bump_seed = Self::assert_valid_pda(
             program_id,
@@ -329,7 +346,10 @@ impl<'a> Processor {
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
         let account_mint = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_mint(account_mint)?;
+        Self::assert_initialized_account_mint(account_mint)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
+        Self::assert_valid_pda(program_id, account_registry_meta, b"meta")?;
         Self::assert_initialized(account_registry_meta)?;
         let account_registry_to_delete = next_account_info(accounts_iter)?;
         Self::assert_valid_pda(
@@ -365,7 +385,10 @@ impl<'a> Processor {
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
         let account_mint = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_mint(account_mint)?;
+        Self::assert_initialized_account_mint(account_mint)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
+        Self::assert_valid_pda(program_id, account_registry_meta, b"meta")?;
         Self::assert_initialized(account_registry_meta)?;
         let account_registry_to_update = next_account_info(accounts_iter)?;
         Self::assert_valid_pda(
@@ -393,14 +416,16 @@ impl<'a> Processor {
     }
 
     fn process_transfer_fee_authority(
-        _program_id: &Pubkey,
+        program_id: &Pubkey,
         accounts: &[AccountInfo],
     ) -> ProgramResult {
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
         let account_new_fee_authority = next_account_info(accounts_iter)?;
+        Self::assert_valid_system_account(account_new_fee_authority)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
+        Self::assert_valid_pda(program_id, account_registry_meta, b"meta")?;
         Self::assert_initialized(account_registry_meta)?;
 
         let mut registry_meta =
@@ -422,7 +447,10 @@ impl<'a> Processor {
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
         let account_mint = next_account_info(accounts_iter)?;
+        Self::assert_valid_account_mint(account_mint)?;
+        Self::assert_initialized_account_mint(account_mint)?;
         let account_registry_meta = next_account_info(accounts_iter)?;
+        Self::assert_valid_pda(program_id, account_registry_meta, b"meta")?;
         Self::assert_initialized(account_registry_meta)?;
         let account_registry_to_update = next_account_info(accounts_iter)?;
         Self::assert_valid_pda(
@@ -431,6 +459,7 @@ impl<'a> Processor {
             &account_mint.key.to_bytes(),
         )?;
         let account_new_token_authority = next_account_info(accounts_iter)?;
+        Self::assert_valid_system_account(account_new_token_authority)?;
 
         let mut registry_node_to_update =
             Self::deserialize_registry_account(account_registry_to_update)?;
@@ -570,9 +599,59 @@ impl<'a> Processor {
         Ok(())
     }
 
-    fn assert_valid_mint(account_mint: &AccountInfo) -> Result<(), RegistryError> {
+    fn assert_valid_account_mint(account_mint: &AccountInfo) -> Result<(), RegistryError> {
         if *account_mint.owner != spl_token::ID {
             return Err(RegistryError::InvalidMint);
+        }
+        Ok(())
+    }
+
+    fn assert_initialized_account_mint(account_mint: &AccountInfo) -> Result<(), RegistryError> {
+        if account_mint.data_len() == 0 {
+            return Err(RegistryError::UninitializedMint);
+        }
+        Ok(())
+    }
+
+    fn assert_valid_registry_first(
+        account_registry_head: &AccountInfo,
+        account_registry_first: &AccountInfo,
+    ) -> Result<(), ProgramError> {
+        let registry_head = Self::deserialize_registry_account(account_registry_head)?;
+        let registry_first = Self::deserialize_registry_account(account_registry_first)?;
+        if registry_head.next_registry_node != account_registry_first.key.to_bytes() {
+            return Err(ProgramError::from(RegistryError::InvalidRegistryNodeFirst));
+        }
+        if registry_first.prev_registry_node != account_registry_head.key.to_bytes() {
+            return Err(ProgramError::from(RegistryError::InvalidRegistryNodeFirst));
+        }
+        Ok(())
+    }
+
+    fn assert_valid_system_program(account: &AccountInfo) -> Result<(), RegistryError> {
+        if *account.key != system_program::ID {
+            return Err(RegistryError::InvalidSystemProgram);
+        }
+        Ok(())
+    }
+
+    fn assert_valid_token_program(account: &AccountInfo) -> Result<(), RegistryError> {
+        if *account.key != spl_token::ID {
+            return Err(RegistryError::InvalidTokenProgram);
+        }
+        Ok(())
+    }
+
+    fn assert_valid_ata_program(account: &AccountInfo) -> Result<(), RegistryError> {
+        if *account.key != spl_associated_token_account::ID {
+            return Err(RegistryError::InvalidATAProgram);
+        }
+        Ok(())
+    }
+
+    fn assert_valid_sysvar_rent(account: &AccountInfo) -> Result<(), RegistryError> {
+        if *account.key != solana_program::sysvar::rent::ID {
+            return Err(RegistryError::InvalidSysvarRentProgram);
         }
         Ok(())
     }

@@ -24,10 +24,12 @@ pub enum RegistryError {
     NotYetRegisteredMint,
     #[error("A provided program derived account is not correct.")]
     InvalidProgramDerivedAccount,
+    #[error("The provided first Registry Node is not correct.")]
+    InvalidRegistryNodeFirst,
     #[error("The provided mint is not owned by the token program.")]
     InvalidMint,
-    #[error("The provided fee mint is not owned by the token program.")]
-    InvalidFeeMint,
+    #[error("The provided mint has not yet been initialized.")]
+    UninitializedMint,
     #[error("The provided account is not a valid Associated Token Account.")]
     InvalidAssociatedTokenAccount,
     #[error("The provided Associated Token Account has no data.")]
@@ -36,6 +38,10 @@ pub enum RegistryError {
     InvalidSystemProgram,
     #[error("The provided token program is not the real token program.")]
     InvalidTokenProgram,
+    #[error("The provided ATA program is not the real ATA program.")]
+    InvalidATAProgram,
+    #[error("The provided sysvar rent program is not the real sysvar rent program.")]
+    InvalidSysvarRentProgram,
     #[error("Attempted to update a token without having update authority.")]
     InvalidTokenUpdateAuthority,
     #[error("Attempted to update the fees without having update authority.")]
@@ -75,11 +81,14 @@ impl PrintProgramError for RegistryError {
             RegistryError::InvalidProgramDerivedAccount => {
                 msg!("RegistryError::InvalidProgramDerivedAccount - A provided program derived account is not correct.")
             }
+            RegistryError::InvalidRegistryNodeFirst => {
+                msg!("RegistryError::InvalidRegistryNodeFirst - The provided first Registry Node is not correct.")
+            }
             RegistryError::InvalidMint => {
                 msg!("RegistryError::InvalidMint - The provided mint is not owned by the token program.")
             }
-            RegistryError::InvalidFeeMint => {
-                msg!("RegistryError::InvalidFeeMint - The provided fee mint is not owned by the token program.")
+            RegistryError::UninitializedMint => {
+                msg!("RegistryError::UninitializedMint - The provided mint has not yet been initialized.")
             }
             RegistryError::InvalidAssociatedTokenAccount => {
                 msg!("RegistryError::InvalidAssociatedTokenAccount - The provided account is not a valid Associated Token Account.")
@@ -92,6 +101,12 @@ impl PrintProgramError for RegistryError {
             }
             RegistryError::InvalidTokenProgram => {
                 msg!("RegistryError::InvalidTokenProgram - The provided token program is not the real token program.")
+            }
+            RegistryError::InvalidATAProgram => {
+                msg!("RegistryError::InvalidATAProgram - The provided ATA program is not the real ATA program.")
+            }
+            RegistryError::InvalidSysvarRentProgram => {
+                msg!("RegistryError::InvalidSysvarRentProgram - The provided sysvar rent program is not the real sysvar rent program.")
             }
             RegistryError::InvalidTokenUpdateAuthority => {
                 msg!("RegistryError::InvalidTokenUpdateAuthority - Attempted to update a token without having update authority.")
