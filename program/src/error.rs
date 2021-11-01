@@ -20,6 +20,8 @@ pub enum RegistryError {
     InvalidSystemAccount,
     #[error("The provided mint is already in the registry.")]
     PreviouslyRegisteredMint,
+    #[error("The provided mint has already been deleted.")]
+    PreviouslyDeletedMint,
     #[error("The provided mint has not been registered yet.")]
     NotYetRegisteredMint,
     #[error("A provided program derived account is not correct.")]
@@ -74,6 +76,9 @@ impl PrintProgramError for RegistryError {
             }
             RegistryError::PreviouslyRegisteredMint => {
                 msg!("RegistryError::PreviouslyRegisteredMint - The provided mint is already in the registry.")
+            }
+            RegistryError::PreviouslyDeletedMint => {
+                msg!("RegistryError::PreviouslyDeletedMint - The provided mint has already been deleted.")
             }
             RegistryError::NotYetRegisteredMint => {
                 msg!("RegistryError::NotYetRegisteredMint - The provided mint has not been registered yet.")

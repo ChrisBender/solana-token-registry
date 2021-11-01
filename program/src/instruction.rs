@@ -39,7 +39,12 @@ pub enum RegistryInstruction {
      * 0. [signer] Fee-payer. Must have pubkey matching `RegistryHeadAccount::fee_update_authority`.
      * 1. [] The new `fee_mint`. Must be owned by the token program.
      * 2. [] The new `fee_destination`. Must be owned by the system program.
-     * 3. [writable] The RegistryMetaAccount.
+     * 3. [writable] The ATA of the fee destination for the fee mint.
+     * 4. [] The system program.
+     * 5. [] The token program.
+     * 6. [] The ATA program.
+     * 7. [] The sysvar rent program.
+     * 8. [writable] The RegistryMetaAccount.
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 1).

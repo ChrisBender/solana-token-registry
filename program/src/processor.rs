@@ -126,27 +126,16 @@ impl<'a> Processor {
         }
 
         // If the fee destination ATA has not yet been initialized, do so.
-        if account_fee_destination_ata.data_len() == 0 {
-            let create_account_instr =
-                spl_associated_token_account::create_associated_token_account(
-                    account_user.key,
-                    account_fee_destination.key,
-                    account_fee_mint.key,
-                );
-            solana_program::program::invoke(
-                &create_account_instr,
-                &[
-                    account_ata_program.clone(),
-                    account_user.clone(),
-                    account_fee_destination_ata.clone(),
-                    account_fee_destination.clone(),
-                    account_fee_mint.clone(),
-                    account_system_program.clone(),
-                    account_token_program.clone(),
-                    account_sysvar_rent.clone(),
-                ],
-            )?;
-        }
+        Self::initialize_ata_if_not_exists(
+            account_ata_program,
+            account_user,
+            account_fee_destination_ata,
+            account_fee_destination,
+            account_fee_mint,
+            account_system_program,
+            account_token_program,
+            account_sysvar_rent,
+        )?;
 
         /* Create the account_registry_meta */
         let account_registry_meta_space = size_of::<RegistryMetaAccount>();
@@ -211,9 +200,36 @@ impl<'a> Processor {
         Self::assert_valid_account_mint(account_fee_mint)?;
         let account_fee_destination = next_account_info(accounts_iter)?;
         Self::assert_valid_system_account(account_fee_destination)?;
+        let account_fee_destination_ata = next_account_info(accounts_iter)?;
+        Self::assert_valid_ata(
+            account_fee_destination.key,
+            account_fee_mint.key,
+            &account_fee_destination_ata,
+        )?;
+        let account_system_program = next_account_info(accounts_iter)?;
+        Self::assert_valid_system_program(account_system_program)?;
+        let account_token_program = next_account_info(accounts_iter)?;
+        Self::assert_valid_token_program(account_token_program)?;
+        let account_ata_program = next_account_info(accounts_iter)?;
+        Self::assert_valid_ata_program(account_ata_program)?;
+        let account_sysvar_rent = next_account_info(accounts_iter)?;
+        Self::assert_valid_sysvar_rent(account_sysvar_rent)?;
+
         let account_registry_meta = next_account_info(accounts_iter)?;
         Self::assert_valid_pda(program_id, account_registry_meta, b"meta")?;
         Self::assert_initialized(account_registry_meta)?;
+
+        // If the fee destination ATA has not yet been initialized, do so.
+        Self::initialize_ata_if_not_exists(
+            account_ata_program,
+            account_user,
+            account_fee_destination_ata,
+            account_fee_destination,
+            account_fee_mint,
+            account_system_program,
+            account_token_program,
+            account_sysvar_rent,
+        )?;
 
         let mut registry_meta =
             RegistryMetaAccount::try_from_slice(&account_registry_meta.data.borrow())?;
@@ -364,6 +380,9 @@ impl<'a> Processor {
             return Err(ProgramError::from(
                 RegistryError::InvalidTokenUpdateAuthority,
             ));
+        }
+        if registry_node_to_delete.deleted {
+            return Err(ProgramError::from(RegistryError::PreviouslyDeletedMint));
         }
 
         registry_node_to_delete.deleted = true;
@@ -541,6 +560,40 @@ impl<'a> Processor {
         Ok(RegistryNodeAccount::try_from_slice(
             &registry_node_account.data.borrow()[4..4 + length_bytes],
         )?)
+    }
+
+    fn initialize_ata_if_not_exists(
+        account_ata_program: &AccountInfo<'a>,
+        account_user: &AccountInfo<'a>,
+        account_fee_destination_ata: &AccountInfo<'a>,
+        account_fee_destination: &AccountInfo<'a>,
+        account_fee_mint: &AccountInfo<'a>,
+        account_system_program: &AccountInfo<'a>,
+        account_token_program: &AccountInfo<'a>,
+        account_sysvar_rent: &AccountInfo<'a>,
+    ) -> Result<(), ProgramError> {
+        if account_fee_destination_ata.data_len() == 0 {
+            let create_account_instr =
+                spl_associated_token_account::create_associated_token_account(
+                    account_user.key,
+                    account_fee_destination.key,
+                    account_fee_mint.key,
+                );
+            solana_program::program::invoke(
+                &create_account_instr,
+                &[
+                    account_ata_program.clone(),
+                    account_user.clone(),
+                    account_fee_destination_ata.clone(),
+                    account_fee_destination.clone(),
+                    account_fee_mint.clone(),
+                    account_system_program.clone(),
+                    account_token_program.clone(),
+                    account_sysvar_rent.clone(),
+                ],
+            )?;
+        }
+        Ok(())
     }
 
     fn assert_valid_pda(

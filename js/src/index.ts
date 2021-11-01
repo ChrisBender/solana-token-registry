@@ -11,14 +11,14 @@ import { serialize, deserialize } from 'borsh'
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
 const ATA_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
 
-interface RegistryMetaAccount {
+export interface RegistryMetaAccount {
   publicKey: PublicKey
   feeAmount: bigint
   feeMint: PublicKey
   feeDestination: PublicKey
   feeUpdateAuthority: PublicKey
 }
-interface RegistryNodeAccount {
+export interface RegistryNodeAccount {
   publicKey: PublicKey
   nextRegistryNode: PublicKey
   mint: PublicKey
@@ -107,7 +107,9 @@ export async function getAllTokens (
 }
 
 /**
- * Returns a sanitized list of all the registered tokens. Throw away all duplicate tickers and names, only keeping the ticker or name with highest active DEX volume.
+ * Returns a sanitized list of all the registered tokens. Throw away all
+ * duplicate tickers and names, only keeping the ticker or name with highest
+ * active DEX volume.
  *
  */
 export async function getAllTokensSanitized (
@@ -254,7 +256,7 @@ export async function getRegistryState (
     tags: borshRegistryHeadAccount.token_tags,
     extensions: borshRegistryHeadAccount.token_extensions,
     updateAuthority: new PublicKey(borshRegistryHeadAccount.token_update_authority),
-    deleted: borshRegistryHeadAccount.deleted
+    deleted: +borshRegistryHeadAccount.deleted !== 0
   }
 
   const registryNodeAccounts = [registryHeadAccount]
@@ -279,7 +281,7 @@ export async function getRegistryState (
       tags: borshRegistryNodeAccount.token_tags,
       extensions: borshRegistryNodeAccount.token_extensions,
       updateAuthority: new PublicKey(borshRegistryNodeAccount.token_update_authority),
-      deleted: borshRegistryNodeAccount.deleted
+      deleted: +borshRegistryNodeAccount.deleted !== 0
     }
     registryNodeAccounts.push(registryNodeAccount)
   }
@@ -287,7 +289,8 @@ export async function getRegistryState (
 }
 
 /**
- * Creates a TransactionInstruction corresponding to the InitializeRegistry contract instruction.
+ * Creates a TransactionInstruction corresponding to the InitializeRegistry
+ * contract instruction.
  *
  */
 export async function createInstructionInitializeRegistry (
@@ -330,7 +333,8 @@ export async function createInstructionInitializeRegistry (
 }
 
 /**
- * Creates a TransactionInstruction corresponding to the UpdateFees contract instruction.
+ * Creates a TransactionInstruction corresponding to the UpdateFees contract
+ * instruction.
  *
  */
 export async function createInstructionUpdateFees (
@@ -345,10 +349,21 @@ export async function createInstructionUpdateFees (
   buffer.writeUInt8(1)
   buffer.writeBigUInt64BE(feeAmount, 1)
 
+  const destinationTokenAccount = await getATA(
+    connection,
+    feeDestinationPublicKey,
+    feeMintPublicKey
+  )
+
   const keys = [
     { isSigner: true, isWritable: false, pubkey: userPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeMintPublicKey },
     { isSigner: false, isWritable: false, pubkey: feeDestinationPublicKey },
+    { isSigner: false, isWritable: true, pubkey: destinationTokenAccount },
+    { isSigner: false, isWritable: false, pubkey: SystemProgram.programId },
+    { isSigner: false, isWritable: false, pubkey: TOKEN_PROGRAM_ID },
+    { isSigner: false, isWritable: false, pubkey: ATA_PROGRAM_ID },
+    { isSigner: false, isWritable: false, pubkey: SYSVAR_RENT_PUBKEY },
     { isSigner: false, isWritable: true, pubkey: await getPDA('meta', programId) }
   ]
 
@@ -360,7 +375,8 @@ export async function createInstructionUpdateFees (
 }
 
 /**
- * Creates a TransactionInstruction corresponding to the CreateEntry contract instruction.
+ * Creates a TransactionInstruction corresponding to the CreateEntry contract
+ * instruction.
  *
  */
 export async function createInstructionCreateEntry (
@@ -424,7 +440,8 @@ export async function createInstructionCreateEntry (
 }
 
 /**
- * Creates a TransactionInstruction corresponding to the DeleteEntry contract instruction.
+ * Creates a TransactionInstruction corresponding to the DeleteEntry contract
+ * instruction.
  *
  */
 export async function createInstructionDeleteEntry (
@@ -451,7 +468,8 @@ export async function createInstructionDeleteEntry (
 }
 
 /**
- * Creates a TransactionInstruction corresponding to the UpdateEntry contract instruction.
+ * Creates a TransactionInstruction corresponding to the UpdateEntry contract
+ * instruction.
  *
  */
 export async function createInstructionUpdateEntry (
@@ -494,7 +512,8 @@ export async function createInstructionUpdateEntry (
 }
 
 /**
- * Creates a TransactionInstruction corresponding to the TransferFeeAuthority contract instruction.
+ * Creates a TransactionInstruction corresponding to the TransferFeeAuthority
+ * contract instruction.
  *
  */
 export async function createInstructionTransferFeeAuthority (
@@ -520,7 +539,8 @@ export async function createInstructionTransferFeeAuthority (
 }
 
 /**
- * Creates a TransactionInstruction corresponding to the TransferTokenAuthority contract instruction.
+ * Creates a TransactionInstruction corresponding to the TransferTokenAuthority
+ * contract instruction.
  *
  */
 export async function createInstructionTransferTokenAuthority (
@@ -549,7 +569,7 @@ export async function createInstructionTransferTokenAuthority (
 }
 
 /* Utilities */
-async function getPDA (
+export async function getPDA (
   seed: string | Uint8Array,
   programId: PublicKey
 ): Promise<PublicKey> {

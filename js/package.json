@@ -14,11 +14,13 @@
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
+    "@types/random-seed": "^0.3.3",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
     "eslint": "^8.0.1",
     "eslint-config-standard-with-typescript": "^21.0.1",
     "jest": "^27.2.5",
+    "random-seed": "^0.3.0",
     "ts-jest": "^27.0.6",
     "typescript": "^4.4.4"
   }

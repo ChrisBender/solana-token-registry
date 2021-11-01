@@ -114,7 +114,7 @@ export async function sendAndConfirmTx (
   signers: Keypair[] = [userKeypair]
 ): Promise<string> {
   const tx = new Transaction({
-    feePayer: userKeypair.publicKey,
+    feePayer: signers[0].publicKey,
     recentBlockhash: (await connection.getRecentBlockhash()).blockhash
   })
   tx.add(instruction)
