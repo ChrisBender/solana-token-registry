@@ -85,6 +85,7 @@ impl<'a> Processor {
         accounts: &[AccountInfo],
         fee_amount: u64,
     ) -> ProgramResult {
+        Self::assert_number_of_accounts(accounts, 11)?;
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
@@ -193,6 +194,7 @@ impl<'a> Processor {
         accounts: &[AccountInfo],
         fee_amount: u64,
     ) -> ProgramResult {
+        Self::assert_number_of_accounts(accounts, 9)?;
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
@@ -253,6 +255,7 @@ impl<'a> Processor {
         token_tags: Vec<String>,
         token_extensions: Vec<Vec<String>>,
     ) -> ProgramResult {
+        Self::assert_number_of_accounts(accounts, 10)?;
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
@@ -358,6 +361,7 @@ impl<'a> Processor {
     }
 
     fn process_delete_entry(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
+        Self::assert_number_of_accounts(accounts, 4)?;
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
@@ -400,6 +404,7 @@ impl<'a> Processor {
         token_tags: Vec<String>,
         token_extensions: Vec<Vec<String>>,
     ) -> ProgramResult {
+        Self::assert_number_of_accounts(accounts, 4)?;
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
@@ -438,6 +443,7 @@ impl<'a> Processor {
         program_id: &Pubkey,
         accounts: &[AccountInfo],
     ) -> ProgramResult {
+        Self::assert_number_of_accounts(accounts, 3)?;
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
@@ -462,6 +468,7 @@ impl<'a> Processor {
         program_id: &Pubkey,
         accounts: &[AccountInfo],
     ) -> ProgramResult {
+        Self::assert_number_of_accounts(accounts, 5)?;
         let accounts_iter = &mut accounts.iter();
         let account_user = next_account_info(accounts_iter)?;
         Self::assert_valid_account_user(account_user)?;
@@ -592,6 +599,16 @@ impl<'a> Processor {
                     account_sysvar_rent.clone(),
                 ],
             )?;
+        }
+        Ok(())
+    }
+
+    fn assert_number_of_accounts(
+        accounts: &[AccountInfo],
+        num: usize,
+    ) -> Result<(), RegistryError> {
+        if accounts.len() != num {
+            return Err(RegistryError::InvalidNumberOfAccounts);
         }
         Ok(())
     }

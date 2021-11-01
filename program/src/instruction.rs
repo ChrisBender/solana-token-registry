@@ -23,12 +23,6 @@ pub enum RegistryInstruction {
      * Byte 0: Instruction number (here, it equals 0).
      * Bytes 1-8: The `fee_amount` in big-endian order.
      *
-     * Errors:
-     * `AlreadyInitialized` if the registry has already been initialized.
-     * `InvalidFeeMint` if the supplied `fee_mint` address is not owned by the token program.
-     * `InvalidFeeDestination` if the supplied `fee_destination` is not owned by the system program.
-     * `InvalidNamedProgram` If the supplied system program is not the real system program.
-     *
      */
     InitializeRegistry { fee_amount: u64 },
 
@@ -49,12 +43,6 @@ pub enum RegistryInstruction {
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 1).
      * Bytes 1-8: The new `fee_amount` in big-endian order.
-     *
-     * Errors:
-     * `NotYetInitialized` if the registry has not yet been initialized.
-     * `InvalidFeeUpdateAuthority` if the fee-payer address does not match `fee_update_authority`.
-     * `InvalidFeeMint` if the supplied `fee_mint` address is not owned by the token program.
-     * `InvalidFeeDestination` if the supplied `fee_destination` is not owned by the system program.
      *
      */
     UpdateFees { fee_amount: u64 },
@@ -78,14 +66,6 @@ pub enum RegistryInstruction {
      * Byte 0: Instruction number (here, it equals 2).
      * Bytes 1-?: The borsh serialization of a CreateUpdateEntryInstructionData.
      *
-     * Errors:
-     * `NotYetInitialized` if the registry has not yet been initialized.
-     * `InvalidMint` if the supplied mint address has been previously registered or is not owned by the token program.
-     * `InvalidSourceAccount` if the source account is not the ATA of the fee-payer.
-     * `InvalidDestinationAccount` if the destination account is not the ATA of the `fee_destination`.
-     * `InvalidNamedProgram` If either the system program or the token program are not correct.
-     * `InvalidInstructionData` if there are not exactly 5 zero-termianted strings, or if the JSON-parsable lists cannot be parsed.
-     *
      */
     CreateEntry {
         token_symbol: String,
@@ -107,11 +87,6 @@ pub enum RegistryInstruction {
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 3).
      *
-     * Errors:
-     * `NotYetInitialized` if the registry has not yet been initialized.
-     * `InvalidMint` if the supplied mint address is not owned by the token program, or has not been previously registered.
-     * `InvalidTokenUpdateAuthority` if the fee-payer address does not match `token_update_authority`.
-     *
      */
     DeleteEntry,
 
@@ -127,12 +102,6 @@ pub enum RegistryInstruction {
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 4).
      * Bytes 1-?: The borsh serialization of a CreateUpdateEntryInstructionData.
-     *
-     * Errors:
-     * `NotYetInitialized` if the registry has not yet been initialized.
-     * `InvalidMint` if the supplied mint address has not been previously registered or is not owned by the token program.
-     * `InvalidInstructionData` if there are not exactly 5 zero-termianted strings, or if the JSON-parsable lists cannot be parsed.
-     * `InvalidTokenUpdateAuthority` if the fee-payer address does not match `token_update_authority`.
      *
      */
     UpdateEntry {
@@ -154,10 +123,6 @@ pub enum RegistryInstruction {
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 5).
      *
-     * Errors:
-     * `NotYetInitialized` if the registry has not yet been initialized.
-     * `InvalidFeeUpdateAuthority` if the fee-payer address does not match `fee_update_authority`, or if the supplied new account is not owned by the system program.
-     *
      */
     TransferFeeAuthority,
 
@@ -173,10 +138,6 @@ pub enum RegistryInstruction {
      *
      * Instruction Data:
      * Byte 0: Instruction number (here, it equals 6).
-     *
-     * Errors:
-     * `NotYetInitialized` if the registry has not yet been initialized.
-     * `InvalidTokenUpdateAuthority` if the fee-payer address does not match `token_update_authority`, or if the supplied new account is not owned by the system program.
      *
      */
     TransferTokenAuthority,

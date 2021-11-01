@@ -12,8 +12,6 @@ pub enum RegistryError {
     NotYetInitialized,
     #[error("The registry has already been initialized.")]
     AlreadyInitialized,
-    #[error("Passed an invalid number of accounts.")]
-    InvalidNumberOfAccounts,
     #[error("The provided user account is not a signer.")]
     InvalidUserAccount,
     #[error("The provided system account is not owned by the system program.")]
@@ -48,8 +46,8 @@ pub enum RegistryError {
     InvalidTokenUpdateAuthority,
     #[error("Attempted to update the fees without having update authority.")]
     InvalidFeeUpdateAuthority,
-    #[error("The provided fee destination is not owned by the system program.")]
-    InvalidFeeDestination,
+    #[error("Passed an invalid number of accounts.")]
+    InvalidNumberOfAccounts,
     #[error("The provided instruction data cannot be parsed.")]
     InvalidInstructionData,
 }
@@ -64,9 +62,6 @@ impl PrintProgramError for RegistryError {
             }
             RegistryError::AlreadyInitialized => {
                 msg!("RegistryError::AlreadyInitialized - The registry has already been initialized.")
-            }
-            RegistryError::InvalidNumberOfAccounts => {
-                msg!("RegistryError::InvalidNumberOfAccounts - Passed an invalid number of accounts.")
             }
             RegistryError::InvalidUserAccount => {
                 msg!("RegistryError::InvalidUserAccount - The provided user account is not a signer.")
@@ -119,8 +114,8 @@ impl PrintProgramError for RegistryError {
             RegistryError::InvalidFeeUpdateAuthority => {
                 msg!("RegistryError::InvalidFeeUpdateAuthority - Attempted to update the fees without having update authority.")
             }
-            RegistryError::InvalidFeeDestination => {
-                msg!("RegistryError::InvalidFeeDestination - The provided fee destination is not owned by the system program.")
+            RegistryError::InvalidNumberOfAccounts => {
+                msg!("RegistryError::InvalidNumberOfAccounts - Passed an invalid number of accounts.")
             }
             RegistryError::InvalidInstructionData => {
                 msg!("RegistryError::InvalidInstructionData - The provided instruction data cannot be parsed.")
