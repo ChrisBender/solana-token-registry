@@ -12,7 +12,6 @@
     "client:start": "cd client && npm run start",
     "client:lint": "cd client && npm run lint",
     "client:build": "cd client && npm run build",
-    "client:test": "cd client && npm run test",
     "client:deploy": "cd client && npm run deploy",
     "lint": "npm run program:lint && npm run js:lint",
     "test": "npm run program:build && npm run js:test"
