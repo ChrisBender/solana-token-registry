@@ -1,38 +1,142 @@
-.App {
+@font-face {
+  font-family: Orbitron;
+  src: url("./fonts/Orbitron-Regular.ttf");
+}
+@font-face {
+  font-family: Orbitron;
+  src: url("./fonts/Orbitron-Bold.ttf");
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: Rubik;
+  src: url("./fonts/Rubik-Regular.ttf");
+}
+@font-face {
+  font-family: Rubik;
+  src: url("./fonts/Rubik-Bold.ttf");
+  font-weight: bold;
+}
+
+.registry {
+  font-family: Rubik;
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
   color: white;
+  background-color: #161B19;
+  min-height: 100vh;
+  overflow: hidden;
 }
 
-.App-link {
-  color: #61dafb;
+.header {
+  background-color: #1E2423;
+  min-height: 7vh;
+  display: flex;
+  align-items: center;
+  position: fixed;
+  width: 100%;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.logo {
+  padding-left: min(5%, 150px);
+  display: flex;
+  margin: 0 auto 0 0;
 }
+.logo-img {
+  min-width: 150px;
+}
+.logo-text {
+  font-family: Orbitron;
+  padding-left: 10px;
+  color: #ABABAB;
+  font-weight: bold;
+}
+
+.link {
+  padding: 10px;
+  padding-left: 15px;
+  padding-right: 15px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  height: 50%;
+  cursor: pointer;
+}
+.link-github {
+  border: 1px solid #ABABAB;
+  margin-right: 10px;
+}
+.link-launch-app {
+  border: 2px solid #025338;
+  background-color: #00D18C;
+  color: #293D35;
+  margin-right: 25px;
+}
+
+.main-text-and-registry-illustration {
+  display: flex;
+  align-items: center;
+}
+.main-text {
+  padding-right: 7%;
+  padding-left: 13%;
+  padding-top: 10%;
+  width: 30%;
+}
+.main-text-title {
+  font-family: Orbitron;
+  font-weight: bold;
+  font-size: 4em;
+}
+.main-text-subtitle {
+  padding-top: 5%;
+  color: #ABABAB;
+  font-size: 1.4em;
+}
+
+.registry-illustration {
+  padding-right: 13%;
+  padding-left: 10%;
+  padding-top: 10%;
+  width: 22%;
+  font-family: Courier New;
+}
+.registry-illustration-content {
+  background-color: #2D2D2D;
+  border-radius: 15px;
+}
+.registry-illustration-header {
+  background-color: #4E4E4E;
+  border-radius: 15px 15px 0px 0px;
+  padding: 1vmin;
+  padding-left: 3vmin;
+  text-align: left;
+  font-size: 1.4em;
+}
+.registry-illustration-token {
+  padding: 2.5vmin;
+  font-size: 1.6em;
+}
+
+.learn-more {
+  padding-top: 13%;
+  font-family: Orbitron;
+  font-size: 1.8em;
+}
+.learn-more-text {
+  padding-bottom: 0.5%;
+}
+.learn-more-symbol {
+}
+
+.explainer {
+  margin-top: 30vmin;
+}
+.explainer-pr-illustration {
+}
+.explainer-text {
+  font-size: 1.6em;
+  width: 50%;
+}
+
+.call-to-action {
+}
+
