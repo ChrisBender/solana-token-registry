@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 25.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="Layer_1" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" image-rendering="optimizeQuality" xmlns:xodm="http://www.corel.com/coreldraw/odm/2003"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1024 1024"
+	 style="enable-background:new 0 0 1024 1024;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#8C8C8C;}
+	.st1{fill:#D1D9FF;}
+	.st2{fill:#343434;}
+	.st3{fill:#3C3C3B;}
+	.st4{fill:#141414;}
+	.st5{fill:#393939;}
+</style>
+<circle class="st0" cx="512" cy="512" r="512"/>
+<circle class="st1" cx="512" cy="512" r="480"/>
+<g id="Layer_x0020_1">
+	<g id="_1421394342400">
+		<g>
+			<polygon class="st2" points="511.9,104.9 506.5,123.4 506.5,661.8 511.9,667.3 761.8,519.6 			"/>
+			<polygon class="st0" points="511.9,104.9 262,519.6 511.9,667.3 511.9,406 			"/>
+			<polygon class="st3" points="511.9,714.6 508.8,718.4 508.8,910.1 511.9,919.1 762,566.9 			"/>
+			<polygon class="st0" points="511.9,919.1 511.9,714.6 262,566.9 			"/>
+			<polygon class="st4" points="511.9,667.3 761.8,519.6 511.9,406 			"/>
+			<polygon class="st5" points="262,519.6 511.9,667.3 511.9,406 			"/>
+		</g>
+	</g>
+</g>
+</svg>

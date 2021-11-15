@@ -5,8 +5,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Homepage from './Homepage';
 import Application from './Application'
 
+import "@fontsource/orbitron/700.css"
 import "@fontsource/orbitron/400.css"
 import "@fontsource/rubik/700.css"
+import "@fontsource/rubik/400.css"
 
 const theme = extendTheme({
   colors: {
@@ -16,6 +18,8 @@ const theme = extendTheme({
     },
     gray: {
       100: "#ABABAB",
+      600: "#4E4E4E",
+      700: "#2D2D2D",
       800: "#1E2423",
       900: "#161B19",
     }
@@ -33,6 +37,12 @@ const theme = extendTheme({
     }
   },
   components: {
+    Text: {
+      baseStyle: {
+        textAlign: "center",
+        lineHeight: "normal",
+      }
+    },
     Button: {
       baseStyle: {
         width: ["40vw", "auto"],

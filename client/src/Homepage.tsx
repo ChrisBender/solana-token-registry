@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link as RouterLink } from "react-router-dom";
 
-import solanaLogo from './solana-logo-color-white.svg';
+import solanaLogo from './logos/solana-logo-color-white.svg';
+import usdcLogo from './logos/usd-coin-usdc-logo.svg';
+import wethLogo from './logos/ethereum-eth-logo.svg';
+import quesLogo from './logos/question-logo.svg';
 
 import {
   Flex,
@@ -18,7 +21,7 @@ class Header extends React.Component {
     return (
       <Flex
         w="100%"
-        h={["14vh", "7vh"]}
+        h={["10vh", "7vh"]}
         bg="gray.800"
         position="fixed"
         alignItems="center"
@@ -31,7 +34,7 @@ class Header extends React.Component {
             Token Registry
           </Text>
         </Flex>
-        <ButtonGroup ml={["0", "auto"]} mr={["0", "50px"]}>
+        <ButtonGroup ml={["0", "auto"]} mr={["0", "50px"]} display={["none", "inline"]}>
           <Link href="https://github.com/ChrisBender/solana-token-registry" isExternal>
             <Button variant="github">
               GitHub
@@ -48,12 +51,58 @@ class Header extends React.Component {
   }
 }
 
-class Body extends React.Component {
+function RegistryIllustrationToken(props: any) {
+  return (
+    <Flex padding="4%" fontSize={["1.1em", "1.5em"]} alignItems="center">
+      <Image src={props.logo} float="left" height={["30px", "50px"]} pl="2%" pr="3%" />
+      <Box>
+        {"{key: " + props.ticker + ", ...}"}
+      </Box>
+    </Flex>
+  );
+  
+}
+
+class MainTextAndIllustration extends React.Component {
   render() {
     return (
-      <Flex pt="7vh">
+      <Flex w="100%" alignItems="center" justifyContent="center" pt="10%" flexWrap="wrap">
+        <Box w={["100%", "30%"]} m={["0 5% 0 5%", "0 8% 0 0"]}>
+          <Text fontFamily="Orbitron" fontWeight="bold" fontSize={["2em", "3.8em"]}>
+            All Solana tokens.<br />In one place.
+          </Text>
+          <Text color="gray.100" fontSize={["1.0em", "1.2em"]} pt="5%">
+            Register your SPL token metadata on-chain. Stop submitting PRs to the token-list repository. 
+          </Text>
+        </Box>
+        <Box w={["100%", "30%"]}>
+          <Box w={["65%", "70%"]} fontFamily="Courier New" bg="gray.700" borderRadius="10px" m="auto" mt={["15%", 0]}>
+            <Box bg="gray.600" borderRadius="10px 10px 0 0" p="3%" pl="5%" fontSize="1.3em">
+              0xregistry
+            </Box>
+            <RegistryIllustrationToken ticker="USDC" logo={usdcLogo} />
+            <RegistryIllustrationToken ticker="wETH" logo={wethLogo} />
+            <RegistryIllustrationToken ticker="????" logo={quesLogo} />
+          </Box>
+        </Box>
       </Flex>
     )
+  }
+}
+
+class Explainer extends React.Component {
+  render() {
+    return (
+      null
+    );
+  }
+}
+
+class CallToAction extends React.Component {
+  render() {
+    return (
+      null
+    );
   }
 }
 
@@ -62,29 +111,17 @@ class Homepage extends React.Component {
     return (
       <Box>
         <Header />
-        <Body />
+        <Flex pt={["10vh", "7vh"]}>
+          <MainTextAndIllustration />
+          <Explainer />
+          <CallToAction />
+        </Flex>
       </Box>
     )
   }
   //render() {
   //  return (
   //    <div className="registry">
-  //      <header className="header">
-  //        <div className="logo">
-  //          <div className="logo-img">
-  //            <img src={solanaLogo} alt="" />
-  //          </div>
-  //          <div className="logo-text">
-  //            Token Registry
-  //          </div>
-  //        </div>
-  //        <a className="link link-github" href="https://github.com/ChrisBender/solana-token-registry">
-  //          GitHub
-  //        </a>
-  //        <div className="link link-launch-app">
-  //          Launch App
-  //        </div>
-  //      </header>
   //      <div className="main-text-and-registry-illustration">
   //        <div className="main-text">
   //          <div className="main-text-title">
