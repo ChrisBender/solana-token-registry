@@ -5,6 +5,9 @@ import solanaLogo from './logos/solana-logo-color-white.svg';
 import usdcLogo from './logos/usd-coin-usdc-logo.svg';
 import wethLogo from './logos/ethereum-eth-logo.svg';
 import quesLogo from './logos/question-logo.svg';
+import prSymbolGreen from './logos/pr-green.svg';
+import prSymbolWhite from './logos/pr-white.svg';
+import xSymbol from './logos/x.svg';
 
 import {
   Flex,
@@ -111,10 +114,61 @@ class LearnMore extends React.Component {
   }
 }
 
+function PullRequestIllustrationEntry(props: any) {
+  return (
+    <Flex padding="4%" fontSize={["0.9em", "1.3em"]} color="gray.100" alignItems="center">
+      <Image src={prSymbolGreen} float="left" height={["10px", "15px"]} pl="2%" pr="4%" />
+      <Text>
+        {props.text}
+      </Text>
+      <Image src={xSymbol} height={["5px", "8px"]} pl="3%" />
+    </Flex>
+  );
+  
+}
+
 class Explainer extends React.Component {
   render() {
     return (
-      null
+      <Flex
+        w="100%"
+        alignItems="center"
+        justifyContent="center"
+        pt={["18%", "12%"]}
+        flexDirection={["column-reverse", "row"]}
+      >
+        <Box w={["100%", "20%"]} mr={["0", "8%"]}>
+          <Box
+            w={["50%", "80%"]}
+            fontFamily="Courier New"
+            bg="gray.700"
+            borderRadius="10px"
+            m="auto"
+            mt={["15%", 0]}
+            pb="10%"
+          >
+            <Flex
+              bg="gray.600"
+              borderRadius="10px 10px 0 0"
+              p="3%"
+              pl="5%"
+              alignItems="center"
+            >
+              <Image src={prSymbolWhite} float="left" height={["10px", "15px"]} pl="2%" pr="4%" />
+              <Box fontSize="1.3em" fontWeight="bold">
+                523 Open
+              </Box>
+            </Flex>
+            <PullRequestIllustrationEntry text="Add HIPPO coin" />
+            <PullRequestIllustrationEntry text="Fix SHIB logo" />
+            <PullRequestIllustrationEntry text="SAFEMOON update" />
+          </Box>
+        </Box>
+        <Text w={["80%", "40%"]} fontSize={["0.9em", "1.2em"]}>
+          Currently, Solana uses a manual GitHub repository to keep track of registered SPL token metadata (the name of the token, the ticker, and URL of the logo).<br /><br />
+          Instead, this on-chain token registry allows <strong>anyone to register this metadata, permissionlessly</strong>. No more manual PR reviews to get your token onto Phantom.
+        </Text>
+      </Flex>
     );
   }
 }
@@ -132,7 +186,7 @@ class Homepage extends React.Component {
     return (
       <Box>
         <Header />
-        <Box pt={["10vh", "7vh"]}>
+        <Box pt={["10vh", "7vh"]} pb="30%">
           <MainTextAndIllustration />
           <LearnMore />
           <Explainer />
@@ -144,14 +198,6 @@ class Homepage extends React.Component {
   //render() {
   //  return (
   //    <div className="registry">
-  //      <div className="learn-more">
-  //        <div className="learn-more-text">
-  //          Learn More
-  //        </div>
-  //        <div className="learn-more-symbol">
-  //          \/
-  //        </div>
-  //      </div>
   //      <div className="explainer">
   //        <div className="explainer-pr-illustration">
   //        </div>
