@@ -34,7 +34,7 @@ class Header extends React.Component {
             Token Registry
           </Text>
         </Flex>
-        <ButtonGroup ml={["0", "auto"]} mr={["0", "50px"]} display={["none", "inline"]}>
+        <ButtonGroup ml={["0", "auto"]} mr={["0", "50px"]} display={["none", "block"]}>
           <Link href="https://github.com/ChrisBender/solana-token-registry" isExternal>
             <Button variant="github">
               GitHub
@@ -66,7 +66,7 @@ function RegistryIllustrationToken(props: any) {
 class MainTextAndIllustration extends React.Component {
   render() {
     return (
-      <Flex w="100%" alignItems="center" justifyContent="center" pt="10%" flexWrap="wrap">
+      <Flex w="100%" alignItems="center" justifyContent="center" pt="12%" flexWrap="wrap">
         <Box w={["100%", "30%"]} m={["0 5% 0 5%", "0 8% 0 0"]}>
           <Text fontFamily="Orbitron" fontWeight="bold" fontSize={["2em", "3.8em"]}>
             All Solana tokens.<br />In one place.
@@ -87,6 +87,27 @@ class MainTextAndIllustration extends React.Component {
         </Box>
       </Flex>
     )
+  }
+}
+
+class LearnMore extends React.Component {
+  render() {
+    return (
+      <Box
+        fontFamily="Orbitron"
+        fontWeight="bold"
+        fontSize="1.8em"
+        mt="12%"
+        display={["none", "block"]}
+      >
+        <Text>
+          Learn More
+        </Text>
+        <Text>
+          \/
+        </Text>
+      </Box>
+    );
   }
 }
 
@@ -111,37 +132,18 @@ class Homepage extends React.Component {
     return (
       <Box>
         <Header />
-        <Flex pt={["10vh", "7vh"]}>
+        <Box pt={["10vh", "7vh"]}>
           <MainTextAndIllustration />
+          <LearnMore />
           <Explainer />
           <CallToAction />
-        </Flex>
+        </Box>
       </Box>
     )
   }
   //render() {
   //  return (
   //    <div className="registry">
-  //      <div className="main-text-and-registry-illustration">
-  //        <div className="main-text">
-  //          <div className="main-text-title">
-  //            All Solana tokens.<br />In one place.
-  //          </div>
-  //          <div className="main-text-subtitle">
-  //            Register your SPL token metadata on-chain. Stop submitting PRs to the token-list repository. 
-  //          </div>
-  //        </div>
-  //        <div className="registry-illustration">
-  //          <div className="registry-illustration-content">
-  //            <div className="registry-illustration-header">
-  //              0xregistry
-  //            </div>
-  //            <RegistryIllustrationToken ticker="USDC" />
-  //            <RegistryIllustrationToken ticker="wETH" />
-  //            <RegistryIllustrationToken ticker="????" />
-  //          </div>
-  //        </div>
-  //      </div>
   //      <div className="learn-more">
   //        <div className="learn-more-text">
   //          Learn More
