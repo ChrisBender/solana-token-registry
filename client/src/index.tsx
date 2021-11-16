@@ -55,7 +55,11 @@ const theme = extendTheme({
           color: "#293D35",
           backgroundColor: "#00D18C",
           border: "2px solid #025338",
-        }
+        },
+        "read-docs": {
+          backgroundColor: "#9945FF",
+          border: "2px solid #432976",
+        },
       }
     }
   }

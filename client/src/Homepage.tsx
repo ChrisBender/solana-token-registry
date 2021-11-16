@@ -69,7 +69,13 @@ function RegistryIllustrationToken(props: any) {
 class MainTextAndIllustration extends React.Component {
   render() {
     return (
-      <Flex w="100%" alignItems="center" justifyContent="center" pt="12%" flexWrap="wrap">
+      <Flex
+        w="100%"
+        alignItems="center"
+        justifyContent="center"
+        pt={["25%", "12%"]}
+        flexWrap="wrap"
+      >
         <Box w={["100%", "30%"]} m={["0 5% 0 5%", "0 8% 0 0"]}>
           <Text fontFamily="Orbitron" fontWeight="bold" fontSize={["2em", "3.8em"]}>
             All Solana tokens.<br />In one place.
@@ -134,7 +140,7 @@ class Explainer extends React.Component {
         w="100%"
         alignItems="center"
         justifyContent="center"
-        pt={["18%", "12%"]}
+        pt={["40%", "12%"]}
         flexDirection={["column-reverse", "row"]}
       >
         <Box w={["100%", "20%"]} mr={["0", "8%"]}>
@@ -173,10 +179,63 @@ class Explainer extends React.Component {
   }
 }
 
+function CallToActionBox(props: any) {
+  const ButtonWrapper = props.buttonWrapper;
+  return (
+      <Flex
+        w={["80%", "25%"]}
+        m={["35% 6% 25% 6%", "0 6% 35% 6%"]}
+        flexDirection="column"
+        alignItems="center"
+      >
+        <Text fontFamily="Orbitron" fontWeight="bold" fontSize={["1.3em", "1.7em"]}>
+          {props.mainText}
+        </Text>
+        <Text pt="6%" pb="12%" fontSize={["1.0em", "1.2em"]}>
+          {props.subText}
+        </Text>
+        <ButtonWrapper {...props.buttonWrapperProps}>
+          <Button
+            variant={props.buttonVariant}
+            fontSize={["1.0em", "1.2em"]}
+            w={["150px", "200px"]}
+          >
+            {props.buttonText}
+          </Button>
+        </ButtonWrapper>
+      </Flex>
+  );
+}
+
 class CallToAction extends React.Component {
   render() {
     return (
-      null
+      <Flex
+        w="100%"
+        pt={["24%", "18%"]}
+        alignItems="center"
+        justifyContent="center"
+        flexWrap="wrap"
+      >
+        <CallToActionBox
+          buttonWrapper={Link}
+          buttonWrapperProps={
+            {href: "https://github.com/ChrisBender/solana-token-registry", isExternal: true}
+          }
+          mainText="For Developers"
+          subText="Use the JavaScript API to read and write to the token registry."
+          buttonText="Read Docs"
+          buttonVariant="read-docs"
+        />
+        <CallToActionBox
+          buttonWrapper={RouterLink}
+          buttonWrapperProps={{to: "/app"}}
+          mainText="For Token Creators"
+          subText="Use the in-browser app to register your token on-chain."
+          buttonText="Launch App"
+          buttonVariant="launch-app"
+        />
+      </Flex>
     );
   }
 }
@@ -186,7 +245,7 @@ class Homepage extends React.Component {
     return (
       <Box>
         <Header />
-        <Box pt={["10vh", "7vh"]} pb="30%">
+        <Box pt={["10vh", "7vh"]}>
           <MainTextAndIllustration />
           <LearnMore />
           <Explainer />
@@ -195,21 +254,6 @@ class Homepage extends React.Component {
       </Box>
     )
   }
-  //render() {
-  //  return (
-  //    <div className="registry">
-  //      <div className="explainer">
-  //        <div className="explainer-pr-illustration">
-  //        </div>
-  //        <div className="explainer-text">
-  //          Currently, Solana uses a manual GitHub repository to keep track of registered SPL token metadata (the name of the token, the ticker, and URL of the logo).<br /><br />Instead, this on-chain token registry allows <strong>anyone to register this metadata, permissionlessly</strong>. No more manual PR reviews to get your token onto Phantom.
-  //        </div>
-  //      </div>
-  //      <div className="call-to-action">
-  //      </div>
-  //    </div>
-  //  );
-  //}
 }
 
 export default Homepage;
