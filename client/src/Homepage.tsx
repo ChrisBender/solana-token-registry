@@ -1,7 +1,15 @@
 import React from 'react';
 import { Link as RouterLink } from "react-router-dom";
 
-import solanaLogo from './logos/solana-logo-color-white.svg';
+import {
+  Flex,
+  Box,
+  Image,
+  Link,
+  Button,
+  Text,
+} from '@chakra-ui/react';
+
 import usdcLogo from './logos/usd-coin-usdc-logo.svg';
 import wethLogo from './logos/ethereum-eth-logo.svg';
 import quesLogo from './logos/question-logo.svg';
@@ -9,50 +17,7 @@ import prSymbolGreen from './logos/pr-green.svg';
 import prSymbolWhite from './logos/pr-white.svg';
 import xSymbol from './logos/x.svg';
 
-import {
-  Flex,
-  Box,
-  Image,
-  Link,
-  Button,
-  ButtonGroup,
-  Text,
-} from '@chakra-ui/react';
-
-class Header extends React.Component {
-  render() {
-    return (
-      <Flex
-        w="100%"
-        h={["10vh", "7vh"]}
-        bg="gray.800"
-        position="fixed"
-        alignItems="center"
-        justifyContent="center"
-        flexWrap="wrap"
-      >
-        <Flex>
-          <Image src={solanaLogo} ml={["0", "100px"]} width="150px" />
-          <Text ml="10px" fontFamily="Orbitron" fontWeight="bold" color="gray.100">
-            Token Registry
-          </Text>
-        </Flex>
-        <ButtonGroup ml={["0", "auto"]} mr={["0", "50px"]} display={["none", "block"]}>
-          <Link href="https://github.com/ChrisBender/solana-token-registry" isExternal>
-            <Button variant="github">
-              GitHub
-            </Button>
-          </Link>
-          <RouterLink to="/app">
-            <Button variant="launch-app">
-              Launch App
-            </Button>
-          </RouterLink>
-        </ButtonGroup>
-      </Flex>
-    );
-  }
-}
+import { Header } from './Common';
 
 function RegistryIllustrationToken(props: any) {
   return (
