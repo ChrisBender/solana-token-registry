@@ -1,5 +1,5 @@
 {
-  "name": "solana-token-registry",
+  "name": "solana-token-registry-all",
   "version": "1.0.0",
   "scripts": {
     "program:lint": "cd program && npm run lint",
@@ -14,6 +14,7 @@
     "client:build": "cd client && npm run build",
     "client:deploy": "cd client && npm run deploy",
     "lint": "npm run program:lint && npm run js:lint",
-    "test": "npm run program:build && npm run js:test"
+    "test": "solana config set --url localhost && npm run program:build && npm run js:test",
+    "final-deploy": "bash ./scripts/final-deploy.sh"
   }
 }

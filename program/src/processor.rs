@@ -290,7 +290,6 @@ impl<'a> Processor {
             &Pubkey::new(&registry_meta.fee_mint),
             &account_fee_source_ata,
         )?;
-        Self::assert_initialized_ata(&account_fee_source_ata)?;
         Self::assert_valid_ata(
             &Pubkey::new(&registry_meta.fee_destination),
             &Pubkey::new(&registry_meta.fee_mint),
@@ -299,6 +298,7 @@ impl<'a> Processor {
         Self::assert_initialized_ata(&account_fee_destination_ata)?;
 
         if account_user.key.to_bytes() != registry_meta.fee_update_authority {
+            Self::assert_initialized_ata(&account_fee_source_ata)?;
             let transfer_instruction = spl_token::instruction::transfer(
                 account_token_program.key,
                 account_fee_source_ata.key,

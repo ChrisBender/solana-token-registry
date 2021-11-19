@@ -1,13 +1,17 @@
 import {
   Connection,
   PublicKey,
+  Keypair,
   SystemProgram,
   TransactionInstruction,
   SYSVAR_RENT_PUBKEY
 } from '@solana/web3.js'
 
 import { serialize, deserialize } from 'borsh'
+import { readFileSync } from 'fs'
+import { registryPrivateKey } from './registryKeypair'
 
+export const PROGRAM_ID = Keypair.fromSecretKey(new Uint8Array(registryPrivateKey)).publicKey
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
 const ATA_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
 
@@ -30,7 +34,7 @@ export interface RegistryNodeAccount {
   updateAuthority: PublicKey
   deleted: boolean
 }
-interface TokenEntry {
+export interface TokenEntry {
   mint: PublicKey
   symbol: string
   name: string
