@@ -9,6 +9,7 @@ import { Connection } from '@solana/web3.js';
 import {
   Flex,
   Box,
+  Checkbox,
   FormControl,
   FormLabel,
   FormHelperText,
@@ -50,14 +51,12 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
   }
 
   render() {
-    console.log(this.state.allTokens)
     let readBoxBody;
     if (this.state.allTokens.size === 0) {
       readBoxBody = <Text h="70vh" p="5%">Loading...</Text>;
     } else {
       const allTokensProcessed: React.CElement<any, any>[] = [];
       this.state.allTokens.forEach((token) => {
-        console.log(token.extensions)
         let link: string = ""
         for (const [key, val] of token.extensions) {
           if (key === "website") {
@@ -85,14 +84,14 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
                 fontWeight="bold"
                 pr="3%"
               >
-                <LinkOverlay href={link}>${token.symbol}</LinkOverlay>
+                <LinkOverlay href={link} target="_blank">${token.symbol}</LinkOverlay>
               </Text>
               <Text color="gray.100">{token.name}</Text>
             </Flex>
           </LinkBox>
         );
       });
-      readBoxBody = <Box h="70vh" overflow="scroll">{allTokensProcessed}</Box>
+      readBoxBody = <Box h={["auto", "70vh"]} overflow={["auto", "scroll"]}>{allTokensProcessed}</Box>
     }
     return (
       <Box
@@ -123,7 +122,6 @@ class WriteBox extends React.Component<ReadWriteBoxProps> {
     return (
       <Box
         w={["90%", "30%"]}
-        maxHeight="75vh"
         bg="gray.700"
         borderRadius="10px"
         ml={["0", "5%"]}
@@ -139,14 +137,56 @@ class WriteBox extends React.Component<ReadWriteBoxProps> {
         >
           Register a Token
         </Text>
-        <Text display="none">
-          Hello, world!
-        </Text>
-        <FormControl id="new-token" display="none">
-          <FormLabel>Email address</FormLabel>
-          <Input type="email" />
-          <FormHelperText>We'll never share your email.</FormHelperText>
-        </FormControl>
+        <Box h={["auto", "70vh"]} overflow={["auto", "scroll"]} p="5% 5% 0 5%">
+          <FormControl id="token-mint" pb="5%" isRequired>
+            <FormLabel>Token Mint</FormLabel>
+            <Input type="text" placeholder="e.g. EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" />
+            <FormHelperText>The mint address of your token.</FormHelperText>
+          </FormControl>
+          <FormControl id="token-symbol" pb="5%" isRequired>
+            <FormLabel>Symbol</FormLabel>
+            <Input type="text" placeholder="e.g. USDC" />
+          </FormControl>
+          <FormControl id="token-name" pb="5%" isRequired>
+            <FormLabel>Full Name</FormLabel>
+            <Input type="text" placeholder="e.g. USD Coin" />
+          </FormControl>
+          <FormControl id="token-logo-url" pb="5%" isRequired>
+            <FormLabel>Logo URL</FormLabel>
+            <Input type="text" placeholder="e.g. https://bit.ly/USDC.svg" />
+            <FormHelperText>Can be HTTP, IPFS, Arweave, etc.</FormHelperText>
+          </FormControl>
+          <FormControl id="token-tags" pb="5%">
+            <FormLabel>Token Tags</FormLabel>
+            <Flex flexWrap="wrap">
+              <Checkbox mr="5%">Stablecoin</Checkbox>
+              <Checkbox mr="5%">LP Token</Checkbox>
+              <Checkbox mr="5%">Wrapped via Sollet</Checkbox>
+              <Checkbox mr="5%">Wrapped via Wormhole</Checkbox>
+              <Checkbox mr="5%">Leveraged</Checkbox>
+              <Checkbox mr="5%">NFT</Checkbox>
+              <Checkbox mr="5%">Tokenized Stock</Checkbox>
+            </Flex>
+          </FormControl>
+          <Flex flexWrap="wrap">
+            <FormControl id="token-extensions-website" w="50%" p="0 3% 3% 3%">
+              <FormLabel>Website</FormLabel>
+              <Input type="text" />
+            </FormControl>
+            <FormControl id="token-extensions-twitter" w="50%" p="0 3% 3% 3%">
+              <FormLabel>Twitter</FormLabel>
+              <Input type="text" />
+            </FormControl>
+            <FormControl id="token-extensions-discord" w="50%" p="0 3% 3% 3%">
+              <FormLabel>Discord</FormLabel>
+              <Input type="text" />
+            </FormControl>
+            <FormControl id="token-extensions-coingecko-id" w="50%" p="0 3% 3% 3%">
+              <FormLabel>CoinGecko ID</FormLabel>
+              <Input type="text" />
+            </FormControl>
+          </Flex>
+        </Box>
       </Box>
     );
   }
