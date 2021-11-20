@@ -8,7 +8,6 @@ import {
 } from '@solana/web3.js'
 
 import { serialize, deserialize } from 'borsh'
-import { readFileSync } from 'fs'
 import { registryPrivateKey } from './registryKeypair'
 
 export const PROGRAM_ID = Keypair.fromSecretKey(new Uint8Array(registryPrivateKey)).publicKey
@@ -80,57 +79,13 @@ const BorshCreateEntryInstructionDataSchema = new Map([
 ])
 
 /**
- * Returns a list of all the registered tokens.
+ * Returns the RegistryMetaAccount and a generator for all the RegistryMetaNodes.
  *
  */
-export async function getAllTokens (
+export async function getRegistryStateGenerator (
   connection: Connection,
   programId: PublicKey
-): Promise<Set<TokenEntry>> {
-  const registryState = await getRegistryState(connection, programId)
-  if (registryState !== null) {
-    const registryNodeAccounts = registryState[1]
-    const tokenEntries = new Set<TokenEntry>()
-    for (const registryNodeAccount of registryNodeAccounts.slice(1, -1)) {
-      if (registryNodeAccount.deleted) {
-        continue
-      }
-      tokenEntries.add({
-        mint: registryNodeAccount.mint,
-        symbol: registryNodeAccount.symbol,
-        name: registryNodeAccount.name,
-        logoURL: registryNodeAccount.logoURL,
-        tags: registryNodeAccount.tags,
-        extensions: registryNodeAccount.extensions,
-        updateAuthority: registryNodeAccount.updateAuthority
-      })
-    }
-    return tokenEntries
-  }
-  return new Set<TokenEntry>()
-}
-
-/**
- * Returns a sanitized list of all the registered tokens. Throw away all
- * duplicate tickers and names, only keeping the ticker or name with highest
- * active DEX volume.
- *
- */
-export async function getAllTokensSanitized (
-  connection: Connection,
-  programId: PublicKey
-): Promise<Set<TokenEntry>> {
-  return await getAllTokens(connection, programId)
-}
-
-/**
- * Returns the RegistryMetaAccount and a list of all the RegistryMetaNodes.
- *
- */
-export async function getRegistryState (
-  connection: Connection,
-  programId: PublicKey
-): Promise<null | [RegistryMetaAccount, RegistryNodeAccount[]]> {
+): Promise<null | [RegistryMetaAccount, AsyncGenerator<RegistryNodeAccount>]> {
   class BorshRegistryMetaAccount {
     head_registry_node = new Uint8Array(32)
     fee_amount = 0
@@ -263,33 +218,141 @@ export async function getRegistryState (
     deleted: +borshRegistryHeadAccount.deleted !== 0
   }
 
-  const registryNodeAccounts = [registryHeadAccount]
-  while (registryNodeAccounts[registryNodeAccounts.length - 1].nextRegistryNode.toString() !== PublicKey.default.toString()) {
-    const registryNodePublicKey = registryNodeAccounts[registryNodeAccounts.length - 1].nextRegistryNode
-    const registryNodeAccountInfo = await connection.getAccountInfo(registryNodePublicKey)
-    // @ts-expect-error
-    length = registryNodeAccountInfo.data.readUInt32BE(0)
-    const borshRegistryNodeAccount = deserialize(
-      BorshRegistryNodeAccountSchema,
-      BorshRegistryNodeAccount,
+  async function* registryNodeAccountsIterator() {
+    yield registryHeadAccount
+    let prevRegistryNode = registryHeadAccount
+    while (prevRegistryNode.nextRegistryNode.toString() !== PublicKey.default.toString()) {
+      const registryNodePublicKey = prevRegistryNode.nextRegistryNode
+      const registryNodeAccountInfo = await connection.getAccountInfo(registryNodePublicKey)
       // @ts-expect-error
-      registryNodeAccountInfo.data.slice(4, 4 + length)
-    )
-    const registryNodeAccount = {
-      publicKey: registryNodePublicKey,
-      nextRegistryNode: new PublicKey(borshRegistryNodeAccount.next_registry_node),
-      mint: new PublicKey(borshRegistryNodeAccount.token_mint),
-      symbol: borshRegistryNodeAccount.token_symbol,
-      name: borshRegistryNodeAccount.token_name,
-      logoURL: borshRegistryNodeAccount.token_logo_url,
-      tags: borshRegistryNodeAccount.token_tags,
-      extensions: borshRegistryNodeAccount.token_extensions,
-      updateAuthority: new PublicKey(borshRegistryNodeAccount.token_update_authority),
-      deleted: +borshRegistryNodeAccount.deleted !== 0
+      length = registryNodeAccountInfo.data.readUInt32BE(0)
+      const borshRegistryNodeAccount = deserialize(
+        BorshRegistryNodeAccountSchema,
+        BorshRegistryNodeAccount,
+        // @ts-expect-error
+        registryNodeAccountInfo.data.slice(4, 4 + length)
+      )
+      const registryNodeAccount = {
+        publicKey: registryNodePublicKey,
+        nextRegistryNode: new PublicKey(borshRegistryNodeAccount.next_registry_node),
+        mint: new PublicKey(borshRegistryNodeAccount.token_mint),
+        symbol: borshRegistryNodeAccount.token_symbol,
+        name: borshRegistryNodeAccount.token_name,
+        logoURL: borshRegistryNodeAccount.token_logo_url,
+        tags: borshRegistryNodeAccount.token_tags,
+        extensions: borshRegistryNodeAccount.token_extensions,
+        updateAuthority: new PublicKey(borshRegistryNodeAccount.token_update_authority),
+        deleted: +borshRegistryNodeAccount.deleted !== 0
+      }
+      yield registryNodeAccount
+      prevRegistryNode = registryNodeAccount
     }
-    registryNodeAccounts.push(registryNodeAccount)
   }
-  return [registryMetaAccount, registryNodeAccounts]
+  return [registryMetaAccount, registryNodeAccountsIterator()]
+}
+
+/**
+ * Returns the RegistryMetaAccount and a list of all the RegistryMetaNodes.
+ *
+ */
+export async function getRegistryState (
+  connection: Connection,
+  programId: PublicKey
+): Promise<null | [RegistryMetaAccount, RegistryNodeAccount[]]> {
+  const registryStateGenerator = await getRegistryStateGenerator(connection, programId)
+  if (registryStateGenerator === null) {
+    return null
+  } else {
+    const [registryMetaAccount, registryNodeAccountsGenerator] = registryStateGenerator
+    const registryNodeAccounts: RegistryNodeAccount[] = []
+    for await (const registryNodeAccount of registryNodeAccountsGenerator) {
+      registryNodeAccounts.push(registryNodeAccount)
+    }
+    return [registryMetaAccount, registryNodeAccounts]
+  }
+}
+
+/**
+ * Returns a list of all the registered tokens.
+ *
+ */
+export async function getAllTokens (
+  connection: Connection,
+  programId: PublicKey
+): Promise<Set<TokenEntry>> {
+  const registryState = await getRegistryState(connection, programId)
+  if (registryState !== null) {
+    const registryNodeAccounts = registryState[1]
+    const tokenEntries = new Set<TokenEntry>()
+    for (const registryNodeAccount of registryNodeAccounts.slice(1, -1)) {
+      if (registryNodeAccount.deleted) {
+        continue
+      }
+      tokenEntries.add({
+        mint: registryNodeAccount.mint,
+        symbol: registryNodeAccount.symbol,
+        name: registryNodeAccount.name,
+        logoURL: registryNodeAccount.logoURL,
+        tags: registryNodeAccount.tags,
+        extensions: registryNodeAccount.extensions,
+        updateAuthority: registryNodeAccount.updateAuthority
+      })
+    }
+    return tokenEntries
+  }
+  return new Set<TokenEntry>()
+}
+
+/**
+ * Returns a generator for all the registered tokens.
+ * 
+ */
+export async function getAllTokensGenerator (
+  connection: Connection,
+  programId: PublicKey
+): Promise<AsyncGenerator<TokenEntry>> {
+  const registryStateGenerator = await getRegistryStateGenerator(connection, programId)
+  async function* allTokensIterator() {
+    if (registryStateGenerator === null) {
+      return
+    } else {
+      const [registryMetaAccount, registryNodeAccountsGenerator] = registryStateGenerator
+      let prevTokenEntry: null | TokenEntry = null;
+      let hasSkippedOne = false;
+      for await (const registryNodeAccount of registryNodeAccountsGenerator) {
+        if (prevTokenEntry !== null) {
+          if (hasSkippedOne) {
+            yield prevTokenEntry
+          } else {
+            hasSkippedOne = true
+          }
+        }
+        prevTokenEntry = {
+          mint: registryNodeAccount.mint,
+          symbol: registryNodeAccount.symbol,
+          name: registryNodeAccount.name,
+          logoURL: registryNodeAccount.logoURL,
+          tags: registryNodeAccount.tags,
+          extensions: registryNodeAccount.extensions,
+          updateAuthority: registryNodeAccount.updateAuthority
+        }
+      }
+    }
+  }
+  return allTokensIterator()
+}   
+
+/**
+ * Returns a sanitized list of all the registered tokens. Throw away all
+ * duplicate tickers and names, only keeping the ticker or name with highest
+ * active DEX volume.
+ *
+ */
+export async function getAllTokensSanitized (
+  connection: Connection,
+  programId: PublicKey
+): Promise<Set<TokenEntry>> {
+  return await getAllTokens(connection, programId)
 }
 
 /**

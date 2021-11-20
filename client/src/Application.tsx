@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   TokenEntry,
-  getAllTokens,
+  getAllTokensGenerator,
   PROGRAM_ID,
 } from 'solana-token-registry';
 import { Connection } from '@solana/web3.js';
@@ -9,13 +9,13 @@ import { Connection } from '@solana/web3.js';
 import {
   Flex,
   Box,
-  //Button,
   FormControl,
   FormLabel,
-  //FormErrorMessage,
   FormHelperText,
   Image,
   Input,
+  LinkBox,
+  LinkOverlay,
   Text,
 } from '@chakra-ui/react';
 
@@ -33,46 +33,63 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
   constructor(props: ReadWriteBoxProps) {
     super(props);
     this.state = {
-      allTokens: new Set(),
+      allTokens: new Set<TokenEntry>(),
     }
   }
 
   componentDidMount() {
-    getAllTokens(this.props.conn, PROGRAM_ID).then((allTokens) => {
-      this.setState({ allTokens })
-    });
+    getAllTokensGenerator(this.props.conn, PROGRAM_ID).then(async (allTokensGenerator) => {
+      const allTokens = new Set<TokenEntry>()
+      for await (const token of allTokensGenerator) {
+        allTokens.add(token)
+        if (allTokens.size >= 8) {
+          this.setState({ allTokens })
+        }
+      }
+    })
   }
 
   render() {
     console.log(this.state.allTokens)
     let readBoxBody;
     if (this.state.allTokens.size === 0) {
-      readBoxBody = <Text p="5%">Loading...</Text>;
+      readBoxBody = <Text h="70vh" p="5%">Loading...</Text>;
     } else {
       const allTokensProcessed: React.CElement<any, any>[] = [];
       this.state.allTokens.forEach((token) => {
         console.log(token.extensions)
+        let link: string = ""
+        for (const [key, val] of token.extensions) {
+          if (key === "website") {
+            link = val;
+          }
+        }
+        if (link === "") {
+          link = `https://explorer.solana.com/address/${token.mint}?cluster=devnet`
+        }
         allTokensProcessed.push(
-          <Flex
-            key={token.mint.toString()}
-            alignItems="center"
-            p="2%"
-          >
-            <Image
-              w={["30px", "50px"]}
-              h={["30px", "50px"]}
-              src={token.logoURL}
-              ml="2%"
-              mr="3%"
-            />
-            <Text
-              fontWeight="bold"
-              pr="3%"
+          <LinkBox>
+            <Flex
+              key={token.mint.toString()}
+              alignItems="center"
+              p="2%"
             >
-              ${token.symbol}
-            </Text>
-            <Text color="gray.100">{token.name}</Text>
-          </Flex>
+              <Image
+                w={["30px", "50px"]}
+                h={["30px", "50px"]}
+                src={token.logoURL}
+                ml="2%"
+                mr="3%"
+              />
+              <Text
+                fontWeight="bold"
+                pr="3%"
+              >
+                <LinkOverlay href={link}>${token.symbol}</LinkOverlay>
+              </Text>
+              <Text color="gray.100">{token.name}</Text>
+            </Flex>
+          </LinkBox>
         );
       });
       readBoxBody = <Box h="70vh" overflow="scroll">{allTokensProcessed}</Box>
