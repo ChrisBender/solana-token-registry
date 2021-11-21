@@ -31,15 +31,25 @@ export function Header(props: any) {
       </Flex>
       <ButtonGroup ml={["0", "auto"]} mr={["0", "50px"]} display={["none", "block"]}>
         <Link href="https://github.com/ChrisBender/solana-token-registry" isExternal>
-          <Button variant="github">
+          <Button variant="github" display={props.suppressGitHub ? "none": "inline"}>
             GitHub
           </Button>
         </Link>
         <RouterLink to="/app">
-          <Button variant="launch-app" display={props.onlyGitHub ? "none" : "inline"}>
+          <Button variant="launch-app" display={props.suppressLaunchApp ? "none" : "inline"}>
             Launch App
           </Button>
         </RouterLink>
+        <Button
+          variant="launch-app"
+          display={props.suppressPhantom ? "none": "inline"}
+          onClick={(e) => {
+            // @ts-ignore
+            props.isConnectedToPhantom ? window.solana.disconnect() : window.solana.connect()
+          }}
+        >
+          {props.isConnectedToPhantom ? "Disconnect Wallet" : "Connect to Phantom"}
+        </Button>
       </ButtonGroup>
     </Flex>
   );

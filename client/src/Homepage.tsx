@@ -209,7 +209,7 @@ class Homepage extends React.Component {
   render() {
     return (
       <Box>
-        <Header />
+        <Header suppressPhantom />
         <Box pt={["10vh", "7vh"]}>
           <MainTextAndIllustration />
           <LearnMore />

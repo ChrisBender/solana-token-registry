@@ -1,10 +1,13 @@
 import React from 'react';
+import { Connection, PublicKey } from '@solana/web3.js';
+
 import {
   TokenEntry,
   getAllTokensGenerator,
+  createInstructionCreateEntry,
   PROGRAM_ID,
 } from 'solana-token-registry';
-import { Connection } from '@solana/web3.js';
+
 import {
   Formik,
   Form,
@@ -32,6 +35,8 @@ import { Header } from './Common';
 
 interface ReadWriteBoxProps {
   conn: Connection;
+  isConnectedToPhantom: boolean;
+  userPublicKey: PublicKey;
 }
 
 interface ReadBoxState {
@@ -136,14 +141,45 @@ function WriteBox(props: ReadWriteBoxProps) {
     return error
   }
   function validateSymbol(value: any) {
-    return null
+    if (!value) {
+      return "Symbol is required."
+    } else {
+      return null
+    }
   }
   function validateName(value: any) {
-    return null
+    if (!value) {
+      return "Name is required."
+    } else {
+      return null
+    }
   }
   function validateLogoURL(value: any) {
-    return null
+    if (!value) {
+      return "Logo URL is required."
+    } else {
+      return null
+    }
   }
+
+  function onSubmit(values: any, actions: any) {
+    setTimeout(() => {
+      console.log(values)
+      actions.setSubmitting(false)
+    }, 1000)
+  }
+//  export async function createInstructionCreateEntry (
+//    connection: Connection,
+//    programId: PublicKey,
+//    userPublicKey: PublicKey,
+//    mintPublicKey: PublicKey,
+//    tokenSymbol: string,
+//    tokenName: string,
+//    tokenLogoUrl: string,
+//    tokenTags: string[],
+//    tokenExtensions: Array<[string, string]>
+//  ): Promise<TransactionInstruction> {
+
 
   return (
     <Box
@@ -165,15 +201,7 @@ function WriteBox(props: ReadWriteBoxProps) {
         Register a Token
       </Text>
       <Box h={["auto", "70vh"]} overflow={["auto", "scroll"]} p="5% 5% 0 5%">
-        <Formik
-          initialValues={{ mint: "" }}
-          onSubmit={(values, actions) => {
-            setTimeout(() => {
-              alert(JSON.stringify(values, null, 2))
-              actions.setSubmitting(false)
-            }, 1000)
-          }}
-        >
+        <Formik initialValues={{}} onSubmit={onSubmit}>
           {(props) => (
             <Form>
               <Field name="mint" validate={validateMint}>
@@ -218,7 +246,7 @@ function WriteBox(props: ReadWriteBoxProps) {
                   </FormControl>
                 )}
               </Field>
-              <FormControl pb="5%">
+              <FormControl p="2%">
                 <FormLabel htmlFor="tags">Token Tags</FormLabel>
                 <Flex flexWrap="wrap">
                   <Field name="tags-stablecoin">
@@ -255,7 +283,7 @@ function WriteBox(props: ReadWriteBoxProps) {
                 <Field name="extensions-website">
                   { // @ts-ignore
                   ({ field, form }) => (
-                    <FormControl pb="5%" w="50%">
+                    <FormControl p="2%" w={["auto", "50%"]}>
                       <FormLabel htmlFor="extensions-website">Website</FormLabel>
                       <Input {...field} id="extensions-website" />
                     </FormControl>
@@ -264,7 +292,7 @@ function WriteBox(props: ReadWriteBoxProps) {
                 <Field name="extensions-twitter">
                   { // @ts-ignore
                   ({ field, form }) => (
-                    <FormControl pb="5%" w="50%">
+                    <FormControl p="2%" w={["auto", "50%"]}>
                       <FormLabel htmlFor="extensions-twitter">Twitter</FormLabel>
                       <Input {...field} id="extensions-twitter" />
                     </FormControl>
@@ -273,7 +301,7 @@ function WriteBox(props: ReadWriteBoxProps) {
                 <Field name="extensions-discord">
                   { // @ts-ignore
                   ({ field, form }) => (
-                    <FormControl pb="5%" w="50%">
+                    <FormControl p="2%" w={["auto", "50%"]}>
                       <FormLabel htmlFor="extensions-discord">Discord</FormLabel>
                       <Input {...field} id="extensions-discord" />
                     </FormControl>
@@ -282,7 +310,7 @@ function WriteBox(props: ReadWriteBoxProps) {
                 <Field name="extensions-coingecko-id">
                   { // @ts-ignore
                   ({ field, form }) => (
-                    <FormControl pb="5%" w="50%">
+                    <FormControl p="2%" w={["auto", "50%"]}>
                       <FormLabel htmlFor="extensions-coingecko-id">CoinGecko ID</FormLabel>
                       <Input {...field} id="extensions-coingecko-id" />
                     </FormControl>
@@ -310,40 +338,61 @@ function WriteBox(props: ReadWriteBoxProps) {
 
 }
 
-class ReadAndWriteBoxes extends React.Component<{}, ReadWriteBoxProps> {
+function ReadAndWriteBoxes(props: ReadWriteBoxProps) {
+  return (
+    <Flex
+      w="100%"
+      pt={["5%", "5%"]}
+      alignItems="center"
+      justifyContent="center"
+      flexWrap="wrap"
+    >
+      <WriteBox {...props} />
+      <ReadBox {...props} />
+    </Flex>
+  );
+}
+
+class Application extends React.Component<{}, ReadWriteBoxProps> {
+
   constructor(props: any) {
     super(props);
     this.state = {
-      conn: new Connection('https://api.devnet.solana.com', 'confirmed')
+      conn: new Connection('https://api.devnet.solana.com', 'confirmed'),
+      isConnectedToPhantom: false,
+      userPublicKey: PublicKey.default,
     };
   }
-  render() {
-    return (
-      <Flex
-        w="100%"
-        pt={["5%", "5%"]}
-        alignItems="center"
-        justifyContent="center"
-        flexWrap="wrap"
-      >
-        <WriteBox conn={this.state.conn} />
-        <ReadBox conn={this.state.conn} />
-      </Flex>
-    );
-  }
-}
 
-class Application extends React.Component {
+  componentDidMount() {
+    // @ts-ignore
+    window.solana.on("connect", async () => {
+      this.setState({
+        isConnectedToPhantom: true,
+        // @ts-ignore
+        userPublicKey: window.solana._publicKey,
+      });
+    });
+    // @ts-ignore
+    window.solana.on("disconnect", async () => {
+      this.setState({
+        isConnectedToPhantom: false,
+        userPublicKey: PublicKey.default,
+      });
+    });
+  }
+
   render() {
     return (
       <Box>
-        <Header onlyGitHub />
+        <Header suppressLaunchApp isConnectedToPhantom={this.state.isConnectedToPhantom} />
         <Box pt={["10vh", "7vh"]}>
-          <ReadAndWriteBoxes />
+          <ReadAndWriteBoxes {...this.state} />
         </Box>
       </Box>
     );
   }
+
 }
 
 export default Application;
