@@ -5,14 +5,22 @@ import {
   PROGRAM_ID,
 } from 'solana-token-registry';
 import { Connection } from '@solana/web3.js';
+import {
+  Formik,
+  Form,
+  Field
+} from 'formik';
 
 import {
   Flex,
   Box,
+  Button,
+  Center,
   Checkbox,
   FormControl,
-  FormLabel,
+  FormErrorMessage,
   FormHelperText,
+  FormLabel,
   Image,
   Input,
   LinkBox,
@@ -25,6 +33,7 @@ import { Header } from './Common';
 interface ReadWriteBoxProps {
   conn: Connection;
 }
+
 interface ReadBoxState {
   allTokens: Set<TokenEntry>;
 }
@@ -98,8 +107,7 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
         w={["90%", "30%"]}
         bg="gray.700"
         borderRadius="10px"
-        mr={["0", "5%"]}
-        mb={["5%", "0"]}
+        ml={["0", "5%"]}
       >
         <Text
           fontFamily="Orbitron"
@@ -115,81 +123,191 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
       </Box>
     );
   }
+
 }
 
-class WriteBox extends React.Component<ReadWriteBoxProps> {
-  render() {
-    return (
-      <Box
-        w={["90%", "30%"]}
-        bg="gray.700"
-        borderRadius="10px"
-        ml={["0", "5%"]}
-      >
-        <Text
-          fontFamily="Orbitron"
-          fontWeight="bold"
-          fontSize="1.3em"
-          borderRadius="8px 8px 0 0"
-          bg="sol.green"
-          color="#293D35"
-          p="2%"
-        >
-          Register a Token
-        </Text>
-        <Box h={["auto", "70vh"]} overflow={["auto", "scroll"]} p="5% 5% 0 5%">
-          <FormControl id="token-mint" pb="5%" isRequired>
-            <FormLabel>Token Mint</FormLabel>
-            <Input type="text" placeholder="e.g. EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" />
-            <FormHelperText>The mint address of your token.</FormHelperText>
-          </FormControl>
-          <FormControl id="token-symbol" pb="5%" isRequired>
-            <FormLabel>Symbol</FormLabel>
-            <Input type="text" placeholder="e.g. USDC" />
-          </FormControl>
-          <FormControl id="token-name" pb="5%" isRequired>
-            <FormLabel>Full Name</FormLabel>
-            <Input type="text" placeholder="e.g. USD Coin" />
-          </FormControl>
-          <FormControl id="token-logo-url" pb="5%" isRequired>
-            <FormLabel>Logo URL</FormLabel>
-            <Input type="text" placeholder="e.g. https://bit.ly/USDC.svg" />
-            <FormHelperText>Can be HTTP, IPFS, Arweave, etc.</FormHelperText>
-          </FormControl>
-          <FormControl id="token-tags" pb="5%">
-            <FormLabel>Token Tags</FormLabel>
-            <Flex flexWrap="wrap">
-              <Checkbox mr="5%">Stablecoin</Checkbox>
-              <Checkbox mr="5%">LP Token</Checkbox>
-              <Checkbox mr="5%">Wrapped via Sollet</Checkbox>
-              <Checkbox mr="5%">Wrapped via Wormhole</Checkbox>
-              <Checkbox mr="5%">Leveraged</Checkbox>
-              <Checkbox mr="5%">NFT</Checkbox>
-              <Checkbox mr="5%">Tokenized Stock</Checkbox>
-            </Flex>
-          </FormControl>
-          <Flex flexWrap="wrap">
-            <FormControl id="token-extensions-website" w="50%" p="0 3% 3% 3%">
-              <FormLabel>Website</FormLabel>
-              <Input type="text" />
-            </FormControl>
-            <FormControl id="token-extensions-twitter" w="50%" p="0 3% 3% 3%">
-              <FormLabel>Twitter</FormLabel>
-              <Input type="text" />
-            </FormControl>
-            <FormControl id="token-extensions-discord" w="50%" p="0 3% 3% 3%">
-              <FormLabel>Discord</FormLabel>
-              <Input type="text" />
-            </FormControl>
-            <FormControl id="token-extensions-coingecko-id" w="50%" p="0 3% 3% 3%">
-              <FormLabel>CoinGecko ID</FormLabel>
-              <Input type="text" />
-            </FormControl>
-          </Flex>
-        </Box>
-      </Box>
-    );
+function WriteBox(props: ReadWriteBoxProps) {
+
+  function validateMint(value: any) {
+    let error
+    if (!value) {
+      error = "Mint is required."
+    }
+    return error
   }
+  function validateSymbol(value: any) {
+    return null
+  }
+  function validateName(value: any) {
+    return null
+  }
+  function validateLogoURL(value: any) {
+    return null
+  }
+
+  return (
+    <Box
+      w={["90%", "30%"]}
+      bg="gray.700"
+      borderRadius="10px"
+      mr={["0", "5%"]}
+      mb={["5%", "0"]}
+    >
+      <Text
+        fontFamily="Orbitron"
+        fontWeight="bold"
+        fontSize="1.3em"
+        borderRadius="8px 8px 0 0"
+        bg="sol.green"
+        color="#293D35"
+        p="2%"
+      >
+        Register a Token
+      </Text>
+      <Box h={["auto", "70vh"]} overflow={["auto", "scroll"]} p="5% 5% 0 5%">
+        <Formik
+          initialValues={{ mint: "" }}
+          onSubmit={(values, actions) => {
+            setTimeout(() => {
+              alert(JSON.stringify(values, null, 2))
+              actions.setSubmitting(false)
+            }, 1000)
+          }}
+        >
+          {(props) => (
+            <Form>
+              <Field name="mint" validate={validateMint}>
+                { // @ts-ignore
+                ({ field, form }) => (
+                  <FormControl pb="5%" isInvalid={form.errors.mint && form.touched.mint}>
+                    <FormLabel htmlFor="mint">Mint</FormLabel>
+                    <Input {...field} id="mint" placeholder="e.g. EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" />
+                    <FormErrorMessage>{form.errors.mint}</FormErrorMessage>
+                    <FormHelperText>The mint address to register.</FormHelperText>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="symbol" validate={validateSymbol}>
+                { // @ts-ignore
+                ({ field, form }) => (
+                  <FormControl pb="5%" isInvalid={form.errors.symbol && form.touched.symbol}>
+                    <FormLabel htmlFor="symbol">Symbol</FormLabel>
+                    <Input {...field} id="symbol" placeholder="e.g. USDC" />
+                    <FormErrorMessage>{form.errors.symbol}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="name" validate={validateName}>
+                { // @ts-ignore
+                ({ field, form }) => (
+                  <FormControl pb="5%" isInvalid={form.errors.name && form.touched.name}>
+                    <FormLabel htmlFor="name">Name</FormLabel>
+                    <Input {...field} id="name" placeholder="e.g. USD Coin" />
+                    <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="logoURL" validate={validateLogoURL}>
+                { // @ts-ignore
+                ({ field, form }) => (
+                  <FormControl pb="5%" isInvalid={form.errors.logoURL && form.touched.logoURL}>
+                    <FormLabel htmlFor="logoURL">Logo URL</FormLabel>
+                    <Input {...field} id="logoURL" placeholder="e.g. https://bit.ly/USDC.svg" />
+                    <FormErrorMessage>{form.errors.logoURL}</FormErrorMessage>
+                    <FormHelperText>Can be HTTPS, IPFS, or Arweave.</FormHelperText>
+                  </FormControl>
+                )}
+              </Field>
+              <FormControl pb="5%">
+                <FormLabel htmlFor="tags">Token Tags</FormLabel>
+                <Flex flexWrap="wrap">
+                  <Field name="tags-stablecoin">
+                    { // @ts-ignore
+                    ({ field, form }) => <Checkbox {...field} mr="5%">Stablecoin</Checkbox>}
+                  </Field>
+                  <Field name="tags-lp-token">
+                    { // @ts-ignore
+                    ({ field, form }) => <Checkbox {...field} mr="5%">LP Token</Checkbox>}
+                  </Field>
+                  <Field name="tags-wrapped-sollet">
+                    { // @ts-ignore
+                    ({ field, form }) => <Checkbox {...field} mr="5%">Wrapped via Sollet</Checkbox>}
+                  </Field>
+                  <Field name="tags-wrapped-wormhole">
+                    { // @ts-ignore
+                    ({ field, form }) => <Checkbox {...field} mr="5%">Wrapped via Wormhole</Checkbox>}
+                  </Field>
+                  <Field name="tags-leveraged">
+                    { // @ts-ignore
+                    ({ field, form }) => <Checkbox {...field} mr="5%">Leveraged</Checkbox>}
+                  </Field>
+                  <Field name="tags-nft">
+                    { // @ts-ignore
+                    ({ field, form }) => <Checkbox {...field} mr="5%">NFT</Checkbox>}
+                  </Field>
+                  <Field name="tags-tokenized-stock">
+                    { // @ts-ignore
+                    ({ field, form }) => <Checkbox {...field} mr="5%">Tokenized Stock</Checkbox>}
+                  </Field>
+                </Flex>
+              </FormControl>
+              <Flex flexWrap="wrap">
+                <Field name="extensions-website">
+                  { // @ts-ignore
+                  ({ field, form }) => (
+                    <FormControl pb="5%" w="50%">
+                      <FormLabel htmlFor="extensions-website">Website</FormLabel>
+                      <Input {...field} id="extensions-website" />
+                    </FormControl>
+                  )}
+                </Field>
+                <Field name="extensions-twitter">
+                  { // @ts-ignore
+                  ({ field, form }) => (
+                    <FormControl pb="5%" w="50%">
+                      <FormLabel htmlFor="extensions-twitter">Twitter</FormLabel>
+                      <Input {...field} id="extensions-twitter" />
+                    </FormControl>
+                  )}
+                </Field>
+                <Field name="extensions-discord">
+                  { // @ts-ignore
+                  ({ field, form }) => (
+                    <FormControl pb="5%" w="50%">
+                      <FormLabel htmlFor="extensions-discord">Discord</FormLabel>
+                      <Input {...field} id="extensions-discord" />
+                    </FormControl>
+                  )}
+                </Field>
+                <Field name="extensions-coingecko-id">
+                  { // @ts-ignore
+                  ({ field, form }) => (
+                    <FormControl pb="5%" w="50%">
+                      <FormLabel htmlFor="extensions-coingecko-id">CoinGecko ID</FormLabel>
+                      <Input {...field} id="extensions-coingecko-id" />
+                    </FormControl>
+                  )}
+                </Field>
+              </Flex>
+              <Center>
+                <Button
+                  variant="launch-app"
+                  m="8% 0 10% 0"
+                  p="0 8% 0 8%"
+                  colorScheme="teal"
+                  type="submit"
+                  isLoading={props.isSubmitting}
+                >
+                  Submit
+                </Button>
+              </Center>
+            </Form>
+          )}
+        </Formik>
+      </Box>
+    </Box>
+  );
+
 }
 
 class ReadAndWriteBoxes extends React.Component<{}, ReadWriteBoxProps> {
@@ -208,8 +326,8 @@ class ReadAndWriteBoxes extends React.Component<{}, ReadWriteBoxProps> {
         justifyContent="center"
         flexWrap="wrap"
       >
-        <ReadBox conn={this.state.conn} />
         <WriteBox conn={this.state.conn} />
+        <ReadBox conn={this.state.conn} />
       </Flex>
     );
   }
