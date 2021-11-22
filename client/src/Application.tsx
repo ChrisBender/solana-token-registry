@@ -1,5 +1,10 @@
 import React from 'react';
-import { Connection, PublicKey } from '@solana/web3.js';
+
+import {
+  Connection,
+  PublicKey,
+  Transaction
+} from '@solana/web3.js';
 
 import {
   TokenEntry,
@@ -133,28 +138,29 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
 
 function WriteBox(props: ReadWriteBoxProps) {
 
-  function validateMint(value: any) {
-    let error
+  function validateMint(value: string) {
     if (!value) {
-      error = "Mint is required."
+      return "Mint is required."
+    } else if (value.length !== 44) {
+      return "Mint must be 44 characters."
     }
-    return error
+    return null
   }
-  function validateSymbol(value: any) {
+  function validateSymbol(value: string) {
     if (!value) {
       return "Symbol is required."
     } else {
       return null
     }
   }
-  function validateName(value: any) {
+  function validateName(value: string) {
     if (!value) {
       return "Name is required."
     } else {
       return null
     }
   }
-  function validateLogoURL(value: any) {
+  function validateLogoURL(value: string) {
     if (!value) {
       return "Logo URL is required."
     } else {
@@ -163,23 +169,41 @@ function WriteBox(props: ReadWriteBoxProps) {
   }
 
   function onSubmit(values: any, actions: any) {
-    setTimeout(() => {
-      console.log(values)
+    console.log(values)
+    console.log(props)
+    if (props.userPublicKey === PublicKey.default) {
+      alert("Please connect your wallet first.")
       actions.setSubmitting(false)
-    }, 1000)
+      return
+    }
+    createInstructionCreateEntry(
+      props.conn,
+      PROGRAM_ID,
+      props.userPublicKey,
+      new PublicKey(values.mint),
+      values.symbol,
+      values.name,
+      values.logoURL,
+      ["tag1", "tag2"],
+      [["key1", "val1"], ["key2", "val2"]],
+    ).then((ix) => {
+      const tx = new Transaction().add(ix);
+      props.conn.getRecentBlockhash().then((blockhashObj) => {
+        tx.recentBlockhash = blockhashObj.blockhash;
+        tx.feePayer = props.userPublicKey;
+        // @ts-ignore
+        window.solana.signTransaction(tx).then((signedTx) => {
+          props.conn.sendRawTransaction(signedTx.serialize()).then((signature) => {
+            console.log("Signature for CreateEntry:", signature)
+            actions.setSubmitting(false)
+          }, (error) => {
+            actions.setErrors({submitButton: error.logs})
+            actions.setSubmitting(false)
+          })
+        })
+      })
+    })
   }
-//  export async function createInstructionCreateEntry (
-//    connection: Connection,
-//    programId: PublicKey,
-//    userPublicKey: PublicKey,
-//    mintPublicKey: PublicKey,
-//    tokenSymbol: string,
-//    tokenName: string,
-//    tokenLogoUrl: string,
-//    tokenTags: string[],
-//    tokenExtensions: Array<[string, string]>
-//  ): Promise<TransactionInstruction> {
-
 
   return (
     <Box
@@ -201,7 +225,26 @@ function WriteBox(props: ReadWriteBoxProps) {
         Register a Token
       </Text>
       <Box h={["auto", "70vh"]} overflow={["auto", "scroll"]} p="5% 5% 0 5%">
-        <Formik initialValues={{}} onSubmit={onSubmit}>
+        <Formik
+          initialValues={{
+            mint: "",
+            symbol: "",
+            name: "",
+            logoURL: "",
+            tagsStablecoin: false,
+            tagsLPToken: false,
+            tagsWrappedSollet: false,
+            tagsWrappedWormhole: false,
+            tagsLeveraged: false,
+            tagsNFT: false,
+            tagsTokenizedStock: false,
+            extensionsWebsite: "",
+            extensionsTwitter: "",
+            extensionsDiscord: "",
+            extensionsCoingeckoID: "",
+          }}
+          onSubmit={onSubmit}
+        >
           {(props) => (
             <Form>
               <Field name="mint" validate={validateMint}>
@@ -249,74 +292,78 @@ function WriteBox(props: ReadWriteBoxProps) {
               <FormControl p="2%">
                 <FormLabel htmlFor="tags">Token Tags</FormLabel>
                 <Flex flexWrap="wrap">
-                  <Field name="tags-stablecoin">
+                  <Field name="tagsStablecoin">
                     { // @ts-ignore
                     ({ field, form }) => <Checkbox {...field} mr="5%">Stablecoin</Checkbox>}
                   </Field>
-                  <Field name="tags-lp-token">
+                  <Field name="tagsLPToken">
                     { // @ts-ignore
                     ({ field, form }) => <Checkbox {...field} mr="5%">LP Token</Checkbox>}
                   </Field>
-                  <Field name="tags-wrapped-sollet">
+                  <Field name="tagsWrappedSollet">
                     { // @ts-ignore
                     ({ field, form }) => <Checkbox {...field} mr="5%">Wrapped via Sollet</Checkbox>}
                   </Field>
-                  <Field name="tags-wrapped-wormhole">
+                  <Field name="tagsWrappedWormhole">
                     { // @ts-ignore
                     ({ field, form }) => <Checkbox {...field} mr="5%">Wrapped via Wormhole</Checkbox>}
                   </Field>
-                  <Field name="tags-leveraged">
+                  <Field name="tagsLeveraged">
                     { // @ts-ignore
                     ({ field, form }) => <Checkbox {...field} mr="5%">Leveraged</Checkbox>}
                   </Field>
-                  <Field name="tags-nft">
+                  <Field name="tagsNFT">
                     { // @ts-ignore
                     ({ field, form }) => <Checkbox {...field} mr="5%">NFT</Checkbox>}
                   </Field>
-                  <Field name="tags-tokenized-stock">
+                  <Field name="tagsTokenizedStock">
                     { // @ts-ignore
                     ({ field, form }) => <Checkbox {...field} mr="5%">Tokenized Stock</Checkbox>}
                   </Field>
                 </Flex>
               </FormControl>
               <Flex flexWrap="wrap">
-                <Field name="extensions-website">
+                <Field name="extensionsWebsite">
                   { // @ts-ignore
                   ({ field, form }) => (
                     <FormControl p="2%" w={["auto", "50%"]}>
-                      <FormLabel htmlFor="extensions-website">Website</FormLabel>
-                      <Input {...field} id="extensions-website" />
+                      <FormLabel htmlFor="extensionsWebsite">Website</FormLabel>
+                      <Input {...field} id="extensionsWebsite" />
                     </FormControl>
                   )}
                 </Field>
-                <Field name="extensions-twitter">
+                <Field name="extensionsTwitter">
                   { // @ts-ignore
                   ({ field, form }) => (
                     <FormControl p="2%" w={["auto", "50%"]}>
-                      <FormLabel htmlFor="extensions-twitter">Twitter</FormLabel>
-                      <Input {...field} id="extensions-twitter" />
+                      <FormLabel htmlFor="extensionsTwitter">Twitter</FormLabel>
+                      <Input {...field} id="extensionsTwitter" />
                     </FormControl>
                   )}
                 </Field>
-                <Field name="extensions-discord">
+                <Field name="extensionsDiscord">
                   { // @ts-ignore
                   ({ field, form }) => (
                     <FormControl p="2%" w={["auto", "50%"]}>
-                      <FormLabel htmlFor="extensions-discord">Discord</FormLabel>
-                      <Input {...field} id="extensions-discord" />
+                      <FormLabel htmlFor="extensionsDiscord">Discord</FormLabel>
+                      <Input {...field} id="extensionsDiscord" />
                     </FormControl>
                   )}
                 </Field>
-                <Field name="extensions-coingecko-id">
+                <Field name="extensionsCoingeckoID">
                   { // @ts-ignore
                   ({ field, form }) => (
                     <FormControl p="2%" w={["auto", "50%"]}>
-                      <FormLabel htmlFor="extensions-coingecko-id">CoinGecko ID</FormLabel>
-                      <Input {...field} id="extensions-coingecko-id" />
+                      <FormLabel htmlFor="extensionsCoingeckoID">CoinGecko ID</FormLabel>
+                      <Input {...field} id="extensionsCoingeckoID" />
                     </FormControl>
                   )}
                 </Field>
               </Flex>
+              <Box>
+                {// @ts-ignore
+                props.errors.submitButton}
+              </Box>
               <Center>
                 <Button
                   variant="launch-app"

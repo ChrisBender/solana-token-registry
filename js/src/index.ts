@@ -469,7 +469,7 @@ export async function createInstructionCreateEntry (
       token_extensions: tokenExtensions
     })
   )
-  const buffer = Buffer.concat([serializedFlag, serializedInstructionData])
+  const buffer = Buffer.concat([Buffer.from(serializedFlag), Buffer.from(serializedInstructionData)])
 
   const registryState = await getRegistryState(connection, programId)
   let registryMetaAccount, registryNodeAccounts
@@ -562,7 +562,7 @@ export async function createInstructionUpdateEntry (
       token_extensions: tokenExtensions
     })
   )
-  const buffer = Buffer.concat([serializedFlag, serializedInstructionData])
+  const buffer = Buffer.concat([Buffer.from(serializedFlag), Buffer.from(serializedInstructionData)])
 
   const keys = [
     { isSigner: true, isWritable: false, pubkey: userPublicKey },
