@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ChakraProvider, extendTheme } from "@chakra-ui/react"
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Homepage from './Homepage';
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
+import Homepage from './Homepage'
 import Application from './Application'
 
 import "@fontsource/orbitron/700.css"
@@ -66,14 +66,24 @@ const theme = extendTheme({
   }
 });
 
+const ScrollToTop = (props: any) => {
+  const location = useLocation();
+  React.useEffect(() => {
+    setTimeout(() => window.scrollTo(0, 0), 30);
+  }, [location]);
+  return <>{props.children}</>
+};
+
 ReactDOM.render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/app" element={<Application />} />
-        </Routes>
+        <ScrollToTop>
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/app" element={<Application />} />
+          </Routes>
+        </ScrollToTop>
       </BrowserRouter>
     </ChakraProvider>
   </React.StrictMode>,

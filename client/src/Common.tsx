@@ -36,7 +36,7 @@ export function Header(props: HeaderProps) {
       flexWrap="wrap"
     >
       <Flex>
-        <Image src={solanaLogo} ml={["0", "100px"]} width="150px" />
+        <Image src={solanaLogo} ml={["0", "100px"]} width={["100px", "150px"]} />
         <Text ml="10px" fontFamily="Orbitron" fontWeight="bold" color="gray.100">
           Token Registry
         </Text>

@@ -167,8 +167,6 @@ function WriteBox(props: ReadWriteBoxProps) {
   }
 
   function onSubmit(values: any, actions: any) {
-    console.log(values)
-    console.log(props)
     if (props.userPublicKey === PublicKey.default) {
       alert("Please connect your wallet first.")
       actions.setSubmitting(false)

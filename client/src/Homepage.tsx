@@ -193,9 +193,10 @@ function CallToAction(props: {[key: string]: never}) {
     >
       <CallToActionBox
         buttonWrapper={Link}
-        buttonWrapperProps={
-          {href: "https://github.com/ChrisBender/solana-token-registry", isExternal: true}
-        }
+        buttonWrapperProps={{
+          href: "https://github.com/ChrisBender/solana-token-registry/blob/master/js/src/index.ts#L279",
+          isExternal: true,
+        }}
         mainText="For Developers"
         subText="Use the JavaScript API to read and write to the token registry."
         buttonText="Read Docs"
