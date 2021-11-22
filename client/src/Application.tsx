@@ -174,6 +174,46 @@ function WriteBox(props: ReadWriteBoxProps) {
       actions.setSubmitting(false)
       return
     }
+
+    /* Process the selected tags into an array. */
+    const tags: string[] = []
+    if (values.tagsStablecoin) {
+      tags.push("stablecoin")
+    }
+    if (values.tagsLPToken) {
+      tags.push("lp-token")
+    }
+    if (values.tagsWrappedSollet) {
+      tags.push("wrapped-sollet")
+    }
+    if (values.tagsWrappedWormhole) {
+      tags.push("wrapped-wormhole")
+    }
+    if (values.tagsLeveraged) {
+      tags.push("leveraged")
+    }
+    if (values.tagsNFT) {
+      tags.push("nft")
+    }
+    if (values.tagsTokenizedStock) {
+      tags.push("tokenized-stock")
+    }
+
+    /* Process the given extensions into an array. */
+    const extensions: [string, string][] = []
+    if (values.extensionsWebsite !== "") {
+      extensions.push(["website", values.extensionsWebsite])
+    }
+    if (values.extensionsTwitter !== "") {
+      extensions.push(["twitter", values.extensionsTwitter])
+    }
+    if (values.extensionsDiscord !== "") {
+      extensions.push(["discord", values.extensionsDiscord])
+    }
+    if (values.extensionsCoingeckoID !== "") {
+      extensions.push(["coingeckoId", values.extensionsCoingeckoID])
+    }
+
     createInstructionCreateEntry(
       props.conn,
       PROGRAM_ID,
@@ -182,8 +222,8 @@ function WriteBox(props: ReadWriteBoxProps) {
       values.symbol,
       values.name,
       values.logoURL,
-      ["tag1", "tag2"],
-      [["key1", "val1"], ["key2", "val2"]],
+      tags,
+      extensions,
     ).then((ix) => {
       const tx = new Transaction().add(ix);
       props.conn.getRecentBlockhash().then((blockhashObj) => {
@@ -201,6 +241,7 @@ function WriteBox(props: ReadWriteBoxProps) {
         })
       })
     })
+
   }
 
   return (
