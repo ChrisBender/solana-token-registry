@@ -87,12 +87,8 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
           link = `https://explorer.solana.com/address/${token.mint}?cluster=devnet`
         }
         allTokensProcessed.push(
-          <LinkBox>
-            <Flex
-              key={token.mint.toString()}
-              alignItems="center"
-              p="2%"
-            >
+          <LinkBox key={token.mint.toString()}>
+            <Flex alignItems="center" p="2%">
               <Image
                 w={["30px", "50px"]}
                 h={["30px", "50px"]}
@@ -435,7 +431,7 @@ class Application extends React.Component<{}, ReadWriteBoxProps> {
     return (
       <Box>
         <Header suppressLaunchApp isConnectedToPhantom={this.state.isConnectedToPhantom} />
-        <Box pt={["10vh", "7vh"]}>
+        <Box pt={["0", "7vh"]}>
           <ReadAndWriteBoxes {...this.state} />
         </Box>
       </Box>

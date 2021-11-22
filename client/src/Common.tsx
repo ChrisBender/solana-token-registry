@@ -16,9 +16,9 @@ export function Header(props: any) {
   return (
     <Flex
       w="100%"
-      h={["10vh", "7vh"]}
+      h="7vh"
       bg="gray.800"
-      position="fixed"
+      position={["static", "fixed"]}
       alignItems="center"
       justifyContent="center"
       flexWrap="wrap"
