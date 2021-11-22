@@ -37,6 +37,7 @@ import {
 } from '@chakra-ui/react';
 
 import { Header } from './Common';
+import quesLogo from './logos/question-logo.svg';
 
 interface ReadWriteBoxProps {
   conn: Connection;
@@ -96,6 +97,7 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
                 w={["30px", "50px"]}
                 h={["30px", "50px"]}
                 src={token.logoURL}
+                fallbackSrc={quesLogo}
                 ml="2%"
                 mr="3%"
               />
