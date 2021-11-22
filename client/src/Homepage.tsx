@@ -19,7 +19,11 @@ import xSymbol from './logos/x.svg';
 
 import { Header } from './Common';
 
-function RegistryIllustrationToken(props: any) {
+interface RegistryIllustrationTokenProps {
+  logo: string,
+  ticker: string,
+}
+function RegistryIllustrationToken(props: RegistryIllustrationTokenProps) {
   return (
     <Flex padding="4%" fontSize={["1.1em", "1.5em"]} alignItems="center">
       <Image src={props.logo} float="left" height={["30px", "50px"]} pl="2%" pr="3%" />
@@ -31,61 +35,60 @@ function RegistryIllustrationToken(props: any) {
   
 }
 
-class MainTextAndIllustration extends React.Component {
-  render() {
-    return (
-      <Flex
-        w="100%"
-        alignItems="center"
-        justifyContent="center"
-        pt={["25%", "12%"]}
-        flexWrap="wrap"
-      >
-        <Box w={["100%", "30%"]} m={["0 5% 0 5%", "0 8% 0 0"]}>
-          <Text fontFamily="Orbitron" fontWeight="bold" fontSize={["2em", "3.8em"]}>
-            All Solana tokens.<br />In one place.
-          </Text>
-          <Text color="gray.100" fontSize={["1.0em", "1.2em"]} pt="5%">
-            Register your SPL token metadata on-chain. Stop submitting PRs to the token-list repository. 
-          </Text>
-        </Box>
-        <Box w={["100%", "30%"]}>
-          <Box w={["65%", "70%"]} fontFamily="Courier New" bg="gray.700" borderRadius="10px" m="auto" mt={["15%", 0]}>
-            <Box bg="gray.600" borderRadius="10px 10px 0 0" p="3%" pl="5%" fontSize="1.3em">
-              0xregistry
-            </Box>
-            <RegistryIllustrationToken ticker="USDC" logo={usdcLogo} />
-            <RegistryIllustrationToken ticker="wETH" logo={wethLogo} />
-            <RegistryIllustrationToken ticker="????" logo={quesLogo} />
-          </Box>
-        </Box>
-      </Flex>
-    )
-  }
-}
-
-class LearnMore extends React.Component {
-  render() {
-    return (
-      <Box
-        fontFamily="Orbitron"
-        fontWeight="bold"
-        fontSize="1.8em"
-        mt="12%"
-        display={["none", "block"]}
-      >
-        <Text>
-          Learn More
+function MainTextAndIllustration(props: {[key: string]: never}) {
+  return (
+    <Flex
+      w="100%"
+      alignItems="center"
+      justifyContent="center"
+      pt={["25%", "12%"]}
+      flexWrap="wrap"
+    >
+      <Box w={["100%", "30%"]} m={["0 5% 0 5%", "0 8% 0 0"]}>
+        <Text fontFamily="Orbitron" fontWeight="bold" fontSize={["2em", "3.8em"]}>
+          All Solana tokens.<br />In one place.
         </Text>
-        <Text>
-          \/
+        <Text color="gray.100" fontSize={["1.0em", "1.2em"]} pt="5%">
+          Register your SPL token metadata on-chain. Stop submitting PRs to the token-list repository. 
         </Text>
       </Box>
-    );
-  }
+      <Box w={["100%", "30%"]}>
+        <Box w={["65%", "70%"]} fontFamily="Courier New" bg="gray.700" borderRadius="10px" m="auto" mt={["15%", 0]}>
+          <Box bg="gray.600" borderRadius="10px 10px 0 0" p="3%" pl="5%" fontSize="1.3em">
+            0xregistry
+          </Box>
+          <RegistryIllustrationToken ticker="USDC" logo={usdcLogo} />
+          <RegistryIllustrationToken ticker="wETH" logo={wethLogo} />
+          <RegistryIllustrationToken ticker="????" logo={quesLogo} />
+        </Box>
+      </Box>
+    </Flex>
+  )
 }
 
-function PullRequestIllustrationEntry(props: any) {
+function LearnMore(props: {[key: string]: never}) {
+  return (
+    <Box
+      fontFamily="Orbitron"
+      fontWeight="bold"
+      fontSize="1.8em"
+      mt="12%"
+      display={["none", "block"]}
+    >
+      <Text>
+        Learn More
+      </Text>
+      <Text>
+        \/
+      </Text>
+    </Box>
+  );
+}
+
+interface PullRequestIllustrationEntryProps {
+  text: string;
+}
+function PullRequestIllustrationEntry(props: PullRequestIllustrationEntryProps) {
   return (
     <Flex padding="4%" fontSize={["0.9em", "1.3em"]} color="gray.100" alignItems="center">
       <Image src={prSymbolGreen} float="left" height={["10px", "15px"]} pl="2%" pr="4%" />
@@ -98,53 +101,60 @@ function PullRequestIllustrationEntry(props: any) {
   
 }
 
-class Explainer extends React.Component {
-  render() {
-    return (
-      <Flex
-        w="100%"
-        alignItems="center"
-        justifyContent="center"
-        pt={["40%", "12%"]}
-        flexDirection={["column-reverse", "row"]}
-      >
-        <Box w={["100%", "20%"]} mr={["0", "8%"]}>
-          <Box
-            w={["50%", "80%"]}
-            fontFamily="Courier New"
-            bg="gray.700"
-            borderRadius="10px"
-            m="auto"
-            mt={["15%", 0]}
-            pb="10%"
+function Explainer(props: {[key: string]: never}) {
+  return (
+    <Flex
+      w="100%"
+      alignItems="center"
+      justifyContent="center"
+      pt={["40%", "12%"]}
+      flexDirection={["column-reverse", "row"]}
+    >
+      <Box w={["100%", "20%"]} mr={["0", "8%"]}>
+        <Box
+          w={["50%", "80%"]}
+          fontFamily="Courier New"
+          bg="gray.700"
+          borderRadius="10px"
+          m="auto"
+          mt={["15%", 0]}
+          pb="10%"
+        >
+          <Flex
+            bg="gray.600"
+            borderRadius="10px 10px 0 0"
+            p="3%"
+            pl="5%"
+            alignItems="center"
           >
-            <Flex
-              bg="gray.600"
-              borderRadius="10px 10px 0 0"
-              p="3%"
-              pl="5%"
-              alignItems="center"
-            >
-              <Image src={prSymbolWhite} float="left" height={["10px", "15px"]} pl="2%" pr="4%" />
-              <Box fontSize="1.3em" fontWeight="bold">
-                523 Open
-              </Box>
-            </Flex>
-            <PullRequestIllustrationEntry text="Add HIPPO coin" />
-            <PullRequestIllustrationEntry text="Fix SHIB logo" />
-            <PullRequestIllustrationEntry text="SAFEMOON update" />
-          </Box>
+            <Image src={prSymbolWhite} float="left" height={["10px", "15px"]} pl="2%" pr="4%" />
+            <Box fontSize="1.3em" fontWeight="bold">
+              523 Open
+            </Box>
+          </Flex>
+          <PullRequestIllustrationEntry text="Add HIPPO coin" />
+          <PullRequestIllustrationEntry text="Fix SHIB logo" />
+          <PullRequestIllustrationEntry text="SAFEMOON update" />
         </Box>
-        <Text w={["80%", "40%"]} fontSize={["0.9em", "1.2em"]}>
-          Currently, Solana uses a manual GitHub repository to keep track of registered SPL token metadata (the name of the token, the ticker, and URL of the logo).<br /><br />
-          Instead, this on-chain token registry allows <strong>anyone to register this metadata, permissionlessly</strong>. No more manual PR reviews to get your token onto Phantom.
-        </Text>
-      </Flex>
-    );
-  }
+      </Box>
+      <Text w={["80%", "40%"]} fontSize={["0.9em", "1.2em"]}>
+        Currently, Solana uses a manual GitHub repository to keep track of registered SPL token metadata (the name of the token, the ticker, and URL of the logo).<br /><br />
+        Instead, this on-chain token registry allows <strong>anyone to register this metadata, permissionlessly</strong>. No more manual PR reviews to get your token onto Phantom.
+      </Text>
+    </Flex>
+  );
+  
 }
 
-function CallToActionBox(props: any) {
+interface CallToActionBoxProps {
+  buttonWrapper: React.ElementType;
+  buttonWrapperProps: {[key: string]: any};
+  mainText: string;
+  subText: string;
+  buttonText: string;
+  buttonVariant: string;
+}
+function CallToActionBox(props: CallToActionBoxProps) {
   const ButtonWrapper = props.buttonWrapper;
   return (
       <Flex
@@ -172,53 +182,51 @@ function CallToActionBox(props: any) {
   );
 }
 
-class CallToAction extends React.Component {
-  render() {
-    return (
-      <Flex
-        w="100%"
-        pt={["24%", "18%"]}
-        alignItems="center"
-        justifyContent="center"
-        flexWrap="wrap"
-      >
-        <CallToActionBox
-          buttonWrapper={Link}
-          buttonWrapperProps={
-            {href: "https://github.com/ChrisBender/solana-token-registry", isExternal: true}
-          }
-          mainText="For Developers"
-          subText="Use the JavaScript API to read and write to the token registry."
-          buttonText="Read Docs"
-          buttonVariant="read-docs"
-        />
-        <CallToActionBox
-          buttonWrapper={RouterLink}
-          buttonWrapperProps={{to: "/app"}}
-          mainText="For Token Creators"
-          subText="Use the in-browser app to register your token on-chain."
-          buttonText="Launch App"
-          buttonVariant="launch-app"
-        />
-      </Flex>
-    );
-  }
+function CallToAction(props: {[key: string]: never}) {
+  return (
+    <Flex
+      w="100%"
+      pt={["24%", "18%"]}
+      alignItems="center"
+      justifyContent="center"
+      flexWrap="wrap"
+    >
+      <CallToActionBox
+        buttonWrapper={Link}
+        buttonWrapperProps={
+          {href: "https://github.com/ChrisBender/solana-token-registry", isExternal: true}
+        }
+        mainText="For Developers"
+        subText="Use the JavaScript API to read and write to the token registry."
+        buttonText="Read Docs"
+        buttonVariant="read-docs"
+      />
+      <CallToActionBox
+        buttonWrapper={RouterLink}
+        buttonWrapperProps={{to: "/app"}}
+        mainText="For Token Creators"
+        subText="Use the in-browser app to register your token on-chain."
+        buttonText="Launch App"
+        buttonVariant="launch-app"
+      />
+    </Flex>
+  );
+  
 }
 
-class Homepage extends React.Component {
-  render() {
-    return (
-      <Box>
-        <Header suppressPhantom />
-        <Box pt={["0", "7vh"]}>
-          <MainTextAndIllustration />
-          <LearnMore />
-          <Explainer />
-          <CallToAction />
-        </Box>
+function Homepage(props: {[key: string]: never}) {
+  return (
+    <Box>
+      <Header suppressPhantom />
+      <Box pt={["0", "7vh"]}>
+        <MainTextAndIllustration />
+        <LearnMore />
+        <Explainer />
+        <CallToAction />
       </Box>
-    )
-  }
+    </Box>
+  )
+  
 }
 
 export default Homepage;

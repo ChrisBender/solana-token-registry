@@ -12,7 +12,19 @@ import {
 
 import solanaLogo from './logos/solana-logo-color-white.svg';
 
-export function Header(props: any) {
+declare global {
+  interface Window {
+    solana: any;
+  }
+}
+
+interface HeaderProps {
+  suppressGitHub?: boolean;
+  suppressLaunchApp?: boolean;
+  suppressPhantom?: boolean;
+  isConnectedToPhantom?: boolean;
+}
+export function Header(props: HeaderProps) {
   return (
     <Flex
       w="100%"
@@ -44,7 +56,6 @@ export function Header(props: any) {
           variant="launch-app"
           display={props.suppressPhantom ? "none": "inline"}
           onClick={(e) => {
-            // @ts-ignore
             props.isConnectedToPhantom ? window.solana.disconnect() : window.solana.connect()
           }}
         >

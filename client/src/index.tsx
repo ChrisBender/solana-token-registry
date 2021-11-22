@@ -22,7 +22,8 @@ const theme = extendTheme({
       700: "#2D2D2D",
       800: "#1E2423",
       900: "#161B19",
-    }
+    },
+    red: "#FF6666"
   },
   fonts: {
     heading: "Orbitron",
