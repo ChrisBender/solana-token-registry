@@ -95,7 +95,7 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
         }
         readBoxBody.push(
           <LinkBox key={token.mint.toString()}>
-            <Flex alignItems="center" p="2%">
+            <Flex alignItems="center" p="3% 3% 3% 4%">
               <Image
                 w={['30px', '50px']}
                 h={['30px', '50px']}
@@ -112,6 +112,7 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
               </Text>
               <Text color="gray.100">{token.name}</Text>
             </Flex>
+            <Box w="auto" h="1px" mr="4%" ml="4%" backgroundColor="gray.900" />
           </LinkBox>
         )
       })
@@ -131,7 +132,7 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
           bg="sol.purple"
           p="2%"
         >
-          Read All Tokens
+          All Registered Tokens
         </Text>
         <Box h={['auto', '70vh']} overflow={['auto', 'scroll']}>
           {readBoxBody}
