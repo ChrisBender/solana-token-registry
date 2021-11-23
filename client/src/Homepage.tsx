@@ -47,8 +47,8 @@ function MainTextAndIllustration (props: {[key: string]: never}) {
         <Text fontFamily="Orbitron" fontWeight="bold" fontSize={['2.5em', '3.8em']}>
           All Solana tokens.<br />In one place.
         </Text>
-        <Text color="gray.100" fontSize={['1.1em', '1.2em']} mt="8%">
-          Register your SPL token metadata on-chain. Stop submitting PRs to the token-list repository.
+        <Text color="gray.100" fontSize={['1.1em', '1.2em']} mt={['6%', '8%']}>
+          Instantly register your SPL token metadata on-chain. No more waiting for manual token-list PR reviews.
         </Text>
       </Box>
       <Box w={['100%', '30%']}>
@@ -117,26 +117,33 @@ function Explainer (props: {[key: string]: never}) {
           mt={['15%', 0]}
           pb="6%"
         >
-          <Flex
-            bg="gray.600"
-            borderRadius="10px 10px 0 0"
-            p="3%"
-            pl="5%"
-            alignItems="center"
-          >
-            <Image src={prSymbolWhite} float="left" height={['10px', '15px']} pl="2%" pr="4%" />
-            <Box fontSize="1.3em" fontWeight="bold">
-              523 Open
-            </Box>
-          </Flex>
-          <PullRequestIllustrationEntry text="Add HIPPO coin" />
-          <PullRequestIllustrationEntry text="Fix SHIB logo" />
-          <PullRequestIllustrationEntry text="SAFEMOON update" />
+          <Link
+            href="https://github.com/solana-labs/token-list/pulls"
+            style={{ textDecoration: 'none' }}
+            isExternal
+        >
+            <Flex
+              bg="gray.600"
+              borderRadius="10px 10px 0 0"
+              p="3%"
+              pl="5%"
+              alignItems="center"
+            >
+              <Image src={prSymbolWhite} float="left" height={['10px', '15px']} pl="2%" pr="4%" />
+              <Box fontSize="1.3em" fontWeight="bold">
+                783 Open
+              </Box>
+            </Flex>
+            <PullRequestIllustrationEntry text="Add HIPPO coin" />
+            <PullRequestIllustrationEntry text="Fix SHIB logo" />
+            <PullRequestIllustrationEntry text="SAFEMOON update" />
+          </Link>
         </Box>
       </Box>
       <Text w={['80%', '40%']} fontSize={['1.0em', '1.2em']}>
-        Currently, Solana uses a GitHub repository to keep track of SPL token metadata, like the name of the token and a URL of the logo.<br /><br />
-        Instead, this on-chain token registry lets you <strong>register this metadata permissionlessly</strong>. No more manual PR reviews to get your token onto Phantom.
+        When users interact with apps built on Solana, they usually want to refer to tokens by a simple name (like &quot;USDC&quot; or &quot;wBTC&quot;), rather than a 44-character-long token address.<br /><br />
+        In order for apps like Phantom or Serum to perform this translation, they use a token metadata registry. Currently, the standard for the Solana ecosystem is a <Link href="https://github.com/solana-labs/token-list" isExternal>single GitHub repository</Link> managed by Solana Labs. This repository, however, is slow for token creators: Adding a new token requres manual approval from a Solana developer.<br /><br />
+        Instead, this on-chain token registry lets token creators <strong>register this metadata permissionlessly</strong>. No more pull requests needed to get a token onto Phantom.
       </Text>
     </Flex>
   )

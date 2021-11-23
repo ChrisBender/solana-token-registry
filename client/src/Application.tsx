@@ -134,7 +134,20 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
         >
           All Registered Tokens
         </Text>
-        <Box h={['auto', '70vh']} overflow={['auto', 'scroll']}>
+        <Box
+          h={['auto', '70vh']}
+          overflowY={['auto', 'scroll']}
+          sx={{
+            '&::-webkit-scrollbar': {
+              backgroundColor: 'rgba(0, 0, 0, 0)',
+              width: '8px'
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: 'gray.100',
+              borderRadius: '4px'
+            }
+          }}
+        >
           {readBoxBody}
         </Box>
       </Box>
@@ -276,7 +289,21 @@ function WriteBox (props: ReadWriteBoxProps) {
       >
         Register a Token
       </Text>
-      <Box h={['auto', '70vh']} overflow={['auto', 'scroll']} p="5% 5% 0 5%">
+      <Box
+        h={['auto', '70vh']}
+        p="3% 5% 0 5%"
+        overflowY={['auto', 'scroll']}
+        sx={{
+          '&::-webkit-scrollbar': {
+            backgroundColor: 'rgba(0, 0, 0, 0)',
+            width: '8px'
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'gray.100',
+            borderRadius: '4px'
+          }
+        }}
+      >
         <Formik
           initialValues={{
             mint: '',
@@ -299,6 +326,9 @@ function WriteBox (props: ReadWriteBoxProps) {
         >
           {(props: {errors: {submitButton: string}, isSubmitting: boolean}) => (
             <Form>
+              <Text pb="3%" color="gray.100">
+                (On Devnet)
+              </Text>
               <Field name="mint" validate={validateMint}>
                 {(fprops: {form: any, field: any}) => (
                   <FormControl
