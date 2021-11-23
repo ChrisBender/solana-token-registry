@@ -422,7 +422,7 @@ function WriteBox (props: ReadWriteBoxProps) {
                   )}
                 </Field>
               </Flex>
-              <Text color="red" mt="5%">
+              <Text color="red.500" mt="5%">
                 {props.errors.submitButton}
               </Text>
               <Center>
@@ -471,21 +471,25 @@ class Application extends React.Component<{}, ReadWriteBoxProps> {
   }
 
   componentDidMount () {
-    if (window.solana !== undefined) {
-      window.solana.on('connect', async () => {
-        this.setState({
-          isConnectedToPhantom: true,
-          userPublicKey: window.solana._publicKey
+    setTimeout(() => {
+      if (window.solana !== undefined) {
+        window.solana.on('connect', async () => {
+          this.setState({
+            isConnectedToPhantom: true,
+            userPublicKey: window.solana._publicKey
+          })
         })
-      })
-      window.solana.on('disconnect', async () => {
-        this.setState({
-          isConnectedToPhantom: false,
-          userPublicKey: PublicKey.default
+        window.solana.on('disconnect', async () => {
+          this.setState({
+            isConnectedToPhantom: false,
+            userPublicKey: PublicKey.default
+          })
         })
-      })
-      window.solana.connect()
-    }
+        window.solana.connect({ onlyIfTrusted: true })
+      } else {
+        console.warn('SOLANA WAS UNDEFINED')
+      }
+    }, 100)
   }
 
   render () {

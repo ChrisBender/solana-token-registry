@@ -40,14 +40,14 @@ function MainTextAndIllustration (props: {[key: string]: never}) {
       w="100%"
       alignItems="center"
       justifyContent="center"
-      pt={['10%', '12%']}
+      mt={['10%', '12%']}
       flexWrap="wrap"
     >
       <Box w={['100%', '30%']} m={['0 5% 0 5%', '0 8% 0 0']}>
-        <Text fontFamily="Orbitron" fontWeight="bold" fontSize={['2em', '3.8em']}>
+        <Text fontFamily="Orbitron" fontWeight="bold" fontSize={['2.5em', '3.8em']}>
           All Solana tokens.<br />In one place.
         </Text>
-        <Text color="gray.100" fontSize={['1.0em', '1.2em']} pt="5%">
+        <Text color="gray.100" fontSize={['1.1em', '1.2em']} mt="8%">
           Register your SPL token metadata on-chain. Stop submitting PRs to the token-list repository.
         </Text>
       </Box>
@@ -70,9 +70,8 @@ function LearnMore (props: {[key: string]: never}) {
     <Box
       fontFamily="Orbitron"
       fontWeight="bold"
-      fontSize="1.8em"
-      mt="12%"
-      display={['none', 'block']}
+      fontSize={['1.2em', '1.8em']}
+      mt={['22%', '12%']}
     >
       <Text>
         Learn More
@@ -105,7 +104,7 @@ function Explainer (props: {[key: string]: never}) {
       w="100%"
       alignItems="center"
       justifyContent="center"
-      pt={['18%', '12%']}
+      mt={['18%', '12%']}
       flexDirection={['column-reverse', 'row']}
     >
       <Box w={['100%', '20%']} mr={['0', '8%']}>
@@ -116,7 +115,7 @@ function Explainer (props: {[key: string]: never}) {
           borderRadius="10px"
           m="auto"
           mt={['15%', 0]}
-          pb="10%"
+          pb="6%"
         >
           <Flex
             bg="gray.600"
@@ -136,8 +135,8 @@ function Explainer (props: {[key: string]: never}) {
         </Box>
       </Box>
       <Text w={['80%', '40%']} fontSize={['1.0em', '1.2em']}>
-        Currently, Solana uses a manual GitHub repository to keep track of registered SPL token metadata (the name of the token, the ticker, and URL of the logo).<br /><br />
-        Instead, this on-chain token registry allows <strong>anyone to register this metadata, permissionlessly</strong>. No more manual PR reviews to get your token onto Phantom.
+        Currently, Solana uses a GitHub repository to keep track of SPL token metadata, like the name of the token and a URL of the logo.<br /><br />
+        Instead, this on-chain token registry lets you <strong>register this metadata permissionlessly</strong>. No more manual PR reviews to get your token onto Phantom.
       </Text>
     </Flex>
   )
@@ -151,20 +150,22 @@ interface CallToActionBoxProps {
   buttonText: string;
   buttonTextMobile: string;
   buttonVariant: string;
+  isFirst: boolean;
 }
 function CallToActionBox (props: CallToActionBoxProps) {
   const ButtonWrapper = props.buttonWrapper
   return (
       <Flex
         w={['80%', '25%']}
-        m={['30% 6% 0 6%', '0 6% 35% 6%']}
+        m={['0 6% 0 6%', '0 6% 35% 6%']}
+        mt={props.isFirst ? '25%' : '30%'}
         flexDirection="column"
         alignItems="center"
       >
         <Text fontFamily="Orbitron" fontWeight="bold" fontSize={['1.3em', '1.7em']}>
           {props.mainText}
         </Text>
-        <Text pt="6%" pb="12%" fontSize={['1.0em', '1.2em']}>
+        <Text mt="6%" mb="12%" fontSize={['1.0em', '1.2em']}>
           {props.subText}
         </Text>
         <ButtonWrapper {...props.buttonWrapperProps}>
@@ -193,8 +194,8 @@ function CallToAction (props: {[key: string]: never}) {
   return (
     <Flex
       w="100%"
-      pt={['0', '18%']}
-      pb={['45%', '0']}
+      mt={['0', '18%']}
+      mb={['45%', '0']}
       alignItems="center"
       justifyContent="center"
       flexWrap="wrap"
@@ -210,6 +211,7 @@ function CallToAction (props: {[key: string]: never}) {
         buttonText="Read Docs"
         buttonTextMobile="Read Docs on GitHub"
         buttonVariant="read-docs"
+        isFirst={true}
       />
       <CallToActionBox
         buttonWrapper={RouterLink}
@@ -219,6 +221,7 @@ function CallToAction (props: {[key: string]: never}) {
         buttonText="Launch App"
         buttonTextMobile="Launch App"
         buttonVariant="launch-app"
+        isFirst={false}
       />
     </Flex>
   )
