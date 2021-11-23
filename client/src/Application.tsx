@@ -1,23 +1,23 @@
-import React from 'react';
+import React from 'react'
 
 import {
   Connection,
   PublicKey,
   Transaction
-} from '@solana/web3.js';
+} from '@solana/web3.js'
 
 import {
   TokenEntry,
   getAllTokensGenerator,
   createInstructionCreateEntry,
-  PROGRAM_ID,
-} from 'solana-token-registry';
+  PROGRAM_ID
+} from 'solana-token-registry'
 
 import {
   Formik,
   Form,
   Field
-} from 'formik';
+} from 'formik'
 
 import {
   Flex,
@@ -33,11 +33,11 @@ import {
   Input,
   LinkBox,
   LinkOverlay,
-  Text,
-} from '@chakra-ui/react';
+  Text
+} from '@chakra-ui/react'
 
-import { Header } from './Common';
-import quesLogo from './logos/question-logo.svg';
+import { Header } from './Common'
+import quesLogo from './logos/question-logo.svg'
 
 interface ReadWriteBoxProps {
   conn: Connection;
@@ -50,15 +50,14 @@ interface ReadBoxState {
 }
 
 class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
-
-  constructor(props: ReadWriteBoxProps) {
-    super(props);
+  constructor (props: ReadWriteBoxProps) {
+    super(props)
     this.state = {
-      allTokens: new Set<TokenEntry>(),
+      allTokens: new Set<TokenEntry>()
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     getAllTokensGenerator(this.props.conn, PROGRAM_ID).then(async (allTokensGenerator) => {
       const allTokens = new Set<TokenEntry>()
       for await (const token of allTokensGenerator) {
@@ -70,28 +69,28 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
     })
   }
 
-  render() {
-    let readBoxBody;
+  render () {
+    let readBoxBody
     if (this.state.allTokens.size === 0) {
-      readBoxBody = <Text h="70vh" p="5%">Loading...</Text>;
+      readBoxBody = <Text h="70vh" p="5%">Loading...</Text>
     } else {
-      const allTokensProcessed: React.ReactElement[] = [];
+      const allTokensProcessed: React.ReactElement[] = []
       this.state.allTokens.forEach((token) => {
-        let link: string = ""
+        let link: string = ''
         for (const [key, val] of token.extensions) {
-          if (key === "website") {
-            link = val;
+          if (key === 'website') {
+            link = val
           }
         }
-        if (link === "") {
+        if (link === '') {
           link = `https://explorer.solana.com/address/${token.mint}?cluster=devnet`
         }
         allTokensProcessed.push(
           <LinkBox key={token.mint.toString()}>
             <Flex alignItems="center" p="2%">
               <Image
-                w={["30px", "50px"]}
-                h={["30px", "50px"]}
+                w={['30px', '50px']}
+                h={['30px', '50px']}
                 src={token.logoURL}
                 fallbackSrc={quesLogo}
                 ml="2%"
@@ -106,16 +105,16 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
               <Text color="gray.100">{token.name}</Text>
             </Flex>
           </LinkBox>
-        );
-      });
-      readBoxBody = <Box h={["auto", "70vh"]} overflow={["auto", "scroll"]}>{allTokensProcessed}</Box>
+        )
+      })
+      readBoxBody = <Box h={['auto', '70vh']} overflow={['auto', 'scroll']}>{allTokensProcessed}</Box>
     }
     return (
       <Box
-        w={["90%", "30%"]}
+        w={['90%', '30%']}
         bg="gray.700"
         borderRadius="10px"
-        ml={["0", "5%"]}
+        ml={['0', '5%']}
       >
         <Text
           fontFamily="Orbitron"
@@ -129,46 +128,44 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
         </Text>
         {readBoxBody}
       </Box>
-    );
+    )
   }
-
 }
 
-function WriteBox(props: ReadWriteBoxProps) {
-
-  function validateMint(value: string) {
+function WriteBox (props: ReadWriteBoxProps) {
+  function validateMint (value: string) {
     if (!value) {
-      return "Mint is required."
+      return 'Mint is required.'
     } else if (value.length !== 44) {
-      return "Mint must be 44 characters."
+      return 'Mint must be 44 characters.'
     }
     return null
   }
-  function validateSymbol(value: string) {
+  function validateSymbol (value: string) {
     if (!value) {
-      return "Symbol is required."
+      return 'Symbol is required.'
     } else {
       return null
     }
   }
-  function validateName(value: string) {
+  function validateName (value: string) {
     if (!value) {
-      return "Name is required."
+      return 'Name is required.'
     } else {
       return null
     }
   }
-  function validateLogoURL(value: string) {
+  function validateLogoURL (value: string) {
     if (!value) {
-      return "Logo URL is required."
+      return 'Logo URL is required.'
     } else {
       return null
     }
   }
 
-  function onSubmit(values: any, actions: any) {
+  function onSubmit (values: any, actions: any) {
     if (props.userPublicKey === PublicKey.default) {
-      alert("Please connect your wallet first.")
+      alert('Please connect your wallet first.')
       actions.setSubmitting(false)
       return
     }
@@ -176,40 +173,40 @@ function WriteBox(props: ReadWriteBoxProps) {
     /* Process the selected tags into an array. */
     const tags: string[] = []
     if (values.tagsStablecoin) {
-      tags.push("stablecoin")
+      tags.push('stablecoin')
     }
     if (values.tagsLPToken) {
-      tags.push("lp-token")
+      tags.push('lp-token')
     }
     if (values.tagsWrappedSollet) {
-      tags.push("wrapped-sollet")
+      tags.push('wrapped-sollet')
     }
     if (values.tagsWrappedWormhole) {
-      tags.push("wrapped-wormhole")
+      tags.push('wrapped-wormhole')
     }
     if (values.tagsLeveraged) {
-      tags.push("leveraged")
+      tags.push('leveraged')
     }
     if (values.tagsNFT) {
-      tags.push("nft")
+      tags.push('nft')
     }
     if (values.tagsTokenizedStock) {
-      tags.push("tokenized-stock")
+      tags.push('tokenized-stock')
     }
 
     /* Process the given extensions into an array. */
     const extensions: [string, string][] = []
-    if (values.extensionsWebsite !== "") {
-      extensions.push(["website", values.extensionsWebsite])
+    if (values.extensionsWebsite !== '') {
+      extensions.push(['website', values.extensionsWebsite])
     }
-    if (values.extensionsTwitter !== "") {
-      extensions.push(["twitter", values.extensionsTwitter])
+    if (values.extensionsTwitter !== '') {
+      extensions.push(['twitter', values.extensionsTwitter])
     }
-    if (values.extensionsDiscord !== "") {
-      extensions.push(["discord", values.extensionsDiscord])
+    if (values.extensionsDiscord !== '') {
+      extensions.push(['discord', values.extensionsDiscord])
     }
-    if (values.extensionsCoingeckoID !== "") {
-      extensions.push(["coingeckoId", values.extensionsCoingeckoID])
+    if (values.extensionsCoingeckoID !== '') {
+      extensions.push(['coingeckoId', values.extensionsCoingeckoID])
     }
 
     createInstructionCreateEntry(
@@ -221,43 +218,42 @@ function WriteBox(props: ReadWriteBoxProps) {
       values.name,
       values.logoURL,
       tags,
-      extensions,
+      extensions
     ).then((ix) => {
-      const tx = new Transaction().add(ix);
+      const tx = new Transaction().add(ix)
       props.conn.getRecentBlockhash().then((blockhashObj) => {
-        tx.recentBlockhash = blockhashObj.blockhash;
-        tx.feePayer = props.userPublicKey;
+        tx.recentBlockhash = blockhashObj.blockhash
+        tx.feePayer = props.userPublicKey
         window.solana.signTransaction(tx).then((signedTx: any) => {
           props.conn.sendRawTransaction(signedTx.serialize()).then((signature) => {
-            console.log("Signature for CreateEntry:", signature)
+            console.log('Signature for CreateEntry:', signature)
             actions.setSubmitting(false)
           }, (error) => {
-            let logLine: string = ""
+            let logLine: string = ''
             for (const line of error.logs) {
-              if (line.includes("Error")) {
-                logLine = line.replace("Program log: ", "")
+              if (line.includes('Error')) {
+                logLine = line.replace('Program log: ', '')
                 break
               }
             }
-            if (logLine === "") {
+            if (logLine === '') {
               logLine = error.logs.join('\n')
             }
-            actions.setErrors({submitButton: logLine})
+            actions.setErrors({ submitButton: logLine })
             actions.setSubmitting(false)
           })
         })
       })
     })
-
   }
 
   return (
     <Box
-      w={["90%", "30%"]}
+      w={['90%', '30%']}
       bg="gray.700"
       borderRadius="10px"
-      mr={["0", "5%"]}
-      mb={["5%", "0"]}
+      mr={['0', '5%']}
+      mb={['5%', '0']}
     >
       <Text
         fontFamily="Orbitron"
@@ -270,13 +266,13 @@ function WriteBox(props: ReadWriteBoxProps) {
       >
         Register a Token
       </Text>
-      <Box h={["auto", "70vh"]} overflow={["auto", "scroll"]} p="5% 5% 0 5%">
+      <Box h={['auto', '70vh']} overflow={['auto', 'scroll']} p="5% 5% 0 5%">
         <Formik
           initialValues={{
-            mint: "",
-            symbol: "",
-            name: "",
-            logoURL: "",
+            mint: '',
+            symbol: '',
+            name: '',
+            logoURL: '',
             tagsStablecoin: false,
             tagsLPToken: false,
             tagsWrappedSollet: false,
@@ -284,10 +280,10 @@ function WriteBox(props: ReadWriteBoxProps) {
             tagsLeveraged: false,
             tagsNFT: false,
             tagsTokenizedStock: false,
-            extensionsWebsite: "",
-            extensionsTwitter: "",
-            extensionsDiscord: "",
-            extensionsCoingeckoID: "",
+            extensionsWebsite: '',
+            extensionsTwitter: '',
+            extensionsDiscord: '',
+            extensionsCoingeckoID: ''
           }}
           onSubmit={onSubmit}
         >
@@ -386,7 +382,7 @@ function WriteBox(props: ReadWriteBoxProps) {
               <Flex flexWrap="wrap">
                 <Field name="extensionsWebsite">
                   {(fprops: {field: any}) => (
-                    <FormControl p="2%" w={["100%", "50%"]}>
+                    <FormControl p="2%" w={['100%', '50%']}>
                       <FormLabel htmlFor="extensionsWebsite">Website</FormLabel>
                       <Input {...fprops.field} id="extensionsWebsite" />
                     </FormControl>
@@ -394,7 +390,7 @@ function WriteBox(props: ReadWriteBoxProps) {
                 </Field>
                 <Field name="extensionsTwitter">
                   {(fprops: {field: any}) => (
-                    <FormControl p="2%" w={["100%", "50%"]}>
+                    <FormControl p="2%" w={['100%', '50%']}>
                       <FormLabel htmlFor="extensionsTwitter">Twitter</FormLabel>
                       <Input {...fprops.field} id="extensionsTwitter" />
                     </FormControl>
@@ -402,7 +398,7 @@ function WriteBox(props: ReadWriteBoxProps) {
                 </Field>
                 <Field name="extensionsDiscord">
                   {(fprops: {field: any}) => (
-                    <FormControl p="2%" w={["100%", "50%"]}>
+                    <FormControl p="2%" w={['100%', '50%']}>
                       <FormLabel htmlFor="extensionsDiscord">Discord</FormLabel>
                       <Input {...fprops.field} id="extensionsDiscord" />
                     </FormControl>
@@ -410,7 +406,7 @@ function WriteBox(props: ReadWriteBoxProps) {
                 </Field>
                 <Field name="extensionsCoingeckoID">
                   {(fprops: {field: any}) => (
-                    <FormControl p="2%" w={["100%", "50%"]}>
+                    <FormControl p="2%" w={['100%', '50%']}>
                       <FormLabel htmlFor="extensionsCoingeckoID">CoinGecko ID</FormLabel>
                       <Input {...fprops.field} id="extensionsCoingeckoID" />
                     </FormControl>
@@ -437,15 +433,14 @@ function WriteBox(props: ReadWriteBoxProps) {
         </Formik>
       </Box>
     </Box>
-  );
-
+  )
 }
 
-function ReadAndWriteBoxes(props: ReadWriteBoxProps) {
+function ReadAndWriteBoxes (props: ReadWriteBoxProps) {
   return (
     <Flex
       w="100%"
-      pt={["5%", "5%"]}
+      pt={['5%', '5%']}
       alignItems="center"
       justifyContent="center"
       flexWrap="wrap"
@@ -453,52 +448,49 @@ function ReadAndWriteBoxes(props: ReadWriteBoxProps) {
       <WriteBox {...props} />
       <ReadBox {...props} />
     </Flex>
-  );
+  )
 }
 
 class Application extends React.Component<{}, ReadWriteBoxProps> {
-
-  constructor(props: {[key: string]: never}) {
-    super(props);
+  constructor (props: {[key: string]: never}) {
+    super(props)
     this.state = {
       conn: new Connection('https://api.devnet.solana.com', 'confirmed'),
       isConnectedToPhantom: false,
-      userPublicKey: PublicKey.default,
-    };
-  }
-
-  componentDidMount() {
-    if (window.solana !== undefined) {
-      window.solana.on("connect", async () => {
-        this.setState({
-          isConnectedToPhantom: true,
-          userPublicKey: window.solana._publicKey,
-        });
-      });
-      window.solana.on("disconnect", async () => {
-        this.setState({
-          isConnectedToPhantom: false,
-          userPublicKey: PublicKey.default,
-        });
-      });
-      window.solana.connect();
+      userPublicKey: PublicKey.default
     }
   }
 
-  render() {
+  componentDidMount () {
+    if (window.solana !== undefined) {
+      window.solana.on('connect', async () => {
+        this.setState({
+          isConnectedToPhantom: true,
+          userPublicKey: window.solana._publicKey
+        })
+      })
+      window.solana.on('disconnect', async () => {
+        this.setState({
+          isConnectedToPhantom: false,
+          userPublicKey: PublicKey.default
+        })
+      })
+      window.solana.connect()
+    }
+  }
+
+  render () {
     return (
       <Box>
-        <Box display={["none", "block"]}>
+        <Box display={['none', 'block']}>
           <Header suppressLaunchApp isConnectedToPhantom={this.state.isConnectedToPhantom} />
         </Box>
-        <Box pt={["0", "7vh"]}>
+        <Box pt={['0', '7vh']}>
           <ReadAndWriteBoxes {...this.state} />
         </Box>
       </Box>
-    );
+    )
   }
-
 }
 
-export default Application;
-
+export default Application

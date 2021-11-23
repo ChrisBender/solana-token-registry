@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link as RouterLink } from "react-router-dom";
+import React from 'react'
+import { Link as RouterLink } from 'react-router-dom'
 
 import {
   Flex,
@@ -7,13 +7,13 @@ import {
   Link,
   Button,
   ButtonGroup,
-  Text,
-} from '@chakra-ui/react';
+  Text
+} from '@chakra-ui/react'
 
-import solanaLogo from './logos/solana-logo-color-white.svg';
+import solanaLogo from './logos/solana-logo-color-white.svg'
 
 declare global {
-  interface Window {
+  interface Window { // eslint-disable-line no-unused-vars
     solana: any;
   }
 }
@@ -24,51 +24,50 @@ interface HeaderProps {
   suppressPhantom?: boolean;
   isConnectedToPhantom?: boolean;
 }
-export function Header(props: HeaderProps) {
+export function Header (props: HeaderProps) {
   return (
     <Flex
       w="100%"
       h="7vh"
       bg="gray.800"
-      position={["static", "fixed"]}
+      position={['static', 'fixed']}
       alignItems="center"
-      justifyContent={["left", "center"]}
+      justifyContent={['left', 'center']}
       flexWrap="wrap"
     >
-      <Flex ml={["8%", "0"]}>
-        <Image src={solanaLogo} ml={["0", "100px"]} width={["80px", "150px"]} />
+      <Flex ml={['8%', '0']}>
+        <Image src={solanaLogo} ml={['0', '100px']} width={['80px', '150px']} />
         <Text
           ml="10px"
           fontFamily="Orbitron"
           fontWeight="bold"
           color="gray.100"
-          fontSize={["0.7em", "1.0em"]}
+          fontSize={['0.7em', '1.0em']}
         >
           Token Registry
         </Text>
       </Flex>
-      <ButtonGroup ml="auto" mr="50px" display={["none", "block"]}>
+      <ButtonGroup ml="auto" mr="50px" display={['none', 'block']}>
         <Link href="https://github.com/ChrisBender/solana-token-registry" isExternal>
-          <Button variant="github" display={props.suppressGitHub ? "none": "inline"}>
+          <Button variant="github" display={props.suppressGitHub ? 'none' : 'inline'}>
             GitHub
           </Button>
         </Link>
         <RouterLink to="/app">
-          <Button variant="launch-app" display={props.suppressLaunchApp ? "none" : "inline"}>
+          <Button variant="launch-app" display={props.suppressLaunchApp ? 'none' : 'inline'}>
             Launch App
           </Button>
         </RouterLink>
         <Button
           variant="launch-app"
-          display={props.suppressPhantom ? "none": "inline"}
+          display={props.suppressPhantom ? 'none' : 'inline'}
           onClick={(e) => {
             props.isConnectedToPhantom ? window.solana.disconnect() : window.solana.connect()
           }}
         >
-          {props.isConnectedToPhantom ? "Disconnect Wallet" : "Connect to Phantom"}
+          {props.isConnectedToPhantom ? 'Disconnect Wallet' : 'Connect to Phantom'}
         </Button>
       </ButtonGroup>
     </Flex>
-  );
+  )
 }
-

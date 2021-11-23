@@ -28,7 +28,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "lint": "",
+    "lint": "npx eslint src/ --ext .tsx --fix",
     "build": "react-scripts build",
     "deploy": "npm run build && bash ./scripts/deploy.sh"
   },
@@ -49,5 +49,15 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.1",
+    "eslint-plugin-react": "^7.27.1"
   }
 }

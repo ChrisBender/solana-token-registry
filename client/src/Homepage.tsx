@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link as RouterLink } from "react-router-dom";
+import React from 'react'
+import { Link as RouterLink } from 'react-router-dom'
 
 import {
   Flex,
@@ -7,53 +7,52 @@ import {
   Image,
   Link,
   Button,
-  Text,
-} from '@chakra-ui/react';
+  Text
+} from '@chakra-ui/react'
 
-import usdcLogo from './logos/usd-coin-usdc-logo.svg';
-import wethLogo from './logos/ethereum-eth-logo.svg';
-import quesLogo from './logos/question-logo.svg';
-import prSymbolGreen from './logos/pr-green.svg';
-import prSymbolWhite from './logos/pr-white.svg';
-import xSymbol from './logos/x.svg';
+import usdcLogo from './logos/usd-coin-usdc-logo.svg'
+import wethLogo from './logos/ethereum-eth-logo.svg'
+import quesLogo from './logos/question-logo.svg'
+import prSymbolGreen from './logos/pr-green.svg'
+import prSymbolWhite from './logos/pr-white.svg'
+import xSymbol from './logos/x.svg'
 
-import { Header } from './Common';
+import { Header } from './Common'
 
 interface RegistryIllustrationTokenProps {
   logo: string,
   ticker: string,
 }
-function RegistryIllustrationToken(props: RegistryIllustrationTokenProps) {
+function RegistryIllustrationToken (props: RegistryIllustrationTokenProps) {
   return (
-    <Flex padding="4%" fontSize={["1.1em", "1.5em"]} alignItems="center">
-      <Image src={props.logo} float="left" height={["30px", "50px"]} pl="2%" pr="3%" />
+    <Flex padding="4%" fontSize={['1.1em', '1.5em']} alignItems="center">
+      <Image src={props.logo} float="left" height={['30px', '50px']} pl="2%" pr="3%" />
       <Box>
-        {"{key: " + props.ticker + ", ...}"}
+        {'{key: ' + props.ticker + ', ...}'}
       </Box>
     </Flex>
-  );
-  
+  )
 }
 
-function MainTextAndIllustration(props: {[key: string]: never}) {
+function MainTextAndIllustration (props: {[key: string]: never}) {
   return (
     <Flex
       w="100%"
       alignItems="center"
       justifyContent="center"
-      pt={["10%", "12%"]}
+      pt={['10%', '12%']}
       flexWrap="wrap"
     >
-      <Box w={["100%", "30%"]} m={["0 5% 0 5%", "0 8% 0 0"]}>
-        <Text fontFamily="Orbitron" fontWeight="bold" fontSize={["2em", "3.8em"]}>
+      <Box w={['100%', '30%']} m={['0 5% 0 5%', '0 8% 0 0']}>
+        <Text fontFamily="Orbitron" fontWeight="bold" fontSize={['2em', '3.8em']}>
           All Solana tokens.<br />In one place.
         </Text>
-        <Text color="gray.100" fontSize={["1.0em", "1.2em"]} pt="5%">
-          Register your SPL token metadata on-chain. Stop submitting PRs to the token-list repository. 
+        <Text color="gray.100" fontSize={['1.0em', '1.2em']} pt="5%">
+          Register your SPL token metadata on-chain. Stop submitting PRs to the token-list repository.
         </Text>
       </Box>
-      <Box w={["100%", "30%"]}>
-        <Box w={["65%", "70%"]} fontFamily="Courier New" bg="gray.700" borderRadius="10px" m="auto" mt={["15%", 0]}>
+      <Box w={['100%', '30%']}>
+        <Box w={['65%', '70%']} fontFamily="Courier New" bg="gray.700" borderRadius="10px" m="auto" mt={['15%', 0]}>
           <Box bg="gray.600" borderRadius="10px 10px 0 0" p="3%" pl="5%" fontSize="1.3em">
             0xregistry
           </Box>
@@ -66,14 +65,14 @@ function MainTextAndIllustration(props: {[key: string]: never}) {
   )
 }
 
-function LearnMore(props: {[key: string]: never}) {
+function LearnMore (props: {[key: string]: never}) {
   return (
     <Box
       fontFamily="Orbitron"
       fontWeight="bold"
       fontSize="1.8em"
       mt="12%"
-      display={["none", "block"]}
+      display={['none', 'block']}
     >
       <Text>
         Learn More
@@ -82,42 +81,41 @@ function LearnMore(props: {[key: string]: never}) {
         \/
       </Text>
     </Box>
-  );
+  )
 }
 
 interface PullRequestIllustrationEntryProps {
   text: string;
 }
-function PullRequestIllustrationEntry(props: PullRequestIllustrationEntryProps) {
+function PullRequestIllustrationEntry (props: PullRequestIllustrationEntryProps) {
   return (
-    <Flex padding="4%" fontSize={["0.9em", "1.3em"]} color="gray.100" alignItems="center">
-      <Image src={prSymbolGreen} float="left" height={["10px", "15px"]} pl="2%" pr="4%" />
+    <Flex padding="4%" fontSize={['0.9em', '1.3em']} color="gray.100" alignItems="center">
+      <Image src={prSymbolGreen} float="left" height={['10px', '15px']} pl="2%" pr="4%" />
       <Text>
         {props.text}
       </Text>
-      <Image src={xSymbol} height={["5px", "8px"]} pl="3%" />
+      <Image src={xSymbol} height={['5px', '8px']} pl="3%" />
     </Flex>
-  );
-  
+  )
 }
 
-function Explainer(props: {[key: string]: never}) {
+function Explainer (props: {[key: string]: never}) {
   return (
     <Flex
       w="100%"
       alignItems="center"
       justifyContent="center"
-      pt={["18%", "12%"]}
-      flexDirection={["column-reverse", "row"]}
+      pt={['18%', '12%']}
+      flexDirection={['column-reverse', 'row']}
     >
-      <Box w={["100%", "20%"]} mr={["0", "8%"]}>
+      <Box w={['100%', '20%']} mr={['0', '8%']}>
         <Box
-          w={["50%", "80%"]}
+          w={['50%', '80%']}
           fontFamily="Courier New"
           bg="gray.700"
           borderRadius="10px"
           m="auto"
-          mt={["15%", 0]}
+          mt={['15%', 0]}
           pb="10%"
         >
           <Flex
@@ -127,7 +125,7 @@ function Explainer(props: {[key: string]: never}) {
             pl="5%"
             alignItems="center"
           >
-            <Image src={prSymbolWhite} float="left" height={["10px", "15px"]} pl="2%" pr="4%" />
+            <Image src={prSymbolWhite} float="left" height={['10px', '15px']} pl="2%" pr="4%" />
             <Box fontSize="1.3em" fontWeight="bold">
               523 Open
             </Box>
@@ -137,13 +135,12 @@ function Explainer(props: {[key: string]: never}) {
           <PullRequestIllustrationEntry text="SAFEMOON update" />
         </Box>
       </Box>
-      <Text w={["80%", "40%"]} fontSize={["1.0em", "1.2em"]}>
+      <Text w={['80%', '40%']} fontSize={['1.0em', '1.2em']}>
         Currently, Solana uses a manual GitHub repository to keep track of registered SPL token metadata (the name of the token, the ticker, and URL of the logo).<br /><br />
         Instead, this on-chain token registry allows <strong>anyone to register this metadata, permissionlessly</strong>. No more manual PR reviews to get your token onto Phantom.
       </Text>
     </Flex>
-  );
-  
+  )
 }
 
 interface CallToActionBoxProps {
@@ -155,19 +152,19 @@ interface CallToActionBoxProps {
   buttonTextMobile: string;
   buttonVariant: string;
 }
-function CallToActionBox(props: CallToActionBoxProps) {
-  const ButtonWrapper = props.buttonWrapper;
+function CallToActionBox (props: CallToActionBoxProps) {
+  const ButtonWrapper = props.buttonWrapper
   return (
       <Flex
-        w={["80%", "25%"]}
-        m={["30% 6% 0 6%", "0 6% 35% 6%"]}
+        w={['80%', '25%']}
+        m={['30% 6% 0 6%', '0 6% 35% 6%']}
         flexDirection="column"
         alignItems="center"
       >
-        <Text fontFamily="Orbitron" fontWeight="bold" fontSize={["1.3em", "1.7em"]}>
+        <Text fontFamily="Orbitron" fontWeight="bold" fontSize={['1.3em', '1.7em']}>
           {props.mainText}
         </Text>
-        <Text pt="6%" pb="12%" fontSize={["1.0em", "1.2em"]}>
+        <Text pt="6%" pb="12%" fontSize={['1.0em', '1.2em']}>
           {props.subText}
         </Text>
         <ButtonWrapper {...props.buttonWrapperProps}>
@@ -175,7 +172,7 @@ function CallToActionBox(props: CallToActionBoxProps) {
             variant={props.buttonVariant}
             fontSize="1.2em"
             w="200px"
-            display={["none", "block"]}
+            display={['none', 'block']}
           >
             {props.buttonText}
           </Button>
@@ -183,21 +180,21 @@ function CallToActionBox(props: CallToActionBoxProps) {
             variant={props.buttonVariant}
             fontSize="1.0em"
             w="200px"
-            display={["block", "none"]}
+            display={['block', 'none']}
           >
             {props.buttonTextMobile}
           </Button>
         </ButtonWrapper>
       </Flex>
-  );
+  )
 }
 
-function CallToAction(props: {[key: string]: never}) {
+function CallToAction (props: {[key: string]: never}) {
   return (
     <Flex
       w="100%"
-      pt={["0", "18%"]}
-      pb={["45%", "0"]}
+      pt={['0', '18%']}
+      pb={['45%', '0']}
       alignItems="center"
       justifyContent="center"
       flexWrap="wrap"
@@ -205,8 +202,8 @@ function CallToAction(props: {[key: string]: never}) {
       <CallToActionBox
         buttonWrapper={Link}
         buttonWrapperProps={{
-          href: "https://github.com/ChrisBender/solana-token-registry/blob/master/js/src/index.ts#L279",
-          isExternal: true,
+          href: 'https://github.com/ChrisBender/solana-token-registry/blob/master/js/src/index.ts#L279',
+          isExternal: true
         }}
         mainText="For Developers"
         subText="Use the JavaScript API to read and write to the token registry."
@@ -216,7 +213,7 @@ function CallToAction(props: {[key: string]: never}) {
       />
       <CallToActionBox
         buttonWrapper={RouterLink}
-        buttonWrapperProps={{to: "/app"}}
+        buttonWrapperProps={{ to: '/app' }}
         mainText="For Token Creators"
         subText="Use the in-browser app to register your token on-chain."
         buttonText="Launch App"
@@ -224,15 +221,14 @@ function CallToAction(props: {[key: string]: never}) {
         buttonVariant="launch-app"
       />
     </Flex>
-  );
-  
+  )
 }
 
-function Homepage(props: {[key: string]: never}) {
+function Homepage (props: {[key: string]: never}) {
   return (
     <Box>
       <Header suppressPhantom />
-      <Box pt={["0", "7vh"]}>
+      <Box pt={['0', '7vh']}>
         <MainTextAndIllustration />
         <LearnMore />
         <Explainer />
@@ -240,8 +236,6 @@ function Homepage(props: {[key: string]: never}) {
       </Box>
     </Box>
   )
-  
 }
 
-export default Homepage;
-
+export default Homepage
