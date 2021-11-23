@@ -386,7 +386,7 @@ function WriteBox(props: ReadWriteBoxProps) {
               <Flex flexWrap="wrap">
                 <Field name="extensionsWebsite">
                   {(fprops: {field: any}) => (
-                    <FormControl p="2%" w={["auto", "50%"]}>
+                    <FormControl p="2%" w={["100%", "50%"]}>
                       <FormLabel htmlFor="extensionsWebsite">Website</FormLabel>
                       <Input {...fprops.field} id="extensionsWebsite" />
                     </FormControl>
@@ -394,7 +394,7 @@ function WriteBox(props: ReadWriteBoxProps) {
                 </Field>
                 <Field name="extensionsTwitter">
                   {(fprops: {field: any}) => (
-                    <FormControl p="2%" w={["auto", "50%"]}>
+                    <FormControl p="2%" w={["100%", "50%"]}>
                       <FormLabel htmlFor="extensionsTwitter">Twitter</FormLabel>
                       <Input {...fprops.field} id="extensionsTwitter" />
                     </FormControl>
@@ -402,7 +402,7 @@ function WriteBox(props: ReadWriteBoxProps) {
                 </Field>
                 <Field name="extensionsDiscord">
                   {(fprops: {field: any}) => (
-                    <FormControl p="2%" w={["auto", "50%"]}>
+                    <FormControl p="2%" w={["100%", "50%"]}>
                       <FormLabel htmlFor="extensionsDiscord">Discord</FormLabel>
                       <Input {...fprops.field} id="extensionsDiscord" />
                     </FormControl>
@@ -410,7 +410,7 @@ function WriteBox(props: ReadWriteBoxProps) {
                 </Field>
                 <Field name="extensionsCoingeckoID">
                   {(fprops: {field: any}) => (
-                    <FormControl p="2%" w={["auto", "50%"]}>
+                    <FormControl p="2%" w={["100%", "50%"]}>
                       <FormLabel htmlFor="extensionsCoingeckoID">CoinGecko ID</FormLabel>
                       <Input {...fprops.field} id="extensionsCoingeckoID" />
                     </FormControl>
@@ -488,7 +488,9 @@ class Application extends React.Component<{}, ReadWriteBoxProps> {
   render() {
     return (
       <Box>
-        <Header suppressLaunchApp isConnectedToPhantom={this.state.isConnectedToPhantom} />
+        <Box display={["none", "block"]}>
+          <Header suppressLaunchApp isConnectedToPhantom={this.state.isConnectedToPhantom} />
+        </Box>
         <Box pt={["0", "7vh"]}>
           <ReadAndWriteBoxes {...this.state} />
         </Box>
