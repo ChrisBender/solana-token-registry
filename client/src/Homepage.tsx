@@ -141,9 +141,25 @@ function Explainer (props: {[key: string]: never}) {
         </Box>
       </Box>
       <Text w={['80%', '40%']} fontSize={['1.0em', '1.2em']}>
-        When users interact with apps built on Solana, they usually want to refer to tokens by a simple name (like &quot;USDC&quot; or &quot;wBTC&quot;), rather than a 44-character-long token address.<br /><br />
-        In order for apps like Phantom or Serum to perform this translation, they use a token metadata registry. Currently, the standard for the Solana ecosystem is a <Link href="https://github.com/solana-labs/token-list" isExternal>single GitHub repository</Link> managed by Solana Labs. This repository, however, is slow for token creators: Adding a new token requres manual approval from a Solana developer.<br /><br />
-        Instead, this on-chain token registry lets token creators <strong>register this metadata permissionlessly</strong>. No more pull requests needed to get a token onto Phantom.
+        <Text pb={['20%', '5%']}>
+          When users interact with apps built on Solana,
+          they usually want to refer to tokens by a simple name (like &quot;USDC&quot; or &quot;wBTC&quot;),
+          rather than a 44-character-long token address.
+        </Text>
+        <Text pb={['20%', '5%']}>
+          In order for apps like Phantom or Serum to perform this translation,
+          they use a token metadata registry.
+          Currently, the standard for the Solana ecosystem is
+          a <Link href="https://github.com/solana-labs/token-list" isExternal>single GitHub repository</Link> managed
+          by Solana Labs.
+          This repository, however, is slow for token creators:
+          Adding a new token requres manual approval from a Solana developer.
+        </Text>
+        <Text pb={['20%', '5%']}>
+          Instead, this on-chain token registry lets token
+          creators <strong>register this metadata permissionlessly</strong>.
+          No more pull requests needed to get a token onto Phantom.
+        </Text>
       </Text>
     </Flex>
   )
