@@ -297,26 +297,26 @@ impl<'a> Processor {
         )?;
         Self::assert_initialized_ata(&account_fee_destination_ata)?;
 
-        if account_user.key.to_bytes() != registry_meta.fee_update_authority {
-            Self::assert_initialized_ata(&account_fee_source_ata)?;
-            let transfer_instruction = spl_token::instruction::transfer(
-                account_token_program.key,
-                account_fee_source_ata.key,
-                account_fee_destination_ata.key,
-                account_user.key,
-                &[account_user.key],
-                registry_meta.fee_amount,
-            )?;
-            solana_program::program::invoke(
-                &transfer_instruction,
-                &[
-                    account_token_program.clone(),
-                    account_fee_source_ata.clone(),
-                    account_fee_destination_ata.clone(),
-                    account_user.clone(),
-                ],
-            )?;
-        }
+        // if account_user.key.to_bytes() != registry_meta.fee_update_authority {
+        //     Self::assert_initialized_ata(&account_fee_source_ata)?;
+        //     let transfer_instruction = spl_token::instruction::transfer(
+        //         account_token_program.key,
+        //         account_fee_source_ata.key,
+        //         account_fee_destination_ata.key,
+        //         account_user.key,
+        //         &[account_user.key],
+        //         registry_meta.fee_amount,
+        //     )?;
+        //     solana_program::program::invoke(
+        //         &transfer_instruction,
+        //         &[
+        //             account_token_program.clone(),
+        //             account_fee_source_ata.clone(),
+        //             account_fee_destination_ata.clone(),
+        //             account_user.clone(),
+        //         ],
+        //     )?;
+        // }
 
         let mut registry_node_new;
         if account_registry_new.data_len() == 0 {
