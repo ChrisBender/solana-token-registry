@@ -35,17 +35,21 @@ export function Header (props: HeaderProps) {
       justifyContent={['left', 'center']}
       flexWrap="wrap"
     >
-      <Flex ml={['8%', '0']}>
-        <Image src={solanaLogo} ml={['0', '100px']} width={['80px', '150px']} />
-        <Text
-          ml="10px"
-          fontFamily="Orbitron"
-          fontWeight="bold"
-          color="gray.100"
-          fontSize={['0.7em', '1.0em']}
-        >
-          Token Registry
-        </Text>
+      <Flex ml={['30px', '100px']}>
+        <RouterLink to="/">
+          <Flex>
+            <Image src={solanaLogo} width={['80px', '150px']} />
+            <Text
+              ml="10px"
+              fontFamily="Orbitron"
+              fontWeight="bold"
+              color="gray.100"
+              fontSize={['0.7em', '1.0em']}
+            >
+              Token Registry
+            </Text>
+          </Flex>
+        </RouterLink>
       </Flex>
       <ButtonGroup ml="auto" mr="50px" display={['none', 'block']}>
         <Link href="https://github.com/ChrisBender/solana-token-registry" isExternal>

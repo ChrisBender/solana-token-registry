@@ -77,7 +77,7 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
     let readBoxBody
     if (this.state.allTokens.size === 0) {
       readBoxBody = (
-        <Center mt="5%">
+        <Center m={['8%', '5%']}>
           <Spinner size="lg" />
         </Center>
       )
