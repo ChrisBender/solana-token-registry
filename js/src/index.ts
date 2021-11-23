@@ -218,7 +218,7 @@ export async function getRegistryStateGenerator (
     deleted: +borshRegistryHeadAccount.deleted !== 0
   }
 
-  async function* registryNodeAccountsIterator() {
+  async function * registryNodeAccountsIterator (): RegistryNodeAccount {
     yield registryHeadAccount
     let prevRegistryNode = registryHeadAccount
     while (prevRegistryNode.nextRegistryNode.toString() !== PublicKey.default.toString()) {
@@ -305,20 +305,18 @@ export async function getAllTokens (
 
 /**
  * Returns a generator for all the registered tokens.
- * 
+ *
  */
 export async function getAllTokensGenerator (
   connection: Connection,
   programId: PublicKey
 ): Promise<AsyncGenerator<TokenEntry>> {
   const registryStateGenerator = await getRegistryStateGenerator(connection, programId)
-  async function* allTokensIterator() {
-    if (registryStateGenerator === null) {
-      return
-    } else {
-      const [registryMetaAccount, registryNodeAccountsGenerator] = registryStateGenerator
-      let prevTokenEntry: null | TokenEntry = null;
-      let hasSkippedOne = false;
+  async function * allTokensIterator (): TokenEntry {
+    if (registryStateGenerator !== null) {
+      const registryNodeAccountsGenerator = registryStateGenerator[1]
+      let prevTokenEntry: null | TokenEntry = null
+      let hasSkippedOne = false
       for await (const registryNodeAccount of registryNodeAccountsGenerator) {
         if (prevTokenEntry !== null) {
           if (hasSkippedOne) {
@@ -340,7 +338,7 @@ export async function getAllTokensGenerator (
     }
   }
   return allTokensIterator()
-}   
+}
 
 /**
  * Returns a sanitized list of all the registered tokens. Throw away all
