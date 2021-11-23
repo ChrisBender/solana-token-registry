@@ -33,6 +33,7 @@ import {
   Input,
   LinkBox,
   LinkOverlay,
+  Spinner,
   Text
 } from '@chakra-ui/react'
 
@@ -62,8 +63,11 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
       const allTokens = new Set<TokenEntry>()
       for await (const token of allTokensGenerator) {
         allTokens.add(token)
-        if (allTokens.size >= 8) {
+        if (allTokens.size % 5 === 0) {
           this.setState({ allTokens })
+        }
+        if (allTokens.size >= 30) {
+          return
         }
       }
     })
@@ -72,9 +76,13 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
   render () {
     let readBoxBody
     if (this.state.allTokens.size === 0) {
-      readBoxBody = <Text h="70vh" p="5%">Loading...</Text>
+      readBoxBody = (
+        <Center mt="5%">
+          <Spinner size="lg" />
+        </Center>
+      )
     } else {
-      const allTokensProcessed: React.ReactElement[] = []
+      readBoxBody = []
       this.state.allTokens.forEach((token) => {
         let link: string = ''
         for (const [key, val] of token.extensions) {
@@ -85,7 +93,7 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
         if (link === '') {
           link = `https://explorer.solana.com/address/${token.mint}?cluster=devnet`
         }
-        allTokensProcessed.push(
+        readBoxBody.push(
           <LinkBox key={token.mint.toString()}>
             <Flex alignItems="center" p="2%">
               <Image
@@ -107,7 +115,6 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
           </LinkBox>
         )
       })
-      readBoxBody = <Box h={['auto', '70vh']} overflow={['auto', 'scroll']}>{allTokensProcessed}</Box>
     }
     return (
       <Box
@@ -126,7 +133,9 @@ class ReadBox extends React.Component<ReadWriteBoxProps, ReadBoxState> {
         >
           Read All Tokens
         </Text>
-        {readBoxBody}
+        <Box h={['auto', '70vh']} overflow={['auto', 'scroll']}>
+          {readBoxBody}
+        </Box>
       </Box>
     )
   }
