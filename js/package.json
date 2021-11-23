@@ -1,6 +1,6 @@
 {
   "name": "solana-token-registry",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "main": "./lib/index.js",
   "scripts": {
     "lint": "npx eslint . --ext .ts --fix",

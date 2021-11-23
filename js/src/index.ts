@@ -218,7 +218,7 @@ export async function getRegistryStateGenerator (
     deleted: +borshRegistryHeadAccount.deleted !== 0
   }
 
-  async function * registryNodeAccountsIterator (): RegistryNodeAccount {
+  async function * registryNodeAccountsIterator (): AsyncGenerator<RegistryNodeAccount> {
     yield registryHeadAccount
     let prevRegistryNode = registryHeadAccount
     while (prevRegistryNode.nextRegistryNode.toString() !== PublicKey.default.toString()) {
@@ -312,7 +312,7 @@ export async function getAllTokensGenerator (
   programId: PublicKey
 ): Promise<AsyncGenerator<TokenEntry>> {
   const registryStateGenerator = await getRegistryStateGenerator(connection, programId)
-  async function * allTokensIterator (): TokenEntry {
+  async function * allTokensIterator (): AsyncGenerator<TokenEntry> {
     if (registryStateGenerator !== null) {
       const registryNodeAccountsGenerator = registryStateGenerator[1]
       let prevTokenEntry: null | TokenEntry = null
