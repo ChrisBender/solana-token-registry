@@ -17,11 +17,12 @@ pushd js > /dev/null
 popd > /dev/null
 npm run js:deploy
 
-# Upgrade the client version.
+# Upgrade the client version and deploy the client.
 sleep 2
 pushd client > /dev/null
   npm install --upgrade solana-token-registry
 popd > /dev/null
+npm run client:deploy
 
 # Initialize the registry, and add all tokens from original tokenlist.json
 node ./client/initRegistry.js
