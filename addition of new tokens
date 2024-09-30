@@ -1,0 +1,210 @@
+
+### Step 5: Additional Setup
+1. Ensure you have the Solana tool suite installed.
+2. Use the SPL Token CLI to create and manage your token mint.
+3. You will need to manage the authority for minting in your deployment workflow.
+
+### Important Notes
+- This example is quite simplified. In a production environment, you will want to include error handling, access controls, and testing.
+- Token minting requires appropriate permissions. Ensure your authority account has minting rights for the token mint.
+- Upgrade logic typically involves creating a new version of the program and deploying it, rather than having it within the smart contract.
+
+You can initialize a Git repository in this directory and push it to GitHub using:
+
+```bash
+git init
+git add .
+git commit -m "Initial commit for Solana token upgrade"
+git remote add origin <YOUR_GITHUB_REPO_URL>
+git push -u origin master
+
+
+
+
+solana-token-upgrade/
+├── Cargo.toml
+├── src/
+│   ├── lib.rs
+│   ├── state.rs
+│   └── instruction.rs
+└── README.md
+
+
+[package]
+name = "solana-token-upgrade"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+solana-program = "1.10.32"  # Ensure you use the latest stable version
+spl-token = "3.4.0"         # Ensure you use the latest stable version
+thiserror = "1.0"           # For error handling
+
+
+use borsh::{BorshDeserialize, BorshSerialize};
+use solana_program::pubkey::Pubkey;
+
+#[derive(BorshSerialize, BorshDeserialize, Debug)]
+pub struct TokenState {
+    pub mint: Pubkey,
+    pub owner: Pubkey,
+    pub total_supply: u64,
+}
+
+impl TokenState {
+    pub fn new(mint: Pubkey, owner: Pubkey) -> Self {
+        Self {
+            mint,
+            owner,
+            total_supply: 0,
+        }
+    }
+}
+
+
+use borsh::{BorshDeserialize, BorshSerialize};
+use solana_program::{program_error::ProgramError, pubkey::Pubkey};
+
+#[derive(BorshSerialize, BorshDeserialize, Debug)]
+pub enum TokenInstruction {
+    MintTokens { amount: u64 },
+    UpgradeProgram { new_program_id: Pubkey },
+}
+
+impl TokenInstruction {
+    pub fn unpack(input: &[u8]) -> Result<Self, ProgramError> {
+        let (&tag, rest) = input.split_first().ok_or(ProgramError::InvalidInstructionData)?;
+
+        Ok(match tag {
+            0 => {
+                let amount = u64::from_le_bytes(rest.try_into().map_err(|_| ProgramError::InvalidInstructionData)?);
+                Self::MintTokens { amount }
+            }
+            1 => {
+                let new_program_id = Pubkey::try_from(&rest[..32]).map_err(|_| ProgramError::InvalidInstructionData)?;
+                Self::UpgradeProgram { new_program_id }
+            }
+            _ => Err(ProgramError::InvalidInstructionData),
+        })
+    }
+}
+
+use solana_program::{
+    account_info::{next_account_info, AccountInfo},
+    entrypoint,
+    entrypoint::ProgramResult,
+    msg,
+    program_error::ProgramError,
+    pubkey::Pubkey,
+    sysvar::Sysvar,
+};
+use spl_token::instruction as token_instruction;
+
+mod state;
+mod instruction;
+
+use state::TokenState;
+use instruction::TokenInstruction;
+
+entrypoint!(process_instruction);
+
+fn process_instruction(
+    program_id: &Pubkey,
+    accounts: &[AccountInfo],
+    instruction_data: &[u8],
+) -> ProgramResult {
+    let instruction = TokenInstruction::unpack(instruction_data)?;
+    let accounts_iter = &mut accounts.iter();
+
+    match instruction {
+        TokenInstruction::MintTokens { amount } => {
+            let token_mint_account = next_account_info(accounts_iter)?;
+            let destination_account = next_account_info(accounts_iter)?;
+            let authority_account = next_account_info(accounts_iter)?;
+
+            // Check that the authority is valid
+            if !authority_account.is_signer {
+                return Err(ProgramError::MissingRequiredSignature);
+            }
+
+            // Mint tokens to the destination account
+            msg!("Minting {} tokens...", amount);
+            token_instruction::mint_to(
+                &spl_token::id(),
+                &token_mint_account.key,
+                &destination_account.key,
+                &authority_account.key,
+                &[],
+                amount,
+            )?;
+            msg!("Mint successful!");
+
+            // Update total supply in state
+            let mut state = TokenState::try_from_slice(&token_mint_account.data.borrow())?;
+            state.total_supply += amount;
+            state.serialize(&mut &mut token_mint_account.data.borrow_mut()[..])?;
+
+            Ok(())
+        }
+        TokenInstruction::UpgradeProgram { new_program_id } => {
+            // Logic for upgrading the program
+            msg!("Upgrading program to new ID: {:?}", new_program_id);
+            // Upgrade logic typically involves deploying a new version externally.
+            Ok(())
+        }
+    }
+}
+
+# Solana Token Upgrade Example
+
+This repository contains a Solana smart contract for minting tokens and supporting program upgrades.
+
+## Requirements
+
+- Rust
+- Solana CLI
+- SPL Token CLI
+
+## Building the Contract
+
+1. Install Rust and set up your environment.
+2. Build the project:
+
+   ```bash
+   cargo build-bpf
+
+solana program deploy path/to/your_program.so
+
+{
+  "instruction": "MintTokens",
+  "amount": 1000,
+  "accounts": [
+    "<TOKEN_MINT_ACCOUNT>",
+    "<DESTINATION_ACCOUNT>",
+    "<AUTHORITY_ACCOUNT>"
+  ]
+}
+
+
+### Step 6: Additional Setup
+1. Install the Solana tool suite and create your token using the SPL Token CLI.
+2. Ensure you manage the authority for minting correctly, and grant permissions as needed.
+3. You can extend the upgrade logic to handle more complex scenarios, such as maintaining state across upgrades or adding migration scripts.
+
+### Important Notes
+- This implementation includes error handling, structured state management, and a clear separation of concerns.
+- The upgrade logic in the provided example is a placeholder, as actual upgrades are usually handled via the Solana CLI or deployment tools, rather than in the smart contract itself.
+- Always test thoroughly on a testnet before deploying to the mainnet, as smart contracts are immutable once deployed.
+
+### Pushing to GitHub
+You can initialize a Git repository in this directory and push it to GitHub using:
+
+```bash
+git init
+git add .
+git commit -m "Initial commit for Solana token upgrade example"
+git remote add origin <YOUR_GITHUB_REPO_URL>
+git push -u origin master
